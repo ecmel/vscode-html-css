@@ -25,14 +25,14 @@ class Snippet {
             let content = dummyClass + inlineStyle[1];
             this._document = lst.TextDocument.create('', 'css', 1, content);
             this._stylesheet = service.parseStylesheet(this._document);
-            this._position = new vsc.Position(this._document.lineCount, content.length);
+            this._position = new vsc.Position(this._document.lineCount - 1, content.length);
         } else {
             let style = styleRegEx.exec(text);
             if (style) {
                 let content = style[1];
                 this._document = lst.TextDocument.create('', 'css', 1, content);
                 this._stylesheet = service.parseStylesheet(this._document);
-                this._position = new vsc.Position(this._document.lineCount, content.length);
+                this._position = new vsc.Position(this._document.lineCount - 1, content.length);
             }
         }
     }
