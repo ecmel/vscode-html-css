@@ -19,22 +19,25 @@ class Snippet {
         let start = new vsc.Position(0, 0);
         let range = new vsc.Range(start, position);
         let text = document.getText(range);
+        let tag;
 
-        let inlineStyle = inlineRegEx.exec(text);
-        if (inlineStyle) {
-            let content = dummyClass + inlineStyle[1];
-            this._document = lst.TextDocument.create('', 'css', 1, content);
-            this._stylesheet = service.parseStylesheet(this._document);
-            this._position = new vsc.Position(this._document.lineCount - 1, content.length);
-        } else {
-            let style = styleRegEx.exec(text);
-            if (style) {
-                let content = style[1];
-                this._document = lst.TextDocument.create('', 'css', 1, content);
-                this._stylesheet = service.parseStylesheet(this._document);
-                this._position = new vsc.Position(this._document.lineCount - 1, content.length);
-            }
+        tag = inlineRegEx.exec(text);
+        if (tag) {
+            this.init(dummyClass + tag[1], position);
+            return;
         }
+
+        tag = styleRegEx.exec(text);
+        if (tag) {
+            this.init(tag[1], position);
+            return;
+        }
+    }
+
+    private init(content: string, position: vsc.Position): void {
+        this._document = lst.TextDocument.create('', 'css', 1, content);
+        this._stylesheet = service.parseStylesheet(this._document);
+        this._position = new vsc.Position(this._document.lineCount - 1, position.character);
     }
 
     public get document(): lst.TextDocument {

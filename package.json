@@ -2,7 +2,7 @@
     "name": "vscode-html-css",
     "displayName": "HTML CSS Support",
     "description": "CSS support in HTML documents",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "publisher": "ecmel",
     "homepage": "https://github.com/ecmel/vscode-html-css",
     "bugs": "https://github.com/ecmel/vscode-html-css/issues",
