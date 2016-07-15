@@ -6,8 +6,7 @@ import * as css from 'vscode-css-languageservice';
 
 let service = css.getCSSLanguageService();
 let styleRegEx = /<style>([^<]*$)/;
-let inlineRegEx = /style=["|']([^"^']*$)/;
-let dummyClass = '.dummy {\n';
+let styleInlineRegEx = /style=["|']([^"^']*$)/;
 
 class Snippet {
 
@@ -16,14 +15,14 @@ class Snippet {
     private _position: lst.Position;
 
     constructor(document: vsc.TextDocument, position: vsc.Position) {
+
         let start = new vsc.Position(0, 0);
         let range = new vsc.Range(start, position);
         let text = document.getText(range);
-        let tag;
 
-        tag = inlineRegEx.exec(text);
+        let tag = styleInlineRegEx.exec(text);
         if (tag) {
-            this.init(dummyClass + tag[1], position.character);
+            this.init('.c {\n' + tag[1], position.character);
             return;
         }
 
