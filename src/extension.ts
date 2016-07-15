@@ -7,7 +7,7 @@ import * as css from 'vscode-css-languageservice';
 let service = css.getCSSLanguageService();
 let styleRegEx = /<style>([^<]*$)/;
 let inlineRegEx = /style=["|']([^"^']*$)/;
-let dummyClass = '.dummy {';
+let dummyClass = '.dummy {\n';
 
 class Snippet {
 
@@ -23,21 +23,21 @@ class Snippet {
 
         tag = inlineRegEx.exec(text);
         if (tag) {
-            this.init(dummyClass + tag[1], position);
+            this.init(dummyClass + tag[1], position.character);
             return;
         }
 
         tag = styleRegEx.exec(text);
         if (tag) {
-            this.init(tag[1], position);
+            this.init(tag[1], position.character);
             return;
         }
     }
 
-    private init(content: string, position: vsc.Position): void {
+    private init(content: string, character: number): void {
         this._document = lst.TextDocument.create('', 'css', 1, content);
         this._stylesheet = service.parseStylesheet(this._document);
-        this._position = new vsc.Position(this._document.lineCount - 1, position.character);
+        this._position = new vsc.Position(this._document.lineCount - 1, character);
     }
 
     public get document(): lst.TextDocument {
