@@ -6,7 +6,9 @@ Visual Studio Code html document CSS support.
 
 Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice)
 
-Supports multi line style and inline style tags.
+Supports style tags
+Supports style attributes
+Supports class completion
 
 ## Installation
 
