@@ -10,6 +10,7 @@ import * as css from 'vscode-css-languageservice';
 let service = css.getCSSLanguageService();
 let map: { [index: string]: vsc.CompletionItem[]; } = {};
 let regex = /[.]([\w-]+)/g;
+let glob = '**/*.css';
 
 class Snippet {
 
@@ -165,13 +166,13 @@ function parse(uri: vsc.Uri) {
 export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
-    let fsw = vsc.workspace.createFileSystemWatcher("**/*.css");
+    let fsw = vsc.workspace.createFileSystemWatcher(glob);
     fsw.onDidCreate(parse);
     fsw.onDidChange(parse);
     fsw.onDidDelete(parse);
     context.subscriptions.push(fsw);
 
-    vsc.workspace.findFiles("**/*.css", "").then(function (uris: vsc.Uri[]) {
+    vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
       for (let i = 0; i < uris.length; i++) {
         parse(uris[i]);
       }
