@@ -1,10 +1,15 @@
+// (c) 2016 Ecmel Ercan
+
 'use strict';
 
+import * as fs from 'fs';
 import * as vsc from 'vscode';
 import * as lst from 'vscode-languageserver-types';
 import * as css from 'vscode-css-languageservice';
 
 let service = css.getCSSLanguageService();
+let map: { [index: string]: vsc.CompletionItem[]; } = {};
+let regex = /[.]([\w-]+)/g;
 
 class Snippet {
 
@@ -94,7 +99,7 @@ class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
 
 class ClassServer implements vsc.CompletionItemProvider {
 
-  private regex = [/class=["|']([^"^']*$)/, /<style>([\s\S]*)<\/style>/];
+  private regex = [/class=["|']([^"^']*$)/, /<style>([\s\S]*)<\/style>/g];
 
   provideCompletionItems(document: vsc.TextDocument, position: vsc.Position, token: vsc.CancellationToken): vsc.CompletionList {
     let start = new vsc.Position(0, 0);
@@ -103,24 +108,25 @@ class ClassServer implements vsc.CompletionItemProvider {
 
     let tag = this.regex[0].exec(text);
     if (tag) {
-      let style = this.regex[1].exec(document.getText());
-      if (style) {
+      let style;
+      let count = 0;
+      while (style = this.regex[1].exec(document.getText())) {
+        count++;
         let snippet = new Snippet(style[1]);
         let symbols = service.findDocumentSymbols(snippet.document, snippet.stylesheet);
-        let ci: vsc.CompletionItem[] = [];
-        for (let i = 0; i < symbols.length; i++) {
-          if (symbols[i].kind !== 5) {
-            continue;
-          }
-          let c = symbols[i].name.split(/\s/);
-          for (let j = 0; j < c.length; j++) {
-            if (c[j].startsWith('.')) {
-              ci.push(new vsc.CompletionItem(c[j].substr(1)));
-            }
-          }
-        }
-        return new vsc.CompletionList(ci);
+        pushSymbols('INTERNAL' + count, symbols);
       }
+      let items: { [index: string]: vsc.CompletionItem; } = {};
+      for (let key in map) {
+        for (let item of map[key]) {
+          items[item.label] = item;
+        }
+      }
+      let ci: vsc.CompletionItem[] = [];
+      for (let item in items) {
+        ci.push(items[item]);
+      }
+      return new vsc.CompletionList(ci, false);
     }
     return null;
   }
@@ -130,8 +136,30 @@ class ClassServer implements vsc.CompletionItemProvider {
   }
 }
 
+function pushSymbols(key: string, symbols: lst.SymbolInformation[]) {
+  let ci: vsc.CompletionItem[] = [];
+  for (let i = 0; i < symbols.length; i++) {
+    if (symbols[i].kind !== 5) {
+      continue;
+    }
+    let symbol;
+    while (symbol = regex.exec(symbols[i].name)) {
+      let item = new vsc.CompletionItem(symbol[1]);
+      ci.push(item);
+    }
+  }
+  map[key] = ci;
+}
+
 function parse(uri: vsc.Uri) {
-  console.log(uri.fsPath);
+  fs.readFile(uri.fsPath, 'utf8', function (err: any, data: string) {
+    if (err) {
+      delete map[uri.fsPath];
+    }
+    let doc = lst.TextDocument.create(uri.fsPath, 'css', 1, data);
+    let symbols = service.findDocumentSymbols(doc, service.parseStylesheet(doc));
+    pushSymbols(uri.fsPath, symbols);
+  });
 }
 
 export function activate(context: vsc.ExtensionContext) {
