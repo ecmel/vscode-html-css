@@ -4,11 +4,11 @@ Visual Studio Code html document CSS support.
 
 ## Features
 
-Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice)
+- CSS class name completion on HTML class attribute.
+- Style attribute CSS completion.
+- Style tag CSS completion.
+- Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice).
 
-Supports style tags
-Supports style attributes
-Supports class completion
 
 ## Installation
 
