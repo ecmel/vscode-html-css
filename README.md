@@ -4,11 +4,10 @@ Visual Studio Code html document CSS support.
 
 ## Features
 
-- CSS class name completion on HTML class attribute.
-- Style attribute CSS completion.
-- Style tag CSS completion.
+- Class attribute name completion.
+- Style attribute CSS completion and hover.
+- Style tag CSS completion and hover.
 - Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice).
-
 
 ## Installation
 
