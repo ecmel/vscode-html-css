@@ -3,6 +3,7 @@
 'use strict';
 
 import * as fs from 'fs';
+import * as path from 'path';
 import * as vsc from 'vscode';
 import * as lst from 'vscode-languageserver-types';
 import * as css from 'vscode-css-languageservice';
@@ -10,7 +11,6 @@ import * as css from 'vscode-css-languageservice';
 let service = css.getCSSLanguageService();
 let map: { [index: string]: vsc.CompletionItem[]; } = {};
 let regex = /[.]([\w-]+)/g;
-let glob = '**/*.css';
 
 class Snippet {
 
@@ -166,10 +166,14 @@ function parse(uri: vsc.Uri) {
 export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
+    let glob = '**/*.css';
+
     let fsw = vsc.workspace.createFileSystemWatcher(glob);
     fsw.onDidCreate(parse);
     fsw.onDidChange(parse);
-    fsw.onDidDelete(parse);
+    fsw.onDidDelete(function (uri: vsc.Uri) {
+      delete map[uri.fsPath];
+    });
     context.subscriptions.push(fsw);
 
     vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
