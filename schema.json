@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Resource",
+  "description": "Resource",
+  "type": "object",
+  "properties": {
+    "dir": {
+      "description": "Directory Resources",
+      "type": "object"
+    },
+    "css": {
+      "description": "CSS Resources",
+      "type": "object"
+    },
+    "js": {
+      "description": "JS Resources",
+      "type": "object"
+    }
+  }
+}

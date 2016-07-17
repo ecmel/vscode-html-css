@@ -25,6 +25,14 @@
   "activationEvents": [
     "onLanguage:html"
   ],
+  "contributes": {
+    "jsonValidation": [
+      {
+        "fileMatch": "resource.json",
+        "url": "./schema.json"
+      }
+    ]
+  },
   "main": "./out/src/extension",
   "scripts": {
     "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
