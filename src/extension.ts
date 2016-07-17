@@ -131,7 +131,7 @@ class ClassServer implements vsc.CompletionItemProvider {
       for (let item in items) {
         ci.push(items[item]);
       }
-      return new vsc.CompletionList(ci, false);
+      return new vsc.CompletionList(ci);
     }
     return null;
   }
@@ -169,16 +169,21 @@ function parse(uri: vsc.Uri) {
 }
 
 function parseResource(resource: any): string {
-  let glob = '{'
+  let glob = ''
+  let count = 0;
   for (let key in resource.css) {
     for (let item of resource.css[key]) {
-      glob = glob + item + ',';
+      glob += item + ',';
+      count++;
     }
   }
-  if (glob.substring(glob.length - 1) === ',') {
-    glob = glob.substring(0, glob.length - 2);
+  if (count > 0) {
+    glob = glob.slice(0, -1);
   }
-  return glob + '}';
+  if (count > 1) {
+    glob = '{' + glob + '}';
+  }
+  return glob;
 }
 
 export function activate(context: vsc.ExtensionContext) {
