@@ -4,6 +4,7 @@
     "description": "CSS support in HTML documents",
     "version": "0.0.12",
     "publisher": "ecmel",
+    "license": "MIT",
     "homepage": "https://github.com/ecmel/vscode-html-css",
     "bugs": "https://github.com/ecmel/vscode-html-css/issues",
     "icon": "icon.png",
