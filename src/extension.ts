@@ -168,19 +168,30 @@ function parse(uri: vsc.Uri) {
   });
 }
 
+function parseResource(resource: any): string {
+  let glob = '{'
+  for (let key in resource.css) {
+    for (let item of resource.css[key]) {
+      glob = glob + item + ',';
+    }
+  }
+  if (glob.substring(glob.length - 1) === ',') {
+    glob = glob.substring(0, glob.length - 2);
+  }
+  return glob + '}';
+}
+
 export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
     let resourceJson = path.resolve(vsc.workspace.rootPath, 'resource.json');
     fs.readFile(resourceJson, 'utf8', function (err: any, data: string) {
-      let glob;
+      let glob: string;
 
       if (err) {
         glob = '**/*.css';
       } else {
-        let resource = JSON.parse(data);
-        //TODO
-        glob = '**/*.css';
+        glob = parseResource(JSON.parse(data));
       }
 
       let fsw = vsc.workspace.createFileSystemWatcher(glob);
