@@ -126,6 +126,7 @@ class ClassServer implements vsc.CompletionItemProvider {
           items[item.label] = item;
         }
       }
+
       let ci: vsc.CompletionItem[] = [];
       for (let item in items) {
         ci.push(items[item]);
@@ -159,10 +160,11 @@ function parse(uri: vsc.Uri) {
   fs.readFile(uri.fsPath, 'utf8', function (err: any, data: string) {
     if (err) {
       delete map[uri.fsPath];
+    } else {
+      let doc = lst.TextDocument.create(uri.fsPath, 'css', 1, data);
+      let symbols = service.findDocumentSymbols(doc, service.parseStylesheet(doc));
+      pushSymbols(uri.fsPath, symbols);
     }
-    let doc = lst.TextDocument.create(uri.fsPath, 'css', 1, data);
-    let symbols = service.findDocumentSymbols(doc, service.parseStylesheet(doc));
-    pushSymbols(uri.fsPath, symbols);
   });
 }
 
