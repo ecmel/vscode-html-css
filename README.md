@@ -29,6 +29,7 @@ Sample resource.json file:
       "src/main/resources/main/css/style.css"
     ]
   }
+}
 ```
 
 ## Installation
