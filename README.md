@@ -1,6 +1,6 @@
-# vscode-html-css README
+# vscode-html-css
 
-Visual Studio Code html document CSS support.
+Visual Studio Code HTML document CSS class and style support.
 
 ## Features
 
