@@ -3,7 +3,6 @@
 'use strict';
 
 import * as fs from 'fs';
-import * as path from 'path';
 import * as vsc from 'vscode';
 import * as lst from 'vscode-languageserver-types';
 import * as css from 'vscode-css-languageservice';
