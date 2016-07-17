@@ -109,14 +109,17 @@ class ClassServer implements vsc.CompletionItemProvider {
 
     let tag = this.regex[0].exec(text);
     if (tag) {
+      let internal: lst.SymbolInformation[] = [];
       let style;
-      let count = 0;
       while (style = this.regex[1].exec(document.getText())) {
-        count++;
         let snippet = new Snippet(style[1]);
         let symbols = service.findDocumentSymbols(snippet.document, snippet.stylesheet);
-        pushSymbols('INTERNAL' + count, symbols);
+        for (let symbol of symbols) {
+          internal.push(symbol);
+        }
       }
+      pushSymbols('internal', internal);
+
       let items: { [index: string]: vsc.CompletionItem; } = {};
       for (let key in map) {
         for (let item of map[key]) {
