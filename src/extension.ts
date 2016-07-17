@@ -2,10 +2,10 @@
 
 'use strict';
 
-import * as fs from 'fs';
 import * as vsc from 'vscode';
 import * as lst from 'vscode-languageserver-types';
 import * as css from 'vscode-css-languageservice';
+import * as fs from 'fs';
 
 let service = css.getCSSLanguageService();
 let map: { [index: string]: vsc.CompletionItem[]; } = {};

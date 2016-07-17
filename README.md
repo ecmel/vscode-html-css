@@ -1,6 +1,6 @@
 # vscode-html-css
 
-Visual Studio Code HTML document CSS class and style support.
+CSS support in HTML documents.
 
 ## Features
 
