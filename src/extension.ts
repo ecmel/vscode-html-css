@@ -39,7 +39,7 @@ class Snippet {
 
 class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
 
-  private regex = [/style=["|']([^"^']*$)/, /<style>([^<]*$)/];
+  private regex = [/style=["|']([^"^']*$)/, /<style[\s\S]*>([^<]*$)/];
 
   private convertCompletionList(list: lst.CompletionList): vsc.CompletionList {
     let ci: vsc.CompletionItem[] = [];
@@ -100,7 +100,7 @@ class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
 
 class ClassServer implements vsc.CompletionItemProvider {
 
-  private regex = [/class=["|']([^"^']*$)/, /<style>([\s\S]*)<\/style>/g];
+  private regex = [/class=["|']([^"^']*$)/, /<style[\s\S]*>([\s\S]*)<\/style>/g];
 
   provideCompletionItems(document: vsc.TextDocument, position: vsc.Position, token: vsc.CancellationToken): vsc.CompletionList {
     let start = new vsc.Position(0, 0);
