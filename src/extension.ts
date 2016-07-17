@@ -1,6 +1,6 @@
-// (c) 2016 Ecmel Ercan
-
 'use strict';
+
+// (c) 2016 Ecmel Ercan
 
 import * as vsc from 'vscode';
 import * as lst from 'vscode-languageserver-types';
