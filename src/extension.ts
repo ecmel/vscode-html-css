@@ -6,6 +6,7 @@ import * as vsc from 'vscode';
 import * as lst from 'vscode-languageserver-types';
 import * as css from 'vscode-css-languageservice';
 import * as fs from 'fs';
+import * as path from 'path';
 
 let service = css.getCSSLanguageService();
 let map: { [index: string]: vsc.CompletionItem[]; } = {};
@@ -170,20 +171,31 @@ function parse(uri: vsc.Uri) {
 export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
-    let glob = '**/*.css';
+    let resourceJson = path.resolve(vsc.workspace.rootPath, 'resource.json');
+    fs.readFile(resourceJson, 'utf8', function (err: any, data: string) {
+      let glob;
 
-    let fsw = vsc.workspace.createFileSystemWatcher(glob);
-    fsw.onDidCreate(parse);
-    fsw.onDidChange(parse);
-    fsw.onDidDelete(function (uri: vsc.Uri) {
-      delete map[uri.fsPath];
-    });
-    context.subscriptions.push(fsw);
-
-    vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
-      for (let i = 0; i < uris.length; i++) {
-        parse(uris[i]);
+      if (err) {
+        glob = '**/*.css';
+      } else {
+        let resource = JSON.parse(data);
+        //TODO
+        glob = '**/*.css';
       }
+
+      let fsw = vsc.workspace.createFileSystemWatcher(glob);
+      fsw.onDidCreate(parse);
+      fsw.onDidChange(parse);
+      fsw.onDidDelete(function (uri: vsc.Uri) {
+        delete map[uri.fsPath];
+      });
+      context.subscriptions.push(fsw);
+
+      vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
+        for (let i = 0; i < uris.length; i++) {
+          parse(uris[i]);
+        }
+      });
     });
   }
 
