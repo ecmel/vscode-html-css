@@ -6,15 +6,27 @@
   "properties": {
     "dir": {
       "description": "Directory Resources",
-      "type": "object"
+      "type": "object",
+      "additionalProperties": {
+        "description": "Directory paths",
+        "type": "array"
+      }
     },
     "css": {
       "description": "CSS Resources",
-      "type": "object"
+      "type": "object",
+      "additionalProperties": {
+        "description": "CSS file paths",
+        "type": "array"
+      }
     },
     "js": {
       "description": "JS Resources",
-      "type": "object"
+      "type": "object",
+      "additionalProperties": {
+        "description": "JS file paths",
+        "type": "array"
+      }
     }
   }
 }
