@@ -199,19 +199,21 @@ export function activate(context: vsc.ExtensionContext) {
         glob = parseResource(JSON.parse(data));
       }
 
-      let fsw = vsc.workspace.createFileSystemWatcher(glob);
-      fsw.onDidCreate(parse);
-      fsw.onDidChange(parse);
-      fsw.onDidDelete(function (uri: vsc.Uri) {
-        delete map[uri.fsPath];
-      });
-      context.subscriptions.push(fsw);
-
       vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
         for (let i = 0; i < uris.length; i++) {
           parse(uris[i]);
         }
       });
+
+      let fsw = vsc.workspace.createFileSystemWatcher(glob);
+
+      fsw.onDidCreate(parse);
+      fsw.onDidChange(parse);
+      fsw.onDidDelete(function (uri: vsc.Uri) {
+        delete map[uri.fsPath];
+      });
+
+      context.subscriptions.push(fsw);
     });
   }
 
