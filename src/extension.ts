@@ -231,7 +231,7 @@ export function activate(context: vsc.ExtensionContext) {
 
   // LANGUAGE CLIENT
 
-  let serverModule = context.asAbsolutePath(path.join('out', 'src', 'server.js'));
+  let serverModule = context.asAbsolutePath(path.join('out', 'srv', 'server.js'));
   let debugOptions = { execArgv: ["--nolazy", "--debug=6004"] };
 
   let serverOptions: lc.ServerOptions = {
