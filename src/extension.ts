@@ -190,6 +190,7 @@ export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
     let resourceJson = path.resolve(vsc.workspace.rootPath, 'resource.json');
+
     fs.readFile(resourceJson, 'utf8', function (err: any, data: string) {
       let glob: string;
 
@@ -205,15 +206,15 @@ export function activate(context: vsc.ExtensionContext) {
         }
       });
 
-      let fsw = vsc.workspace.createFileSystemWatcher(glob);
+      let watcher = vsc.workspace.createFileSystemWatcher(glob);
 
-      fsw.onDidCreate(parse);
-      fsw.onDidChange(parse);
-      fsw.onDidDelete(function (uri: vsc.Uri) {
+      watcher.onDidCreate(parse);
+      watcher.onDidChange(parse);
+      watcher.onDidDelete(function (uri: vsc.Uri) {
         delete map[uri.fsPath];
       });
 
-      context.subscriptions.push(fsw);
+      context.subscriptions.push(watcher);
     });
   }
 
