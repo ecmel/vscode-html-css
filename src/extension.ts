@@ -3,6 +3,7 @@
 // (c) 2016 Ecmel Ercan
 
 import * as vsc from 'vscode';
+import * as lc from 'vscode-languageclient';
 import * as lst from 'vscode-languageserver-types';
 import * as css from 'vscode-css-languageservice';
 import * as fs from 'fs';
@@ -226,6 +227,24 @@ export function activate(context: vsc.ExtensionContext) {
   let classServer = new ClassServer();
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider('html', classServer));
+
+
+  // LANGUAGE CLIENT
+
+  let serverModule = context.asAbsolutePath(path.join('out', 'src', 'server.js'));
+  let debugOptions = { execArgv: ["--nolazy", "--debug=6004"] };
+
+  let serverOptions: lc.ServerOptions = {
+    run: { module: serverModule, transport: lc.TransportKind.ipc },
+    debug: { module: serverModule, transport: lc.TransportKind.ipc, options: debugOptions }
+  }
+
+  let clientOptions: lc.LanguageClientOptions = {
+    documentSelector: ['html']
+  }
+
+  let client = new lc.LanguageClient('HTML CSS Support', serverOptions, clientOptions).start();
+  context.subscriptions.push(client);
 }
 
 export function deactivate() {
