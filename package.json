@@ -47,6 +47,7 @@
     "vscode-languageclient": "2.3.0",
     "vscode-languageserver": "2.2.1",
     "vscode-languageserver-types": "1.0.1",
-    "vscode-css-languageservice": "1.0.4"
+    "vscode-css-languageservice": "1.0.4",
+    "htmlparser2": "3.9.0"
   }
 }
