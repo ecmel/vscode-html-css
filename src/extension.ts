@@ -3,7 +3,6 @@
 // (c) 2016 Ecmel Ercan
 
 import * as vsc from 'vscode';
-import * as lc from 'vscode-languageclient';
 import * as lst from 'vscode-languageserver-types';
 import * as css from 'vscode-css-languageservice';
 import * as fs from 'fs';
@@ -40,7 +39,7 @@ class Snippet {
 
 class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
 
-  private regex = [/style=["|']([^"^']*$)/, /<style[\s\S]*>([^<]*$)/];
+  private regex = [/style=["|']([^"^']*$)/i, /<style[\s\S]*>([^<]*$)/i];
 
   private convertCompletionList(list: lst.CompletionList): vsc.CompletionList {
     let ci: vsc.CompletionItem[] = [];
@@ -101,7 +100,7 @@ class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
 
 class ClassServer implements vsc.CompletionItemProvider {
 
-  private regex = [/class=["|']([^"^']*$)/, /<style[\s\S]*>([\s\S]*)<\/style>/g];
+  private regex = [/class=["|']([^"^']*$)/i, /<style[\s\S]*>([\s\S]*)<\/style>/ig];
 
   provideCompletionItems(document: vsc.TextDocument, position: vsc.Position, token: vsc.CancellationToken): vsc.CompletionList {
     let start = new vsc.Position(0, 0);
@@ -227,24 +226,6 @@ export function activate(context: vsc.ExtensionContext) {
   let classServer = new ClassServer();
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider('html', classServer));
-
-
-  // LANGUAGE CLIENT
-
-  let serverModule = context.asAbsolutePath(path.join('out', 'srv', 'server.js'));
-  let debugOptions = { execArgv: ["--nolazy", "--debug=6004"] };
-
-  let serverOptions: lc.ServerOptions = {
-    run: { module: serverModule, transport: lc.TransportKind.ipc },
-    debug: { module: serverModule, transport: lc.TransportKind.ipc, options: debugOptions }
-  }
-
-  let clientOptions: lc.LanguageClientOptions = {
-    documentSelector: ['html']
-  }
-
-  let client = new lc.LanguageClient('HTML CSS Support', serverOptions, clientOptions).start();
-  context.subscriptions.push(client);
 }
 
 export function deactivate() {
