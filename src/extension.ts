@@ -220,12 +220,15 @@ export function activate(context: vsc.ExtensionContext) {
 
   let styleServer = new StyleServer();
 
-  context.subscriptions.push(vsc.languages.registerCompletionItemProvider('html', styleServer));
-  context.subscriptions.push(vsc.languages.registerHoverProvider('html', styleServer));
+  context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
+    ['html', 'laravel-blade'], styleServer));
+  context.subscriptions.push(vsc.languages.registerHoverProvider(
+    ['html', 'laravel-blade'], styleServer));
 
   let classServer = new ClassServer();
 
-  context.subscriptions.push(vsc.languages.registerCompletionItemProvider('html', classServer));
+  context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
+    ['html', 'laravel-blade'], classServer));
 }
 
 export function deactivate() {

@@ -11,10 +11,14 @@ CSS support in HTML documents.
 - Supports optional resource.json file for fine tuned resource selection.
 - Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice).
 
-## resource.json
+## Supported Languages
 
-If a resource.json file is found in the root of the workspace, only files listed in the file will be
-used for class attribute completion.
+- html
+- laravel-blade
+
+## Optional resource.json
+
+If a resource.json file is found in the root of the workspace, only files listed in the file will be used for class attribute completion.
 
 ### Example
 
