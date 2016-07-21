@@ -141,7 +141,7 @@ class ClassServer implements vsc.CompletionItemProvider {
   }
 }
 
-function pushSymbols(key: string, symbols: lst.SymbolInformation[]) {
+function pushSymbols(key: string, symbols: lst.SymbolInformation[]): void {
   let ci: vsc.CompletionItem[] = [];
   for (let i = 0; i < symbols.length; i++) {
     if (symbols[i].kind !== 5) {
@@ -156,7 +156,7 @@ function pushSymbols(key: string, symbols: lst.SymbolInformation[]) {
   map[key] = ci;
 }
 
-function parse(uri: vsc.Uri) {
+function parse(uri: vsc.Uri): void {
   fs.readFile(uri.fsPath, 'utf8', function (err: any, data: string) {
     if (err) {
       delete map[uri.fsPath];
@@ -168,45 +168,31 @@ function parse(uri: vsc.Uri) {
   });
 }
 
-function parseResource(resource: any): string {
-  let glob = ''
-  let count = 0;
-  for (let key in resource.css) {
-    for (let item of resource.css[key]) {
-      glob += item + ',';
-      count++;
-    }
-  }
-  if (count > 0) {
-    glob = glob.slice(0, -1);
-  }
-  if (count > 1) {
-    glob = '{' + glob + '}';
-  }
-  return glob;
-}
-
 export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
     let resourceJson = path.resolve(vsc.workspace.rootPath, 'resource.json');
 
     fs.readFile(resourceJson, 'utf8', function (err: any, data: string) {
-      let glob: string;
+      let glob = '**/*.css';
 
       if (err) {
-        glob = '**/*.css';
+        vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
+          for (let i = 0; i < uris.length; i++) {
+            parse(uris[i]);
+          }
+        });
       } else {
-        glob = parseResource(JSON.parse(data));
+        let resources = JSON.parse(data);
+
+        for (let key in resources.css) {
+          for (let resource of resources.css[key]) {
+            parse(vsc.Uri.file(path.resolve(vsc.workspace.rootPath, resource)));
+          }
+        }
       }
 
-      vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
-        for (let i = 0; i < uris.length; i++) {
-          parse(uris[i]);
-        }
-      });
-
-      let watcher = vsc.workspace.createFileSystemWatcher(glob);
+      let watcher = vsc.workspace.createFileSystemWatcher(glob); // TODO
 
       watcher.onDidCreate(parse);
       watcher.onDidChange(parse);
