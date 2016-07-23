@@ -4,11 +4,11 @@
   "description": "Resource",
   "type": "object",
   "properties": {
-    "dir": {
-      "description": "Directory Resources",
+    "fonts": {
+      "description": "Font Resources",
       "type": "object",
       "additionalProperties": {
-        "description": "Directory paths",
+        "description": "Font paths",
         "type": "array"
       }
     },
