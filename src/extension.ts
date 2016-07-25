@@ -215,6 +215,10 @@ export function activate(context: vsc.ExtensionContext) {
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
     ['html', 'laravel-blade'], classServer));
+
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('laravel-blade', {
+    wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g
+  }));
 }
 
 export function deactivate() {
