@@ -10,7 +10,9 @@ import * as path from 'path';
 
 let service = css.getCSSLanguageService();
 let map: { [index: string]: vsc.CompletionItem[]; } = {};
-let regex = /[.]([\w-]+)/g;
+let regex = /[\.\#]([\w-]+)/g;
+let dot = vsc.CompletionItemKind.Class;
+let hash = vsc.CompletionItemKind.Reference;
 
 class Snippet {
 
@@ -129,7 +131,9 @@ class ClassServer implements vsc.CompletionItemProvider {
 
       let ci: vsc.CompletionItem[] = [];
       for (let item in items) {
-        ci.push(items[item]);
+        if (items[item].kind === dot) {
+          ci.push(items[item]);
+        }
       }
       return new vsc.CompletionList(ci);
     }
@@ -150,6 +154,7 @@ function pushSymbols(key: string, symbols: lst.SymbolInformation[]): void {
     let symbol;
     while (symbol = regex.exec(symbols[i].name)) {
       let item = new vsc.CompletionItem(symbol[1]);
+      item.kind = symbol[0].startsWith('.') ? dot : hash;
       ci.push(item);
     }
   }
