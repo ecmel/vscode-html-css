@@ -102,7 +102,7 @@ class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
 
 class ClassServer implements vsc.CompletionItemProvider {
 
-  private regex = [/class=["|']([^"^']*$)/i, /<style[\s\S]*>([\s\S]*)<\/style>/ig];
+  private regex = [/(class|id)=["|']([^"^']*$)/i, /<style[\s\S]*>([\s\S]*)<\/style>/ig];
 
   provideCompletionItems(document: vsc.TextDocument, position: vsc.Position, token: vsc.CancellationToken): vsc.CompletionList {
     let start = new vsc.Position(0, 0);
@@ -129,9 +129,13 @@ class ClassServer implements vsc.CompletionItemProvider {
         }
       }
 
+      let id = false;
+      if (tag[0].startsWith('id')) {
+        id = true;
+      }
       let ci: vsc.CompletionItem[] = [];
       for (let item in items) {
-        if (items[item].kind === dot) {
+        if ((id && items[item].kind === hash) || !id && items[item].kind === dot) {
           ci.push(items[item]);
         }
       }

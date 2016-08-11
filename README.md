@@ -6,6 +6,7 @@ CSS support in HTML documents.
 
 - Style tag completion and hover.
 - Style attribute completion and hover.
+- Id attribute completion.
 - Class attribute completion.
 - Scans workspace folder for css files.
 - Supports optional resource.json file for fine tuned resource selection.
