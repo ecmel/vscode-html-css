@@ -129,10 +129,7 @@ class ClassServer implements vsc.CompletionItemProvider {
         }
       }
 
-      let id = false;
-      if (tag[0].startsWith('id')) {
-        id = true;
-      }
+      let id = tag[0].startsWith('id');
       let ci: vsc.CompletionItem[] = [];
       for (let item in items) {
         if ((id && items[item].kind === hash) || !id && items[item].kind === dot) {
