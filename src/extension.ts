@@ -207,16 +207,20 @@ export function activate(context: vsc.ExtensionContext) {
   let styleServer = new StyleServer();
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
-    ['html', 'laravel-blade'], styleServer));
+    ['html', 'laravel-blade', 'razor'], styleServer));
   context.subscriptions.push(vsc.languages.registerHoverProvider(
-    ['html', 'laravel-blade'], styleServer));
+    ['html', 'laravel-blade', 'razor'], styleServer));
 
   let classServer = new ClassServer();
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
-    ['html', 'laravel-blade'], classServer));
+    ['html', 'laravel-blade', 'razor'], classServer));
 
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('laravel-blade', {
+    wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g
+  }));
+
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('razor', {
     wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g
   }));
 }

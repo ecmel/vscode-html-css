@@ -15,6 +15,7 @@ CSS support in HTML documents.
 
 - html
 - laravel-blade
+- razor
 
 ## Optional resource.json
 

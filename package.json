@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS support in HTML documents",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "publisher": "ecmel",
   "license": "MIT",
   "homepage": "https://github.com/ecmel/vscode-html-css",
@@ -24,7 +24,8 @@
   ],
   "activationEvents": [
     "onLanguage:html",
-    "onLanguage:laravel-blade"
+    "onLanguage:laravel-blade",
+    "onLanguage:razor"
   ],
   "contributes": {
     "jsonValidation": [
@@ -46,6 +47,6 @@
   },
   "dependencies": {
     "vscode-languageserver-types": "1.0.1",
-    "vscode-css-languageservice": "1.0.4"
+    "vscode-css-languageservice": "1.0.6"
   }
 }
