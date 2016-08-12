@@ -20,7 +20,7 @@ CSS support in HTML documents.
 
 ## Optional resource.json
 
-If a resource.json file is found in the root of the workspace, only files listed in the file will be used for class attribute completion.
+If a resource.json file is found in the root of the workspace, only files listed in the file will be used for class and id attribute completion.
 
 ### Example
 
