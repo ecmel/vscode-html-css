@@ -8,7 +8,7 @@ CSS support for HTML documents.
 - Style attribute completion and hover.
 - Id attribute completion.
 - Class attribute completion.
-- Supports Zen Coding completion for id and class attributes
+- Supports Zen Coding completion for id and class attributes.
 - Scans workspace folder for css files.
 - Supports optional resource.json file for fine tuned resource selection.
 - Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice).
