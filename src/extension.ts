@@ -107,8 +107,8 @@ class ClassServer implements vsc.CompletionItemProvider {
 
   private regex = [
     /(class|id)=["|']([^"^']*$)/i,
-    /<style[\s\S]*>([\s\S]*)<\/style>/ig,
-    /(\.|\#)[^\.^\#^\<^\>]*$/i
+    /(\.|\#)[^\.^\#^\<^\>]*$/i,
+    /<style[\s\S]*>([\s\S]*)<\/style>/ig
   ];
 
   provideCompletionItems(document: vsc.TextDocument, position: vsc.Position, token: vsc.CancellationToken): vsc.CompletionList {
@@ -118,12 +118,12 @@ class ClassServer implements vsc.CompletionItemProvider {
 
     let tag = this.regex[0].exec(text);
     if (!tag) {
-      tag = this.regex[2].exec(text);
+      tag = this.regex[1].exec(text);
     }
     if (tag) {
       let internal: lst.SymbolInformation[] = [];
       let style;
-      while (style = this.regex[1].exec(document.getText())) {
+      while (style = this.regex[2].exec(document.getText())) {
         let snippet = new Snippet(style[1]);
         let symbols = service.findDocumentSymbols(snippet.document, snippet.stylesheet);
         for (let symbol of symbols) {
@@ -232,12 +232,18 @@ export function activate(context: vsc.ExtensionContext) {
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
     ['html', 'laravel-blade', 'razor'], classServer));
 
+  let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
+
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('html', {
+    wordPattern: wp
+  }));
+
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('laravel-blade', {
-    wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g
+    wordPattern: wp
   }));
 
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('razor', {
-    wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g
+    wordPattern: wp
   }));
 }
 
