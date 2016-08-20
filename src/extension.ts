@@ -102,7 +102,7 @@ class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
 
 class ClassServer implements vsc.CompletionItemProvider {
 
-  private regex = [/(class|id)=["|']([^"^']*$)/i, /<style[\s\S]*>([\s\S]*)<\/style>/ig, /(\.|\#)[^\.^\#]*$/i];
+  private regex = [/(class|id)=["|']([^"^']*$)/i, /<style[\s\S]*>([\s\S]*)<\/style>/ig, /(\.|\#)[^\.^\#^\<^\>]*$/i];
 
   provideCompletionItems(document: vsc.TextDocument, position: vsc.Position, token: vsc.CancellationToken): vsc.CompletionList {
     let start = new vsc.Position(0, 0);
