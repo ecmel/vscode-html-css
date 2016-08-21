@@ -7,7 +7,7 @@
     }
     
     .internal-test1 .internal-test2 {
-      color: gray;
+      color: red;
     }
     
     #internal_id {
@@ -21,10 +21,10 @@
 </head>
 
 <body>
-  <a href="#" id="external_id" style="color: white; background-color: ghostwhite;" class="external">TEST</a>
+  <a href="#" id="external_id" style="color: white;" class="external">TEST</a>
   <a href="#" id="internal_id" style="
     color: white; 
-    background-color: ghostwhite;" class="
+    background-color: red;" class="
   external 
   internal
   ">TEST</a>
