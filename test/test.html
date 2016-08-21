@@ -2,28 +2,31 @@
 
 <head>
   <style>
-    .test {
+    .internal {
       color: red;
-      background-color: blue;
     }
     
-    .test2 .test3 {
+    .internal-test1 .internal-test2 {
       color: gray;
     }
     
-    #test4 {
+    #internal_id {
+      color: red;
+    }
+    
+    #internal_id-test1 #internal_id-test2 {
       color: red;
     }
   </style>
 </head>
 
 <body>
-  <a href="#" id="external-test" style="color: white; background-color: ghostwhite;" class="external">TEST</a>
-  <a href="#" id="test4" style="
+  <a href="#" id="external_id" style="color: white; background-color: ghostwhite;" class="external">TEST</a>
+  <a href="#" id="internal_id" style="
     color: white; 
     background-color: ghostwhite;" class="
   external 
-  test
+  internal
   ">TEST</a>
 </body>
 

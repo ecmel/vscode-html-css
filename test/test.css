@@ -1,14 +1,15 @@
 .external {
   color: red;
-  background-color: blue;
 }
 
-#external-test {
+.external-test1 .external-test2 {
   color: red;
-  background-color: blue;
 }
 
-#external-test2 {
+#external_id {
   color: red;
-  background-color: blue;
+}
+
+#external_id-test1 #external_id-test2 {
+  color: red;
 }
