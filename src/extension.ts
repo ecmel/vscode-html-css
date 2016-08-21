@@ -166,6 +166,7 @@ function pushSymbols(key: string, symbols: lst.SymbolInformation[]): void {
     while (symbol = regex.exec(symbols[i].name)) {
       let item = new vsc.CompletionItem(symbol[1]);
       item.kind = symbol[0].startsWith('.') ? dot : hash;
+      item.detail = path.basename(key);
       ci.push(item);
     }
   }
