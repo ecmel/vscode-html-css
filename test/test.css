@@ -1,9 +1,14 @@
-  .external {
-    color: red;
-    background-color: blue;
-  }
-  
-  #external-test {
-    color: red;
-    background-color: blue;
-  }
+.external {
+  color: red;
+  background-color: blue;
+}
+
+#external-test {
+  color: red;
+  background-color: blue;
+}
+
+#external-test2 {
+  color: red;
+  background-color: blue;
+}
