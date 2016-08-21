@@ -130,7 +130,7 @@ class ClassServer implements vsc.CompletionItemProvider {
           internal.push(symbol);
         }
       }
-      pushSymbols('internal', internal);
+      pushSymbols('style', internal);
 
       let items: { [index: string]: vsc.CompletionItem; } = {};
       for (let key in map) {
