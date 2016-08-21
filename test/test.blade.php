@@ -10,7 +10,7 @@
     .test2 .test3 {
       color: gray;
     }
-
+    
     #test4 {
       color: red;
     }
@@ -19,12 +19,9 @@
 
 <body>
   <a href="#" id="external-test" style="color: white; background-color: ghostwhite;" class="external">TEST</a>
-  <a href="#" 
-  id="test4"
-  style="
+  <a href="#" id="test4" style="
     color: white; 
-    background-color: ghostwhite;" 
-  class="
+    background-color: ghostwhite;" class="
   external 
   test
   ">TEST</a>
