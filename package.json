@@ -8,6 +8,10 @@
   "homepage": "https://github.com/ecmel/vscode-html-css",
   "bugs": "https://github.com/ecmel/vscode-html-css/issues",
   "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecmel/vscode-html-css.git"
+  },
   "engines": {
     "vscode": "^1.0.0"
   },
