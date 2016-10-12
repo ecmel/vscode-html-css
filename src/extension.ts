@@ -189,6 +189,7 @@ export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
     let resourceJson = path.resolve(vsc.workspace.rootPath, 'resource.json');
+    let hasResourceJson = false;
 
     fs.readFile(resourceJson, 'utf8', function (err: any, data: string) {
       let glob = '**/*.css';
@@ -204,15 +205,25 @@ export function activate(context: vsc.ExtensionContext) {
 
         for (let key in resources.css) {
           for (let resource of resources.css[key]) {
-            parse(vsc.Uri.file(path.resolve(vsc.workspace.rootPath, resource)));
+            let uri = vsc.Uri.file(path.resolve(vsc.workspace.rootPath, resource));
+            parse(uri);
           }
         }
+        hasResourceJson = true;
       }
 
       let watcher = vsc.workspace.createFileSystemWatcher(glob); // TODO
 
-      watcher.onDidCreate(parse);
-      watcher.onDidChange(parse);
+      watcher.onDidCreate(function (uri: vsc.Uri) {
+        if (!hasResourceJson || map[uri.fsPath]) {
+          parse(uri);
+        }
+      });
+      watcher.onDidChange(function (uri: vsc.Uri) {
+        if (!hasResourceJson || map[uri.fsPath]) {
+          parse(uri);
+        }
+      });
       watcher.onDidDelete(function (uri: vsc.Uri) {
         delete map[uri.fsPath];
       });
