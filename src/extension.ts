@@ -212,7 +212,7 @@ export function activate(context: vsc.ExtensionContext) {
         }
       }
 
-      let watcher = vsc.workspace.createFileSystemWatcher(glob); 
+      let watcher = vsc.workspace.createFileSystemWatcher(glob);
 
       watcher.onDidCreate(function (uri: vsc.Uri) {
         if (resourceJsonPaths.length === 0 || resourceJsonPaths.indexOf(uri.fsPath) !== -1) {
