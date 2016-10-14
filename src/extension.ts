@@ -244,19 +244,20 @@ export function activate(context: vsc.ExtensionContext) {
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
     ['html', 'laravel-blade', 'razor'], classServer));
 
-  let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
+  //  https://github.com/Microsoft/vscode/issues/13675
+  //  let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
 
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('html', {
-    wordPattern: wp
-  }));
+  //  context.subscriptions.push(vsc.languages.setLanguageConfiguration('html', {
+  //    wordPattern: wp
+  //  }));
 
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('laravel-blade', {
-    wordPattern: wp
-  }));
+  //  context.subscriptions.push(vsc.languages.setLanguageConfiguration('laravel-blade', {
+  //    wordPattern: wp
+  //  }));
 
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('razor', {
-    wordPattern: wp
-  }));
+  //  context.subscriptions.push(vsc.languages.setLanguageConfiguration('razor', {
+  //    wordPattern: wp
+  //  }));
 }
 
 export function deactivate() {
