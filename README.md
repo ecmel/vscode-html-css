@@ -18,6 +18,7 @@ CSS support for HTML documents.
 - html
 - laravel-blade
 - razor
+- vue
 
 ## Optional resource.json
 

@@ -29,7 +29,8 @@
   "activationEvents": [
     "onLanguage:html",
     "onLanguage:laravel-blade",
-    "onLanguage:razor"
+    "onLanguage:razor",
+    "onLanguage:vue"
   ],
   "contributes": {
     "jsonValidation": [

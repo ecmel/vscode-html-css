@@ -235,14 +235,14 @@ export function activate(context: vsc.ExtensionContext) {
   let styleServer = new StyleServer();
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
-    ['html', 'laravel-blade', 'razor'], styleServer));
+    ['html', 'laravel-blade', 'razor', 'vue'], styleServer));
   context.subscriptions.push(vsc.languages.registerHoverProvider(
-    ['html', 'laravel-blade', 'razor'], styleServer));
+    ['html', 'laravel-blade', 'razor', 'vue'], styleServer));
 
   let classServer = new ClassServer();
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
-    ['html', 'laravel-blade', 'razor'], classServer));
+    ['html', 'laravel-blade', 'razor', 'vue'], classServer));
 
   //  https://github.com/Microsoft/vscode/issues/13675
   //  let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
