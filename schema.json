@@ -27,6 +27,10 @@
         "description": "JS file paths",
         "type": "array"
       }
+    },
+    "require": {
+      "description": "RequireJS Resources",
+      "type": "object"
     }
   }
 }
