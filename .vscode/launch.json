@@ -8,7 +8,6 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
-        "${workspaceRoot}/test",
         "--extensionDevelopmentPath=${workspaceRoot}"
       ],
       "stopOnEntry": false,
@@ -22,7 +21,6 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
-        "${workspaceRoot}/test",
         "--extensionDevelopmentPath=${workspaceRoot}",
         "--extensionTestsPath=${workspaceRoot}/out/test"
       ],
