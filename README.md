@@ -4,7 +4,6 @@ CSS support for HTML documents.
 
 ## Features
 
-- Style tag completion and hover.
 - Style attribute completion and hover.
 - Id attribute completion.
 - Class attribute completion.

@@ -42,8 +42,8 @@ class Snippet {
 class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
 
   private regex = [
-    /style=["|']([^"^']*$)/i,
-    /<style[^\<\s\S]*\>([^\<]*)/i
+    /style=["|']([^"^']*$)/i //,
+   // /<style[^\<\s\S]*\>([^\<]*)/i
   ];
 
   private convertCompletionList(list: lst.CompletionList): vsc.CompletionList {
@@ -70,10 +70,10 @@ class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
       return new Snippet('.c {\n' + tag[1], position.character);
     }
 
-    tag = this.regex[1].exec(text);
-    if (tag) {
-      return new Snippet(tag[1], position.character);
-    }
+//    tag = this.regex[1].exec(text);
+//    if (tag) {
+//      return new Snippet(tag[1], position.character);
+//    }
 
     return null;
   }
