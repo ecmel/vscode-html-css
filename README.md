@@ -1,4 +1,4 @@
-![Visual Studio Code Marketplace Version](https://vsmarketplacebadge.apphb.com/version/ecmel.vscode-html-css.svg)
+![Marketplace Version](https://vsmarketplacebadge.apphb.com/version/ecmel.vscode-html-css.svg)
 
 # Visual Studio Code CSS Support for HTML Documents
 
