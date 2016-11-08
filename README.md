@@ -1,3 +1,5 @@
+![VS Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/ecmel.vscode-html-css.svg) ![VS Marketplace Installs](https://vsmarketplacebadge.apphb.com/installs/ecmel.vscode-html-css.svg) ![VS Marketplace Rating](https://vsmarketplacebadge.apphb.com/rating-short/ecmel.vscode-html-css.svg)
+
 # Visual Studio Code CSS Support for HTML Documents
 
 CSS support for HTML documents.
