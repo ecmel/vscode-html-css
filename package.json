@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS support for HTML documents",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "publisher": "ecmel",
   "license": "MIT",
   "homepage": "https://github.com/ecmel/vscode-html-css",
@@ -30,7 +30,8 @@
     "onLanguage:html",
     "onLanguage:laravel-blade",
     "onLanguage:razor",
-    "onLanguage:vue"
+    "onLanguage:vue",
+    "onLanguage:blade"
   ],
   "contributes": {
     "jsonValidation": [
