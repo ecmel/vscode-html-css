@@ -232,12 +232,12 @@ export function activate(context: vsc.ExtensionContext) {
     });
   }
 
-  let styleServer = new StyleServer();
+  // let styleServer = new StyleServer();
 
-  context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
-    ['html', 'laravel-blade', 'razor', 'vue', 'blade'], styleServer));
-  context.subscriptions.push(vsc.languages.registerHoverProvider(
-    ['html', 'laravel-blade', 'razor', 'vue', 'blade'], styleServer));
+  //context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
+  //  ['html', 'laravel-blade', 'razor', 'vue', 'blade'], styleServer));
+  //context.subscriptions.push(vsc.languages.registerHoverProvider(
+  //  ['html', 'laravel-blade', 'razor', 'vue', 'blade'], styleServer));
 
   let classServer = new ClassServer();
 
