@@ -2,14 +2,13 @@
 
 # Visual Studio Code CSS Support for HTML Documents
 
-CSS support for HTML documents.
+Missing CSS support for HTML documents.
 
 ## Features
 
-- Style attribute completion and hover.
-- Id attribute completion.
 - Class attribute completion.
-- Supports Zen Coding completion for id and class attributes.
+- Id attribute completion.
+- Supports Zen Coding completion for class and id attributes.
 - Scans workspace folder for css files.
 - Supports optional resource.json file for fine tuned resource selection.
 - Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice).
