@@ -1,6 +1,6 @@
 'use strict';
 
-// (c) 2016 Ecmel Ercan
+// (c) 2016-2017 Ecmel Ercan
 
 import * as vsc from 'vscode';
 import * as lst from 'vscode-languageserver-types';
@@ -43,7 +43,7 @@ class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
 
   private regex = [
     /style=["|']([^"^']*$)/i //,
-   // /<style[^\<\s\S]*\>([^\<]*)/i
+    // /<style[^\<\s\S]*\>([^\<]*)/i
   ];
 
   private convertCompletionList(list: lst.CompletionList): vsc.CompletionList {
@@ -70,10 +70,10 @@ class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
       return new Snippet('.c {\n' + tag[1], position.character);
     }
 
-//    tag = this.regex[1].exec(text);
-//    if (tag) {
-//      return new Snippet(tag[1], position.character);
-//    }
+    //    tag = this.regex[1].exec(text);
+    //    if (tag) {
+    //      return new Snippet(tag[1], position.character);
+    //    }
 
     return null;
   }
@@ -245,19 +245,27 @@ export function activate(context: vsc.ExtensionContext) {
     ['html', 'laravel-blade', 'razor', 'vue', 'blade'], classServer));
 
   //  https://github.com/Microsoft/vscode/issues/13675
-  //  let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
+  let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
 
   //  context.subscriptions.push(vsc.languages.setLanguageConfiguration('html', {
   //    wordPattern: wp
   //  }));
 
-  //  context.subscriptions.push(vsc.languages.setLanguageConfiguration('laravel-blade', {
-  //    wordPattern: wp
-  //  }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('laravel-blade', {
+    wordPattern: wp
+  }));
 
-  //  context.subscriptions.push(vsc.languages.setLanguageConfiguration('razor', {
-  //    wordPattern: wp
-  //  }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('razor', {
+    wordPattern: wp
+  }));
+
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('vue', {
+    wordPattern: wp
+  }));
+
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('blade', {
+    wordPattern: wp
+  }));
 }
 
 export function deactivate() {
