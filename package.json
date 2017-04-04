@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS support for HTML documents",
-  "version": "0.0.34",
+  "version": "0.0.35",
   "publisher": "ecmel",
   "license": "MIT",
   "homepage": "https://github.com/ecmel/vscode-html-css",
@@ -55,7 +55,7 @@
     "@types/mocha": "^2.2.32"
   },
   "dependencies": {
-    "vscode-languageserver-types": "1.0.4",
-    "vscode-css-languageservice": "1.1.0"
+    "vscode-languageserver-types": "3.2.0",
+    "vscode-css-languageservice": "2.0.0"
   }
 }
