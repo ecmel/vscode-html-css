@@ -19,6 +19,9 @@ Missing CSS support for HTML documents.
 - laravel-blade
 - razor
 - vue
+- pug
+- jade
+- hbs
 
 ## Optional resource.json
 

@@ -242,7 +242,7 @@ export function activate(context: vsc.ExtensionContext) {
   let classServer = new ClassServer();
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
-    ['html', 'laravel-blade', 'razor', 'vue', 'blade'], classServer));
+    ['html', 'laravel-blade', 'razor', 'vue', 'blade', 'pug', 'jade', 'handlebars'], classServer));
 
   //  https://github.com/Microsoft/vscode/issues/13675
   let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
@@ -264,6 +264,18 @@ export function activate(context: vsc.ExtensionContext) {
   }));
 
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('blade', {
+    wordPattern: wp
+  }));
+
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('pug', {
+    wordPattern: wp
+  }));
+
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('jade', {
+    wordPattern: wp
+  }));
+
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('handlebars', {
     wordPattern: wp
   }));
 }

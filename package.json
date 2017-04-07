@@ -31,7 +31,10 @@
     "onLanguage:laravel-blade",
     "onLanguage:razor",
     "onLanguage:vue",
-    "onLanguage:blade"
+    "onLanguage:blade",
+    "onLanguage:pug",
+    "onLanguage:jade",
+    "onLanguage:handlebars"
   ],
   "contributes": {
     "jsonValidation": [
