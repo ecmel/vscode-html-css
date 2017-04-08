@@ -17,7 +17,7 @@
 </style>
 
 <template>
-	<div id="internal_id" class="internal"></div>
+	<div id="internal_id" class="internal-test1"></div>
 </template>
 
 <script>

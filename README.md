@@ -21,7 +21,7 @@ Missing CSS support for HTML documents.
 - vue
 - pug
 - jade
-- hbs
+- handlebars
 
 ## Optional resource.json
 
