@@ -39,70 +39,6 @@ class Snippet {
   }
 }
 
-class StyleServer implements vsc.CompletionItemProvider, vsc.HoverProvider {
-
-  private regex = [
-    /style=["|']([^"^']*$)/i //,
-    // /<style[^\<\s\S]*\>([^\<]*)/i
-  ];
-
-  private convertCompletionList(list: lst.CompletionList): vsc.CompletionList {
-    let ci: vsc.CompletionItem[] = [];
-    for (let i = 0; i < list.items.length; i++) {
-      ci[i] = new vsc.CompletionItem(list.items[i].label);
-      ci[i].detail = list.items[i].detail;
-      ci[i].documentation = list.items[i].documentation;
-      ci[i].filterText = list.items[i].filterText;
-      ci[i].insertText = list.items[i].insertText;
-      ci[i].kind = list.items[i].kind;
-      ci[i].sortText = list.items[i].sortText;
-    }
-    return new vsc.CompletionList(ci, list.isIncomplete);
-  }
-
-  private createSnippet(document: vsc.TextDocument, position: vsc.Position): Snippet {
-    let start = new vsc.Position(0, 0);
-    let range = new vsc.Range(start, position);
-    let text = document.getText(range);
-
-    let tag = this.regex[0].exec(text);
-    if (tag) {
-      return new Snippet('.c {\n' + tag[1], position.character);
-    }
-
-    //    tag = this.regex[1].exec(text);
-    //    if (tag) {
-    //      return new Snippet(tag[1], position.character);
-    //    }
-
-    return null;
-  }
-
-  provideCompletionItems(document: vsc.TextDocument, position: vsc.Position, token: vsc.CancellationToken): vsc.CompletionList {
-    let snippet = this.createSnippet(document, position);
-
-    if (snippet) {
-      let result = service.doComplete(snippet.document, snippet.position, snippet.stylesheet);
-      return this.convertCompletionList(result);
-    }
-    return null;
-  }
-
-  resolveCompletionItem(item: vsc.CompletionItem, token: vsc.CancellationToken): vsc.CompletionItem {
-    return item;
-  }
-
-  provideHover(document: vsc.TextDocument, position: vsc.Position, token: vsc.CancellationToken): vsc.Hover {
-    let snippet = this.createSnippet(document, position);
-
-    if (snippet) {
-      let result = service.doHover(snippet.document, snippet.position, snippet.stylesheet);
-      return new vsc.Hover(result.contents);
-    }
-    return null;
-  }
-}
-
 class ClassServer implements vsc.CompletionItemProvider {
 
   private regex = [
@@ -188,96 +124,54 @@ function parse(uri: vsc.Uri): void {
 export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
-    let resourceJson = path.resolve(vsc.workspace.rootPath, 'resource.json');
-    let resourceJsonPaths = [];
 
-    fs.readFile(resourceJson, 'utf8', function (err: any, data: string) {
-      let glob = '**/*.css';
+    let glob = '**/*.css';
 
-      if (err) {
-        vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
-          for (let i = 0; i < uris.length; i++) {
-            parse(uris[i]);
-          }
-        });
-      } else {
-        let resources = JSON.parse(data);
-
-        for (let key in resources.css) {
-          for (let resource of resources.css[key]) {
-            let uri = vsc.Uri.file(path.resolve(vsc.workspace.rootPath, resource));
-            resourceJsonPaths.push(uri.fsPath);
-            parse(uri);
-          }
-        }
+    vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
+      for (let i = 0; i < uris.length; i++) {
+        parse(uris[i]);
       }
-
-      let watcher = vsc.workspace.createFileSystemWatcher(glob);
-
-      watcher.onDidCreate(function (uri: vsc.Uri) {
-        if (resourceJsonPaths.length === 0 || resourceJsonPaths.indexOf(uri.fsPath) !== -1) {
-          parse(uri);
-        }
-      });
-      watcher.onDidChange(function (uri: vsc.Uri) {
-        if (resourceJsonPaths.length === 0 || resourceJsonPaths.indexOf(uri.fsPath) !== -1) {
-          parse(uri);
-        }
-      });
-      watcher.onDidDelete(function (uri: vsc.Uri) {
-        delete map[uri.fsPath];
-      });
-
-      context.subscriptions.push(watcher);
     });
-  }
 
-  // let styleServer = new StyleServer();
+    let watcher = vsc.workspace.createFileSystemWatcher(glob);
 
-  //context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
-  //  ['html', 'laravel-blade', 'razor', 'vue', 'blade'], styleServer));
-  //context.subscriptions.push(vsc.languages.registerHoverProvider(
-  //  ['html', 'laravel-blade', 'razor', 'vue', 'blade'], styleServer));
+    watcher.onDidCreate(function (uri: vsc.Uri) {
+      parse(uri);
+    });
+    watcher.onDidChange(function (uri: vsc.Uri) {
+      parse(uri);
+    });
+    watcher.onDidDelete(function (uri: vsc.Uri) {
+      delete map[uri.fsPath];
+    });
+
+    context.subscriptions.push(watcher);
+  };
 
   let classServer = new ClassServer();
 
-  context.subscriptions.push(vsc.languages.registerCompletionItemProvider(
-    ['html', 'laravel-blade', 'razor', 'vue', 'blade', 'pug', 'jade', 'handlebars'], classServer));
+  context.subscriptions.push(vsc.languages.registerCompletionItemProvider([
+    'html',
+    'laravel-blade',
+    'razor',
+    'vue',
+    'blade',
+    'pug',
+    'jade',
+    'handlebars',
+    'php'
+  ], classServer));
 
-  //  https://github.com/Microsoft/vscode/issues/13675
   let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
 
-  //  context.subscriptions.push(vsc.languages.setLanguageConfiguration('html', {
-  //    wordPattern: wp
-  //  }));
-
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('laravel-blade', {
-    wordPattern: wp
-  }));
-
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('razor', {
-    wordPattern: wp
-  }));
-
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('vue', {
-    wordPattern: wp
-  }));
-
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('blade', {
-    wordPattern: wp
-  }));
-
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('pug', {
-    wordPattern: wp
-  }));
-
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('jade', {
-    wordPattern: wp
-  }));
-
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('handlebars', {
-    wordPattern: wp
-  }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('laravel-blade', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('razor', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('vue', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('blade', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('pug', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('jade', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('handlebars', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('php', { wordPattern: wp }));
 }
 
 export function deactivate() {

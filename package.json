@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS support for HTML documents",
-  "version": "0.0.36",
+  "version": "0.1.0",
   "publisher": "ecmel",
   "license": "MIT",
   "homepage": "https://github.com/ecmel/vscode-html-css",
@@ -36,14 +36,6 @@
     "onLanguage:jade",
     "onLanguage:handlebars"
   ],
-  "contributes": {
-    "jsonValidation": [
-      {
-        "fileMatch": "resource.json",
-        "url": "./schema.json"
-      }
-    ]
-  },
   "main": "./out/src/extension",
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
