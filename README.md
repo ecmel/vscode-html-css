@@ -1,5 +1,3 @@
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version/ecmel.vscode-html-css.svg)](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css)
-
 # Visual Studio Code CSS Support for HTML Documents
 
 Missing CSS support for HTML documents.
