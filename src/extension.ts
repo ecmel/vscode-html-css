@@ -136,7 +136,6 @@ function parseRemote(url: string) {
 }
 
 function parseRemoteConfig() {
-  console.log('parse remote');
   let remoteCssConfig = vsc.workspace.getConfiguration('css');
   let urls = remoteCssConfig.get('remoteStyleSheets') as string[];
   urls.forEach(url => parseRemote(url));
