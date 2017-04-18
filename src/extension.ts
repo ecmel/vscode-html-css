@@ -7,6 +7,7 @@ import * as lst from 'vscode-languageserver-types';
 import * as css from 'vscode-css-languageservice';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as https from 'https';
 
 let service = css.getCSSLanguageService();
 let map: { [index: string]: vsc.CompletionItem[]; } = {};
@@ -121,6 +122,26 @@ function parse(uri: vsc.Uri): void {
   });
 }
 
+function parseRemote(url: string) {
+  https.get(url, res => {
+    let styles = '';
+    res.on('data', d => {
+      styles += d.toString();
+    }).on('end', () => {
+      let doc = lst.TextDocument.create(url, 'css', 1, styles);
+      let symbols = service.findDocumentSymbols(doc, service.parseStylesheet(doc));
+      pushSymbols(url, symbols);
+    });
+  })
+}
+
+function parseRemoteConfig() {
+  console.log('parse remote');
+  let remoteCssConfig = vsc.workspace.getConfiguration('css');
+  let urls = remoteCssConfig.get('remoteStyleSheets') as string[];
+  urls.forEach(url => parseRemote(url));
+}
+
 export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
@@ -132,6 +153,8 @@ export function activate(context: vsc.ExtensionContext) {
         parse(uris[i]);
       }
     });
+
+    parseRemoteConfig();
 
     let watcher = vsc.workspace.createFileSystemWatcher(glob);
 
@@ -172,6 +195,9 @@ export function activate(context: vsc.ExtensionContext) {
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('jade', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('handlebars', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('php', { wordPattern: wp }));
+  context.subscriptions.push(vsc.workspace.onDidChangeConfiguration(e => {
+    parseRemoteConfig();
+  }));
 }
 
 export function deactivate() {
