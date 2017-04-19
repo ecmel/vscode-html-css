@@ -15,6 +15,18 @@
   "engines": {
     "vscode": "^1.10.0"
   },
+  "contributes": {
+    "configuration": {
+      "title": "CSS Settings",
+      "properties": {
+        "css.remoteStyleSheets": {
+          "type": "array",
+          "default": [],
+          "description": "A list of remote style sheets."
+        }
+      }
+    }
+  },
   "categories": [
     "Languages",
     "Other"
