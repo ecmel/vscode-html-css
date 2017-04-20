@@ -138,7 +138,7 @@ function parseRemote(url: string) {
 function parseRemoteConfig() {
   let remoteCssConfig = vsc.workspace.getConfiguration('css');
   let urls = remoteCssConfig.get('remoteStyleSheets') as string[];
-  urls.forEach(url => parseRemote(url));
+  urls.forEach((url) => parseRemote(url));
 }
 
 export function activate(context: vsc.ExtensionContext) {
@@ -194,9 +194,7 @@ export function activate(context: vsc.ExtensionContext) {
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('jade', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('handlebars', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('php', { wordPattern: wp }));
-  context.subscriptions.push(vsc.workspace.onDidChangeConfiguration(e => {
-    parseRemoteConfig();
-  }));
+  context.subscriptions.push(vsc.workspace.onDidChangeConfiguration((e) => parseRemoteConfig()));
 }
 
 export function deactivate() {

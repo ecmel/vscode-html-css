@@ -8,6 +8,7 @@ Missing CSS support for HTML documents.
 - Id attribute completion.
 - Supports Zen Coding completion for class and id attributes.
 - Scans workspace folder for css files.
+- Supports remote css files.
 - Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice).
 
 ## Supported Languages
@@ -20,6 +21,16 @@ Missing CSS support for HTML documents.
 - jade
 - handlebars
 - php
+
+## Remote Style Sheets
+
+Remote style sheets can be specified in VS Code settings:
+
+```
+"css.remoteStyleSheets": [
+  "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+]
+```
 
 ## Installation
 
