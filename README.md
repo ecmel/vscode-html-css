@@ -21,6 +21,7 @@ Missing CSS support for HTML documents.
 - jade
 - handlebars
 - php
+- twig
 
 ## Remote Style Sheets
 
