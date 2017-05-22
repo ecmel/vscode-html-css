@@ -22,6 +22,7 @@ Missing CSS support for HTML documents.
 - handlebars
 - php
 - twig
+- md
 
 ## Remote Style Sheets
 
