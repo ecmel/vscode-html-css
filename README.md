@@ -7,7 +7,7 @@ Missing CSS support for HTML documents.
 - Class attribute completion.
 - Id attribute completion.
 - Supports Zen Coding completion for class and id attributes.
-- Scans workspace folder for css files.
+- Scans workspace folder for css and scss files.
 - Supports remote css files.
 - Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice).
 
@@ -23,6 +23,7 @@ Missing CSS support for HTML documents.
 - php
 - twig
 - md
+- javascriptreact
 
 ## Remote Style Sheets
 
@@ -37,3 +38,6 @@ Remote style sheets can be specified in VS Code settings:
 ## Installation
 
 [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css)
+
+## Usage
+You can view a list of attributes via `ctrl + space`.
