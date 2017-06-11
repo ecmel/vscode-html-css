@@ -8,7 +8,6 @@ import * as css from 'vscode-css-languageservice';
 import * as fs from 'fs';
 import * as path from 'path';
 const request = require('request');
-// import * as https from 'https';
 
 let service = css.getCSSLanguageService();
 let map: { [index: string]: vsc.CompletionItem[]; } = {};
