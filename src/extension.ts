@@ -184,7 +184,8 @@ export function activate(context: vsc.ExtensionContext) {
     'php',
     'twig',
     'md',
-    'javascriptreact'
+    'javascriptreact',
+    'erb'
   ], classServer));
 
   let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
@@ -200,6 +201,7 @@ export function activate(context: vsc.ExtensionContext) {
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('twig', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('md', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('javascriptreact', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('erb', { wordPattern: wp }));
 
   context.subscriptions.push(vsc.workspace.onDidChangeConfiguration((e) => parseRemoteConfig()));
 }
