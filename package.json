@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS support for HTML documents",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "publisher": "ecmel",
   "license": "MIT",
   "homepage": "https://github.com/ecmel/vscode-html-css",
@@ -23,6 +23,14 @@
           "type": "array",
           "default": [],
           "description": "A list of remote style sheets."
+        },
+        "css.fileExtensions": {
+          "type": "array",
+          "default": [
+            "css",
+            "scss"
+          ],
+          "description": "A list of style sheet file extensions you want the extension to look for."
         }
       }
     }

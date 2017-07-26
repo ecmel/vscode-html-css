@@ -34,6 +34,15 @@ Remote style sheets can be specified in VS Code settings:
   "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
 ]
 ```
+## Style Sheet File Extensions
+
+By default, `css` and `scss` files in the project are parsed. You may configure this in VS Code Settings
+
+Remote style sheets can be specified in VS Code settings:
+
+```
+"css.fileExtensions": [ "css", "scss"]
+```
 
 ## Installation
 
