@@ -57,6 +57,7 @@
     "onLanguage:php",
     "onLanguage:twig",
     "onLanguage:md",
+    "onLanguage:javascript",
     "onLanguage:javascriptreact"
   ],
   "main": "./out/src/extension",

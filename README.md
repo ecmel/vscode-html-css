@@ -23,6 +23,7 @@ Missing CSS support for HTML documents.
 - php
 - twig
 - md
+- javascript
 - javascriptreact
 
 ## Remote Style Sheets
