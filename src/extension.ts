@@ -142,9 +142,10 @@ export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
 
-    let globs = ['**/*.css', '**/*.scss'];
-
-    globs.forEach(glob => {
+    const remoteCssConfig = vsc.workspace.getConfiguration('css');
+    const extensions = remoteCssConfig.get('fileExtensions') as string[];
+    extensions.forEach(ext => {
+      const glob = `**/*.${ext}`
       vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
         for (let i = 0; i < uris.length; i++) {
           parse(uris[i]);
@@ -184,6 +185,7 @@ export function activate(context: vsc.ExtensionContext) {
     'php',
     'twig',
     'md',
+    'javascript',
     'javascriptreact',
     'erb'
   ], classServer));
@@ -200,6 +202,7 @@ export function activate(context: vsc.ExtensionContext) {
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('php', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('twig', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('md', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('javascript', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('javascriptreact', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('erb', { wordPattern: wp }));
 
