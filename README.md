@@ -23,6 +23,7 @@ Missing CSS support for HTML documents.
 - php
 - twig
 - md
+- nunjucks
 - javascript
 - javascriptreact
 
