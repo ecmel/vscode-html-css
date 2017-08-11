@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS support for HTML documents",
-  "version": "0.1.4",
+  "version": "0.1.8",
   "publisher": "ecmel",
   "license": "MIT",
   "homepage": "https://github.com/ecmel/vscode-html-css",
@@ -23,6 +23,14 @@
           "type": "array",
           "default": [],
           "description": "A list of remote style sheets."
+        },
+        "css.fileExtensions": {
+          "type": "array",
+          "default": [
+            "css",
+            "scss"
+          ],
+          "description": "A list of style sheet file extensions you want the extension to look for."
         }
       }
     }
@@ -47,7 +55,10 @@
     "onLanguage:jade",
     "onLanguage:handlebars",
     "onLanguage:php",
-    "onLanguage:twig"
+    "onLanguage:twig",
+    "onLanguage:md",
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact"
   ],
   "main": "./out/src/extension",
   "scripts": {
@@ -64,7 +75,8 @@
     "@types/mocha": "^2.2.32"
   },
   "dependencies": {
-    "vscode-languageserver-types": "3.2.0",
-    "vscode-css-languageservice": "2.0.3"
+    "request": "^2.81.0",
+    "vscode-css-languageservice": "2.0.3",
+    "vscode-languageserver-types": "3.2.0"
   }
 }

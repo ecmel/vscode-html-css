@@ -7,7 +7,7 @@ import * as lst from 'vscode-languageserver-types';
 import * as css from 'vscode-css-languageservice';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as https from 'https';
+const request = require('request');
 
 let service = css.getCSSLanguageService();
 let map: { [index: string]: vsc.CompletionItem[]; } = {};
@@ -43,7 +43,7 @@ class Snippet {
 class ClassServer implements vsc.CompletionItemProvider {
 
   private regex = [
-    /(class|id)=["|']([^"^']*$)/i,
+    /(class|id|className)=["|']([^"^']*$)/i,
     /(\.|\#)[^\.^\#^\<^\>]*$/i,
     /<style[\s\S]*>([\s\S]*)<\/style>/ig
   ];
@@ -123,16 +123,13 @@ function parse(uri: vsc.Uri): void {
 }
 
 function parseRemote(url: string) {
-  https.get(url, res => {
-    let styles = '';
-    res.on('data', d => {
-      styles += d.toString();
-    }).on('end', () => {
-      let doc = lst.TextDocument.create(url, 'css', 1, styles);
+  request(url, (err, response, body: string) => {
+    if (body.length > 0) {
+      let doc = lst.TextDocument.create(url, 'css', 1, body);
       let symbols = service.findDocumentSymbols(doc, service.parseStylesheet(doc));
       pushSymbols(url, symbols);
-    });
-  })
+    }
+  });
 }
 
 function parseRemoteConfig() {
@@ -145,29 +142,33 @@ export function activate(context: vsc.ExtensionContext) {
 
   if (vsc.workspace.rootPath) {
 
-    let glob = '**/*.css';
+    const remoteCssConfig = vsc.workspace.getConfiguration('css');
+    const extensions = remoteCssConfig.get('fileExtensions') as string[];
+    extensions.forEach(ext => {
+      const glob = `**/*.${ext}`
+      vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
+        for (let i = 0; i < uris.length; i++) {
+          parse(uris[i]);
+        }
+      });
 
-    vsc.workspace.findFiles(glob, '').then(function (uris: vsc.Uri[]) {
-      for (let i = 0; i < uris.length; i++) {
-        parse(uris[i]);
-      }
+      let watcher = vsc.workspace.createFileSystemWatcher(glob);
+
+      watcher.onDidCreate(function (uri: vsc.Uri) {
+        parse(uri);
+      });
+      watcher.onDidChange(function (uri: vsc.Uri) {
+        parse(uri);
+      });
+      watcher.onDidDelete(function (uri: vsc.Uri) {
+        delete map[uri.fsPath];
+      });
+
+      context.subscriptions.push(watcher);
     });
 
     parseRemoteConfig();
 
-    let watcher = vsc.workspace.createFileSystemWatcher(glob);
-
-    watcher.onDidCreate(function (uri: vsc.Uri) {
-      parse(uri);
-    });
-    watcher.onDidChange(function (uri: vsc.Uri) {
-      parse(uri);
-    });
-    watcher.onDidDelete(function (uri: vsc.Uri) {
-      delete map[uri.fsPath];
-    });
-
-    context.subscriptions.push(watcher);
   };
 
   let classServer = new ClassServer();
@@ -182,7 +183,11 @@ export function activate(context: vsc.ExtensionContext) {
     'jade',
     'handlebars',
     'php',
-    'twig'
+    'twig',
+    'md',
+    'javascript',
+    'javascriptreact',
+    'erb'
   ], classServer));
 
   let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
@@ -196,6 +201,10 @@ export function activate(context: vsc.ExtensionContext) {
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('handlebars', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('php', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('twig', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('md', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('javascript', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('javascriptreact', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('erb', { wordPattern: wp }));
 
   context.subscriptions.push(vsc.workspace.onDidChangeConfiguration((e) => parseRemoteConfig()));
 }
