@@ -185,6 +185,7 @@ export function activate(context: vsc.ExtensionContext) {
     'php',
     'twig',
     'md',
+    'nunjucks',
     'javascript',
     'javascriptreact',
     'erb'
@@ -202,6 +203,7 @@ export function activate(context: vsc.ExtensionContext) {
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('php', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('twig', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('md', { wordPattern: wp }));
+  context.subscriptions.push(vsc.languages.setLanguageConfiguration('nunjucks', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('javascript', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('javascriptreact', { wordPattern: wp }));
   context.subscriptions.push(vsc.languages.setLanguageConfiguration('erb', { wordPattern: wp }));

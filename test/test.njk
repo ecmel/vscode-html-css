@@ -1,0 +1,33 @@
+<html>
+
+<head>
+  <style>
+    .internal {
+      color: red;
+    }
+    
+    .internal-test1 .internal-test2 {
+      color: red;
+    }
+    
+    #internal_id {
+      color: red;
+    }
+    
+    #internal_id-test1 #internal_id-test2 {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="#" id="external_id" style="color: white;" class="external-test1">TEST</a>
+  <a href="#" id="internal_id" style="
+    color: white; 
+    background-color: red;" class="
+  external container
+  internal
+  ">TEST</a>
+</body>
+
+</html>
