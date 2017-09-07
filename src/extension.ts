@@ -44,7 +44,7 @@ class ClassServer implements vsc.CompletionItemProvider {
 
   private regex = [
     /(class|id|className)=["|']([^"^']*$)/i,
-    /(\.|\#)[^\.^\#^\<^\>]*$/i,
+    /(\.|\#)[^\s]*$/i,
     /<style[\s\S]*>([\s\S]*)<\/style>/ig
   ];
 
@@ -55,7 +55,11 @@ class ClassServer implements vsc.CompletionItemProvider {
 
     let tag = this.regex[0].exec(text);
     if (!tag) {
-      tag = this.regex[1].exec(text);
+      const textList = text.split('\n');
+      const finalLineText = textList.length > 0 ? textList[textList.length - 1] : false;
+      if (finalLineText) {
+        tag = this.regex[1].exec(finalLineText);
+      }
     }
     if (tag) {
       let internal: lst.SymbolInformation[] = [];
