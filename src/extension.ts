@@ -144,7 +144,7 @@ function parseRemoteConfig() {
 
 export function activate(context: vsc.ExtensionContext) {
 
-  if (vsc.workspace.rootPath) {
+  if (vsc.workspace.workspaceFolders) {
 
     const remoteCssConfig = vsc.workspace.getConfiguration('css');
     const extensions = remoteCssConfig.get('fileExtensions') as string[];
