@@ -43,7 +43,8 @@
     "html",
     "css",
     "class",
-    "id"
+    "id",
+    "multi-root ready"
   ],
   "activationEvents": [
     "onLanguage:html",
