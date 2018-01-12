@@ -78,7 +78,7 @@
   },
   "dependencies": {
     "request": "^2.81.0",
-    "vscode-css-languageservice": "2.0.3",
-    "vscode-languageserver-types": "3.2.0"
+    "vscode-css-languageservice": "3.0.3",
+    "vscode-languageserver-types": "3.5.0"
   }
 }
