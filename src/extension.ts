@@ -175,9 +175,7 @@ export function activate(context: vsc.ExtensionContext) {
 
   };
 
-  let classServer = new ClassServer();
-
-  context.subscriptions.push(vsc.languages.registerCompletionItemProvider([
+  const langs = [
     'html',
     'laravel-blade',
     'razor',
@@ -193,24 +191,15 @@ export function activate(context: vsc.ExtensionContext) {
     'javascript',
     'javascriptreact',
     'erb'
-  ], classServer));
+  ]
+
+  context.subscriptions.push(vsc.languages.registerCompletionItemProvider(langs, new ClassServer()));
 
   let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
 
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('laravel-blade', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('razor', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('vue', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('blade', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('pug', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('jade', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('handlebars', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('php', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('twig', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('md', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('nunjucks', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('javascript', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('javascriptreact', { wordPattern: wp }));
-  context.subscriptions.push(vsc.languages.setLanguageConfiguration('erb', { wordPattern: wp }));
+  for (let i = 1; i < langs.length; i++) {
+    context.subscriptions.push(vsc.languages.setLanguageConfiguration(langs[i], { wordPattern: wp }));
+  }
 
   context.subscriptions.push(vsc.workspace.onDidChangeConfiguration((e) => parseRemoteConfig()));
 }
