@@ -190,7 +190,9 @@ export function activate(context: vsc.ExtensionContext) {
     'nunjucks',
     'javascript',
     'javascriptreact',
-    'erb'
+    'erb',
+    'typescript',
+    'typescriptreact'
   ]
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(langs, new ClassServer()));
