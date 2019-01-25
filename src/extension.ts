@@ -177,6 +177,7 @@ export function activate(context: vsc.ExtensionContext) {
 
   const langs = [
     'html',
+    'django-html',
     'laravel-blade',
     'razor',
     'vue',
