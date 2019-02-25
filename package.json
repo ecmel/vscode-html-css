@@ -71,14 +71,14 @@
     "test": "npm run compile && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
-    "typescript": "^2.6.1",
-    "vscode": "^1.1.6",
-    "@types/node": "^7.0.43",
-    "@types/mocha": "^2.2.42"
+    "typescript": "^3.3.3333",
+    "vscode": "^1.1.30",
+    "@types/node": "^11.9.5",
+    "@types/mocha": "^5.2.6"
   },
   "dependencies": {
-    "request": "^2.81.0",
-    "vscode-css-languageservice": "^3.0.3",
-    "vscode-languageserver-types": "^3.5.0"
+    "request": "^2.88.0",
+    "vscode-css-languageservice": "^3.0.12",
+    "vscode-languageserver-types": "^3.14.0"
   }
 }
