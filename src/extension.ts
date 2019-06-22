@@ -196,7 +196,7 @@ export function activate(context: vsc.ExtensionContext) {
     'typescriptreact'
   ]
 
-  context.subscriptions.push(vsc.languages.registerCompletionItemProvider(langs, new ClassServer()));
+  context.subscriptions.push(vsc.languages.registerCompletionItemProvider(langs, new ClassServer(), '.', '#', '\'', '"'));
 
   let wp = /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\.\"\,\<\>\/\?\s]+)/g;
 
