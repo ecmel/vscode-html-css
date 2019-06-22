@@ -44,7 +44,7 @@ class ClassServer implements vsc.CompletionItemProvider {
 
   private regex = [
     /(class|id|className)=["|']([^"^']*$)/i,
-    /(\.|\#)[^\s]*$/i,
+    /(?:\.([^\s\#\.]*)$)|(?:\#([^\s\.\#]*)$)/i,
     /<style[\s\S]*>([\s\S]*)<\/style>/ig
   ];
 
