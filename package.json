@@ -60,9 +60,11 @@
     "onLanguage:md",
     "onLanguage:nunjucks",
     "onLanguage:javascript",
-    "onLanguage:javascriptreact"
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact",
+    "onLanguage:typescript"
   ],
-  "main": "./out/src/extension",
+  "main": "./out/extension",
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",

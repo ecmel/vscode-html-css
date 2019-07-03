@@ -26,23 +26,26 @@ Missing CSS support for HTML documents.
 - nunjucks
 - javascript
 - javascriptreact
+- typescript
+- typescriptreact
 
 ## Remote Style Sheets
 
 Remote style sheets can be specified in VS Code settings:
 
-```
+```json
 "css.remoteStyleSheets": [
   "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
 ]
 ```
+
 ## Style Sheet File Extensions
 
 By default, `css` and `scss` files in the project are parsed. You may configure this in VS Code Settings
 
 Remote style sheets can be specified in VS Code settings:
 
-```
+```json
 "css.fileExtensions": [ "css", "scss"]
 ```
 
@@ -51,4 +54,5 @@ Remote style sheets can be specified in VS Code settings:
 [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css)
 
 ## Usage
+
 You can view a list of attributes via `ctrl + space`.
