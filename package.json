@@ -64,7 +64,7 @@
     "onLanguage:typescriptreact",
     "onLanguage:typescript"
   ],
-  "main": "./out/extension",
+  "main": "./out/src/extension",
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
