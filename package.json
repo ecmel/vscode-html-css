@@ -60,7 +60,9 @@
     "onLanguage:md",
     "onLanguage:nunjucks",
     "onLanguage:javascript",
-    "onLanguage:javascriptreact"
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact",
+    "onLanguage:typescript"
   ],
   "main": "./out/src/extension",
   "scripts": {
