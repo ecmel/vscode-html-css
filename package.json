@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS support for HTML documents",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "publisher": "ecmel",
   "license": "MIT",
   "homepage": "https://github.com/ecmel/vscode-html-css",
@@ -64,23 +64,28 @@
     "onLanguage:typescriptreact",
     "onLanguage:typescript"
   ],
-  "main": "./out/src/extension",
+  "main": "./dist/extension",
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "webpack --mode production",
+    "webpack": "webpack --mode development",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
+    "build": "vsce package --out dist/ecmel.vscode-html-css.vsix",
     "test": "npm run compile && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
-    "typescript": "^3.3.3333",
-    "vscode": "^1.1.30",
-    "@types/node": "^11.9.5",
-    "@types/mocha": "^5.2.6"
-  },
-  "dependencies": {
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^11.13.18",
     "request": "^2.88.0",
-    "vscode-css-languageservice": "^3.0.12",
-    "vscode-languageserver-types": "^3.14.0"
-  }
+    "ts-loader": "^6.0.4",
+    "typescript": "^3.5.3",
+    "vsce": "^1.66.0",
+    "vscode-css-languageservice": "^4.0.2",
+    "vscode-languageserver-types": "^3.14.0",
+    "vscode": "^1.1.35",
+    "webpack-cli": "^3.3.6",
+    "webpack": "^4.37.0"
+  },
+  "dependencies": {}
 }
