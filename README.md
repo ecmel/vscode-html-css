@@ -28,6 +28,7 @@ Missing CSS support for HTML documents.
 - javascriptreact
 - typescript
 - typescriptreact
+- HTML (EEx)
 
 ## Remote Style Sheets
 
