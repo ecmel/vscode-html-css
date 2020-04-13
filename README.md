@@ -36,7 +36,7 @@ Remote style sheets can be specified in VS Code settings:
 
 ```json
 "css.remoteStyleSheets": [
-  "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+  "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
 ]
 ```
 
