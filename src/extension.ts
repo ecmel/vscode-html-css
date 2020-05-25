@@ -194,7 +194,8 @@ export function activate(context: vsc.ExtensionContext) {
     'erb',
     'typescript',
     'typescriptreact',
-    'HTML (Eex)'
+    'HTML (Eex)',
+    'html-eex'
   ]
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(langs, new ClassServer(), '.', '#', '\'', '"', ' '));
