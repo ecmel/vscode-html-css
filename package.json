@@ -64,7 +64,8 @@
     "onLanguage:typescriptreact",
     "onLanguage:typescript",
     "onLanguage:HTML (EEx)",
-    "onLanguage:html-eex"
+    "onLanguage:html-eex",
+    "onLanguage:haml"
   ],
   "main": "./dist/extension",
   "scripts": {

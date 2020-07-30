@@ -29,6 +29,7 @@ Missing CSS support for HTML documents.
 - typescript
 - typescriptreact
 - HTML (EEx)
+- Haml
 
 ## Remote Style Sheets
 
