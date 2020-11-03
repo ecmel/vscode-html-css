@@ -13,22 +13,26 @@ Missing CSS support for HTML documents.
 
 ## Supported Languages
 
-- html
-- laravel-blade
-- razor
-- vue
-- pug
-- jade
-- handlebars
-- php
-- twig
-- md
-- nunjucks
-- javascript
-- javascriptreact
-- typescript
-- typescriptreact
-- HTML (EEx)
+Supported languages can be configured with the `css.enabledLanguages` configuration setting. By
+default the following languages are enabled:
+
+```json
+"css.enabledLanguages": [
+  "html",
+  "laravel-blade",
+  "razor",
+  "vue",
+  "pug",
+  "jade",
+  "handlebars",
+  "php",
+  "twig",
+  "nunjucks",
+  "javascriptreact",
+  "typescriptreact",
+  "HTML (EEx)"
+]
+```
 
 ## Remote Style Sheets
 

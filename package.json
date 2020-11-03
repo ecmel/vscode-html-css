@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS support for HTML documents",
-  "version": "0.2.3",
+  "version": "0.3.3",
   "publisher": "ecmel",
   "license": "MIT",
   "homepage": "https://github.com/ecmel/vscode-html-css",
@@ -31,6 +31,29 @@
             "scss"
           ],
           "description": "A list of style sheet file extensions you want the extension to look for."
+        },
+        "css.enabledLanguages": {
+          "type": "array",
+          "description": "A list of languages where suggestions are desired.",
+          "default": [
+            "html",
+            "django-html",
+            "laravel-blade",
+            "razor",
+            "vue",
+            "blade",
+            "pug",
+            "jade",
+            "handlebars",
+            "php",
+            "twig",
+            "nunjucks",
+            "javascriptreact",
+            "erb",
+            "typescriptreact",
+            "HTML (Eex)",
+            "html-eex"
+          ]
         }
       }
     }
@@ -57,12 +80,9 @@
     "onLanguage:handlebars",
     "onLanguage:php",
     "onLanguage:twig",
-    "onLanguage:md",
     "onLanguage:nunjucks",
-    "onLanguage:javascript",
     "onLanguage:javascriptreact",
     "onLanguage:typescriptreact",
-    "onLanguage:typescript",
     "onLanguage:HTML (EEx)",
     "onLanguage:html-eex"
   ],
