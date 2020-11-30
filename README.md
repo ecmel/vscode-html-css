@@ -30,6 +30,7 @@ Missing CSS support for HTML documents.
 - typescriptreact
 - HTML (EEx)
 - Haml
+- svelte
 
 ## Remote Style Sheets
 
