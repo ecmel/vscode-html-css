@@ -196,7 +196,8 @@ export function activate(context: vsc.ExtensionContext) {
     'typescriptreact',
     'HTML (Eex)',
     'html-eex',
-    'svelte',
+    'haml',
+    'svelte'
   ]
 
   context.subscriptions.push(vsc.languages.registerCompletionItemProvider(langs, new ClassServer(), '.', '#', '\'', '"', ' '));
