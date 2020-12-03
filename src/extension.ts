@@ -1,6 +1,7 @@
 import {
 	workspace,
 	languages,
+	Uri,
 	Range,
 	ExtensionContext,
 	CompletionItemProvider,
@@ -22,9 +23,9 @@ import fetch from 'node-fetch';
 
 class ClassCompletionItemProvider implements CompletionItemProvider {
 
+	readonly logger = "[vscode-html-css]";
 	readonly start = new Position(0, 0);
 	readonly selectors = new Map<string, CompletionItem>();
-	readonly stylesheets = new Set<string>();
 	readonly canComplete = /class\s*=\s*(["'])(?:(?!\1).)*$/si;
 	readonly findLinkRel = /rel\s*=\s*(["'])(.*)\1/i;
 	readonly findLinkHref = /href\s*=\s*(["'])(.*)\1/i;
@@ -33,47 +34,52 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 		if (workspace.workspaceFolders) {
 			const glob = "**/*.html";
 
-			workspace.findFiles(glob).then(uris => uris.forEach(uri => {
-				workspace.fs.readFile(uri).then(file => {
-					const findLinks = /<link([^>]+)>/gi;
-					const text = file.toString();
+			const watcher = workspace.createFileSystemWatcher(glob);
 
-					let link;
+			watcher.onDidCreate(uri=> this.findRemoteStyles(uri));
+			watcher.onDidChange(uri=> this.findRemoteStyles(uri));
+			watcher.onDidDelete(uri=> this.findRemoteStyles(uri));
 
-					while ((link = findLinks.exec(text)) !== null) {
-						const rel = this.findLinkRel.exec(link[1]);
-						if (rel) {
-							if (rel[2] === "stylesheet") {
-								const href = this.findLinkHref.exec(link[1]);
-								if (href) {
-									if (href[2].startsWith("http")) {
-										if (!this.stylesheets.has(href[2])) {
-											this.stylesheets.add(href[2]);
-											fetch(href[2]).then(res => {
-												if (res.status === 200) {
-													console.info(`[vscode-html-css]: Fetched ${href[2]}`);
-													res.text().then(text => {
-														walk(parse(text), (node) => {
-															if (node.type === "ClassSelector") {
-																this.selectors.set(node.name, new CompletionItem(node.name));
-															};
-														});
-													});
-												} else {
-													console.warn(`[vscode-html-css]: Unable to fetch ${href[2]} Status: ${res.status}`);
-												}
-											}).catch(reason => {
-												console.error(`[vscode-html-css]: ${reason}`);
-											});
-										}
-									}
-								}
-							}
-						}
-					}
-				});
-			}));
+			context.subscriptions.push(watcher);
+
+			workspace.findFiles(glob).then(uris => uris.forEach(uri=> this.findRemoteStyles(uri)));
 		}
+	}
+
+	findRemoteStyles(uri: Uri) {
+		workspace.fs.readFile(uri).then(file => {
+			const text = file.toString();
+			const findLinks = /<link([^>]+)>/gi;
+
+			let link;
+
+			while ((link = findLinks.exec(text)) !== null) {
+				const rel = this.findLinkRel.exec(link[1]);
+				if (rel && rel[2] === "stylesheet") {
+					const href = this.findLinkHref.exec(link[1]);
+					if (href && href[2].startsWith("http")) {
+						fetch(href[2]).then(res => {
+							if (res.status === 200) {
+								res.text().then(text => {
+									walk(parse(text), (node) => {
+										if (node.type === "ClassSelector") {
+											this.selectors.set(node.name, new CompletionItem(node.name));
+										};
+									});
+								});
+								console.info(`${this.logger} Fetched ${href[2]}`);
+							} else {
+								console.warn(`${this.logger} Unable to fetch ${href[2]}`);
+							}
+						}, error => {
+							console.error(`${this.logger} ${error}`);
+						});
+					}
+				}
+			}
+		}, error => {
+			console.error(`${this.logger} ${error}`);
+		});
 	}
 
 	provideCompletionItems(
