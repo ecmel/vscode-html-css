@@ -28,30 +28,41 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 	readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
 	fetchRemoteStyleSheet(href: string): Thenable<Map<string, CompletionItem>> {
-		return new Promise((resolve, reject) => {
-			const selectors = new Map<string, CompletionItem>();
+		return new Promise((resolve) => {
+			const selectors = this.cache.get(href);
 
-			fetch(href).then(res => {
-				if (res.status === 200) {
-					res.text().then(text => {
-						walk(parse(text), (node) => {
-							if (node.type === "ClassSelector") {
-								selectors.set(node.name, new CompletionItem(node.name));
-							};
+			if (selectors) {
+				resolve(selectors);
+			} else {
+				const selectors = new Map<string, CompletionItem>();
+
+				fetch(href).then(res => {
+					if (res.status === 200) {
+						res.text().then(text => {
+
+							walk(parse(text), (node) => {
+								if (node.type === "ClassSelector") {
+									selectors.set(node.name, new CompletionItem(node.name));
+								};
+							});
+
+							this.cache.set(href, selectors);
+							
+							resolve(selectors);
+
+						}, () => {
+							resolve(selectors);
 						});
+					} else {
 						resolve(selectors);
-					}, () => {
-						resolve(selectors);
-					});
-				} else {
-					resolve(selectors);
-				}
-			}, () => resolve(selectors));
+					}
+				}, () => resolve(selectors));
+			}
 		});
 	}
 
 	findRemoteStyleSheets(text: string): Thenable<Map<string, CompletionItem>> {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			const links = new Map<string, CompletionItem>();
 			const findLinks = /<link([^>]+)>/gi;
 			const promises = [];
@@ -65,16 +76,9 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 					const href = this.findLinkHref.exec(link[1]);
 
 					if (href && href[2].startsWith("http")) {
-						const items = this.cache.get(href[2]);
-
-						if (items) {
+						promises.push(this.fetchRemoteStyleSheet(href[2]).then(items => {
 							items.forEach((value, key) => links.set(key, value));
-						} else {
-							promises.push(this.fetchRemoteStyleSheet(href[2]).then(items => {
-								this.cache.set(href[2], items);
-								items.forEach((value, key) => links.set(key, value));
-							}));
-						}
+						}));
 					}
 				}
 			}
