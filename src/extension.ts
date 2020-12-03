@@ -1,7 +1,5 @@
 import {
-	workspace,
 	languages,
-	Uri,
 	Range,
 	ExtensionContext,
 	CompletionItemProvider,
@@ -23,62 +21,75 @@ import fetch from 'node-fetch';
 
 class ClassCompletionItemProvider implements CompletionItemProvider {
 
-	readonly logger = "[vscode-html-css]";
 	readonly start = new Position(0, 0);
-	readonly selectors = new Map<string, CompletionItem>();
+	readonly cache = new Map<string, Map<string, CompletionItem>>();
 	readonly canComplete = /class\s*=\s*(["'])(?:(?!\1).)*$/si;
 	readonly findLinkRel = /rel\s*=\s*(["'])(.*)\1/i;
 	readonly findLinkHref = /href\s*=\s*(["'])(.*)\1/i;
 
-	constructor(context: ExtensionContext) {
-		if (workspace.workspaceFolders) {
-			const glob = "**/*.html";
+	fetchRemoteStyleSheet(link: string): Thenable<string> {
+		return new Promise((resolve, reject) => {
 
-			const watcher = workspace.createFileSystemWatcher(glob);
+			const rel = this.findLinkRel.exec(link);
 
-			watcher.onDidCreate(uri=> this.findRemoteStyles(uri));
-			watcher.onDidChange(uri=> this.findRemoteStyles(uri));
-			watcher.onDidDelete(uri=> this.findRemoteStyles(uri));
+			if (rel && rel[2] === "stylesheet") {
 
-			context.subscriptions.push(watcher);
+				const href = this.findLinkHref.exec(link);
 
-			workspace.findFiles(glob).then(uris => uris.forEach(uri=> this.findRemoteStyles(uri)));
-		}
-	}
+				if (href && href[2].startsWith("http")) {
+					if (this.cache.has(href[2])) {
+						resolve(href[2]);
+					} else {
+						const selectors = new Map<string, CompletionItem>();
+						this.cache.set(href[2], selectors);
 
-	findRemoteStyles(uri: Uri) {
-		workspace.fs.readFile(uri).then(file => {
-			const text = file.toString();
-			const findLinks = /<link([^>]+)>/gi;
-
-			let link;
-
-			while ((link = findLinks.exec(text)) !== null) {
-				const rel = this.findLinkRel.exec(link[1]);
-				if (rel && rel[2] === "stylesheet") {
-					const href = this.findLinkHref.exec(link[1]);
-					if (href && href[2].startsWith("http")) {
 						fetch(href[2]).then(res => {
 							if (res.status === 200) {
 								res.text().then(text => {
 									walk(parse(text), (node) => {
 										if (node.type === "ClassSelector") {
-											this.selectors.set(node.name, new CompletionItem(node.name));
+											selectors.set(node.name, new CompletionItem(node.name));
 										};
 									});
+									resolve(href[2]);
+								}, () => {
+									resolve();
 								});
-								console.info(`${this.logger} Fetched ${href[2]}`);
 							} else {
-								console.warn(`${this.logger} Unable to fetch ${href[2]}`);
+								resolve();
 							}
-						}, error => {
-							console.error(`${this.logger} ${error}`);
-						});
+						}, () => resolve());
 					}
+				} else {
+					resolve();
 				}
+
+			} else {
+				resolve();
 			}
-		}, error => {
-			console.error(`${this.logger} ${error}`);
+		});
+	}
+
+	findRemoteStyleSheets(text: string): Thenable<Map<string, CompletionItem>> {
+		return new Promise((resolve, reject) => {
+			const links = new Map<string, CompletionItem>();
+			const findLinks = /<link([^>]+)>/gi;
+			const promises = [];
+
+			let link;
+
+			while ((link = findLinks.exec(text)) !== null) {
+				promises.push(this.fetchRemoteStyleSheet(link[1]).then(href => {
+					if (href) {
+						const items = this.cache.get(href);
+						if (items) {
+							items.forEach((value, key) => links.set(key, value));
+						}
+					}
+				}));
+			}
+
+			Promise.all(promises).then(() => resolve(links));
 		});
 	}
 
@@ -86,8 +97,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 		document: TextDocument,
 		position: Position,
 		token: CancellationToken,
-		context: CompletionContext)
-		: ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
+		context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 
 		return new Promise((resolve, reject) => {
 			const range = new Range(this.start, position);
@@ -95,7 +105,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 			const canComplete = this.canComplete.test(text);
 
 			if (canComplete) {
-				const selectors = new Map<string, CompletionItem>();
+				const styles = new Map<string, CompletionItem>();
 				const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
 
 				let style;
@@ -103,12 +113,15 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 				while ((style = findStyles.exec(text)) !== null) {
 					walk(parse(style[1]), (node) => {
 						if (node.type === "ClassSelector") {
-							selectors.set(node.name, new CompletionItem(node.name));
+							styles.set(node.name, new CompletionItem(node.name));
 						};
 					});
 				}
 
-				resolve([...selectors, ...this.selectors].map(o => o[1]));
+				this.findRemoteStyleSheets(text).then(links => {
+					styles.forEach((value, key) => links.set(key, value));
+					resolve([...links.values()]);
+				});
 			} else {
 				reject();
 			}
@@ -119,7 +132,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 export function activate(context: ExtensionContext) {
 	context.subscriptions.push(
 		languages.registerCompletionItemProvider("html",
-			new ClassCompletionItemProvider(context), "\"", "'"));
+			new ClassCompletionItemProvider(), "\"", "'"));
 }
 
 export function deactivate() { }
