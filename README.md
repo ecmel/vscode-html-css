@@ -5,51 +5,16 @@ Missing CSS support for HTML documents.
 ## Features
 
 - Class attribute completion.
-- Id attribute completion.
-- Supports Zen Coding completion for class and id attributes.
-- Scans workspace folder for css and scss files.
+- Scans workspace folder for css files.
 - Supports remote css files.
-- Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice).
 
 ## Supported Languages
 
-- html
-- laravel-blade
-- razor
-- vue
-- pug
-- jade
-- handlebars
-- php
-- twig
-- md
-- nunjucks
-- javascript
-- javascriptreact
-- typescript
-- typescriptreact
-- HTML (EEx)
-- Haml
-- svelte
-
-## Remote Style Sheets
-
-Remote style sheets can be specified in VS Code settings:
-
 ```json
-"css.remoteStyleSheets": [
-  "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-]
-```
-
-## Style Sheet File Extensions
-
-By default, `css` and `scss` files in the project are parsed. You may configure this in VS Code Settings
-
-Remote style sheets can be specified in VS Code settings:
-
-```json
-"css.fileExtensions": [ "css", "scss"]
+"files.associations": {
+  "*.tpl": "html",
+  "*.master": "html"
+}
 ```
 
 ## Installation
@@ -58,4 +23,4 @@ Remote style sheets can be specified in VS Code settings:
 
 ## Usage
 
-You can view a list of attributes via `ctrl + space`.
+You can view a list of class attributes via `ctrl + space`.

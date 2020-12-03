@@ -1,5 +1,5 @@
 out
-node_modules
-*.vsix
-**/*.log
 dist
+node_modules
+.vscode-test/
+*.vsix
