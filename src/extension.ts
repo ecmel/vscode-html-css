@@ -74,7 +74,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 							resolve(key);
 						}, () => resolve(NONE));
 					} else {
-						resolve(NONE);
+						this.cache.set(key, items);
+						resolve(key);
 					}
 				}, () => resolve(NONE));
 			}
@@ -83,7 +84,6 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 
 	findDocumentLinks(text: string): Thenable<Set<string>> {
 		return new Promise(resolve => {
-
 			const findLinks = /<link([^>]+)>/gi;
 			const keys = new Set<string>();
 			const promises = [];
@@ -109,7 +109,6 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 
 	findRemoteStyles(): Thenable<Set<string>> {
 		return new Promise(resolve => {
-
 			const keys = new Set<string>();
 			const promises = [];
 
