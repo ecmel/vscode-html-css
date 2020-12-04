@@ -5,12 +5,13 @@ Missing CSS support for HTML documents.
 ## Features
 
 - Html class attribute completion.
-- Parses `<link rel="stylesheet">` and `<style></style>` tags.
-- Supports remote style sheets.
+- Supports `<link rel="stylesheet">` and `<style></style>` tags.
+- Supports other remote style sheets, see below.
+- Local workspace parsing for css files is depreceted.
 
 ## Remote Style Sheets
 
-Remote style sheets can be specified in VS Code settings:
+If it is not possible to specify remote styles with `<link rel="stylesheet">` tag, they can be specified in VS Code settings:
 
 ```json
 "css.remoteStyleSheets": [
