@@ -165,7 +165,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 export function activate(context: ExtensionContext) {
 	context.subscriptions.push(languages
 		.registerCompletionItemProvider("html",
-			new ClassCompletionItemProvider(context)));
+			new ClassCompletionItemProvider(context), "\"", "'"));
 }
 
 export function deactivate() { }
