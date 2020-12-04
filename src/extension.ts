@@ -1,7 +1,5 @@
 import fetch from "node-fetch";
-
 import { parse, walk } from "css-tree";
-
 import {
 	languages,
 	Range,
@@ -24,8 +22,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 	readonly start = new Position(0, 0);
 	readonly cache = new Map<string, Map<string, CompletionItem>>();
 	readonly canComplete = /class\s*=\s*(["'])(?:(?!\1).)*$/si;
-	readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
-	readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
+	readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).))+\1/si;
+	readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).))+\1/si;
 
 	remoteStyles: string[] = [];
 
@@ -43,6 +41,14 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 		if (keys) {
 			this.remoteStyles = keys;
 		}
+	}
+
+	parseTextToItems(text: string, items: Map<string, CompletionItem>) {
+		walk(parse(text), (node) => {
+			if (node.type === "ClassSelector") {
+				items.set(node.name, new CompletionItem(node.name));
+			}
+		});
 	}
 
 	fetchRemoteStyleSheet(key: string): Thenable<string> {
@@ -63,16 +69,10 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 				fetch(key).then(res => {
 					if (res.status < 400) {
 						res.text().then(text => {
-							walk(parse(text), (node) => {
-								if (node.type === "ClassSelector") {
-									items.set(node.name, new CompletionItem(node.name));
-								};
-							});
+							this.parseTextToItems(text, items);
 							this.cache.set(key, items);
 							resolve(key);
-						}, () => {
-							resolve(NONE);
-						});
+						}, () => resolve(NONE));
 					} else {
 						resolve(NONE);
 					}
@@ -83,6 +83,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 
 	findDocumentLinks(text: string): Thenable<Set<string>> {
 		return new Promise(resolve => {
+
 			const findLinks = /<link([^>]+)>/gi;
 			const keys = new Set<string>();
 			const promises = [];
@@ -108,6 +109,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 
 	findRemoteStyles(): Thenable<Set<string>> {
 		return new Promise(resolve => {
+
 			const keys = new Set<string>();
 			const promises = [];
 
@@ -127,11 +129,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 		let style;
 
 		while ((style = findStyles.exec(text)) !== null) {
-			walk(parse(style[1]), (node) => {
-				if (node.type === "ClassSelector") {
-					items.set(node.name, new CompletionItem(node.name));
-				}
-			});
+			this.parseTextToItems(text, items);
 		}
 
 		return items;
