@@ -18,7 +18,7 @@ import {
 	walk
 } from "css-tree";
 
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
 class ClassCompletionItemProvider implements CompletionItemProvider {
 
@@ -37,48 +37,47 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 	}
 
 	parseRemoteConfig() {
-		const config = workspace.getConfiguration('css');
-		const hrefs = config.get('remoteStyleSheets') as string[];
+		const config = workspace.getConfiguration("css");
+		const keys = config.get("remoteStyleSheets") as string[];
 
-		if (hrefs) {
-			this.remoteStyles = hrefs;
+		if (keys) {
+			this.remoteStyles = keys;
 		}
 	}
 
-	fetchRemoteStyleSheet(href: string): Thenable<Map<string, CompletionItem>> {
-
+	fetchRemoteStyleSheet(key: string): Thenable<Map<string, CompletionItem>> {
 		return new Promise(resolve => {
-			const selectors = this.cache.get(href);
+			const items = this.cache.get(key);
 
-			if (selectors) {
-				resolve(selectors);
+			if (items) {
+				resolve(items);
 			} else {
-				const selectors = new Map<string, CompletionItem>();
+				const items = new Map<string, CompletionItem>();
 
-				fetch(href).then(res => {
+				fetch(key).then(res => {
 					if (res.status === 200) {
 						res.text().then(text => {
 							walk(parse(text), (node) => {
 								if (node.type === "ClassSelector") {
-									selectors.set(node.name, new CompletionItem(node.name));
+									items.set(node.name, new CompletionItem(node.name));
 								};
 							});
-							this.cache.set(href, selectors);
-							resolve(selectors);
+							this.cache.set(key, items);
+							resolve(items);
 						}, () => {
-							resolve(selectors);
+							resolve(items);
 						});
 					} else {
-						resolve(selectors);
+						resolve(items);
 					}
-				}, () => resolve(selectors));
+				}, () => resolve(items));
 			}
 		});
 	}
 
 	findDocumentLinks(text: string): Thenable<Map<string, CompletionItem>> {
 		return new Promise(resolve => {
-			const links = new Map<string, CompletionItem>();
+			const items = new Map<string, CompletionItem>();
 			const findLinks = /<link([^>]+)>/gi;
 			const promises = [];
 
@@ -92,29 +91,46 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 
 					if (href && href[2].startsWith("http")) {
 						promises.push(this.fetchRemoteStyleSheet(href[2]).then(items => {
-							items.forEach((value, key) => links.set(key, value));
+							items.forEach((value, key) => items.set(key, value));
 						}));
 					}
 				}
 			}
 
-			Promise.all(promises).then(() => resolve(links));
+			Promise.all(promises).then(() => resolve(items));
 		});
 	}
 
 	findRemoteStyles(): Thenable<Map<string, CompletionItem>> {
 		return new Promise(resolve => {
-			const links = new Map<string, CompletionItem>();
+			const items = new Map<string, CompletionItem>();
 			const promises = [];
 
 			for (let i = 0; i < this.remoteStyles.length; i++) {
-				promises.push(this.fetchRemoteStyleSheet(this.remoteStyles[i]).then(items => {
-					items.forEach((value, key) => links.set(key, value));
+				promises.push(this.fetchRemoteStyleSheet(this.remoteStyles[i]).then(found => {
+					found.forEach((value, key) => items.set(key, value));
 				}));
 			}
 
-			Promise.all(promises).then(() => resolve(links));
+			Promise.all(promises).then(() => resolve(items));
 		});
+	}
+
+	findDocumentStyles(text: string): Map<string, CompletionItem> {
+		const items = new Map<string, CompletionItem>();
+		const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
+
+		let style;
+
+		while ((style = findStyles.exec(text)) !== null) {
+			walk(parse(style[1]), (node) => {
+				if (node.type === "ClassSelector") {
+					items.set(node.name, new CompletionItem(node.name));
+				}
+			});
+		}
+
+		return items;
 	}
 
 	provideCompletionItems(
@@ -129,25 +145,15 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 			const canComplete = this.canComplete.test(text);
 
 			if (canComplete) {
-				const styles = new Map<string, CompletionItem>();
-				const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
+				const styles = this.findDocumentStyles(text);
 
-				let style;
+				this.findRemoteStyles().then(items => {
+					styles.forEach((value, key) => items.set(key, value));
 
-				while ((style = findStyles.exec(text)) !== null) {
-					walk(parse(style[1]), (node) => {
-						if (node.type === "ClassSelector") {
-							styles.set(node.name, new CompletionItem(node.name));
-						}
-					});
-				}
+					this.findDocumentLinks(text).then(links => {
+						links.forEach((value, key) => items.set(key, value));
 
-				this.findDocumentLinks(text).then(links => {
-					styles.forEach((value, key) => links.set(key, value));
-
-					this.findRemoteStyles().then(styles => {
-						styles.forEach((value, key) => links.set(key, value));
-						resolve([...links.values()]);
+						resolve([...items.values()]);
 					});
 				});
 			} else {
