@@ -67,7 +67,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 				const items = new Map<string, CompletionItem>();
 
 				fetch(key).then(res => {
-					if (res.status < 400) {
+					if (res.ok) {
 						res.text().then(text => {
 							this.parseTextToItems(text, items);
 							this.cache.set(key, items);
