@@ -45,12 +45,12 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 		}
 	}
 
-	fetchRemoteStyleSheet(key: string): Thenable<Map<string, CompletionItem>> {
+	fetchRemoteStyleSheet(key: string): Thenable<string> {
 		return new Promise(resolve => {
 			const items = this.cache.get(key);
 
 			if (items) {
-				resolve(items);
+				resolve(key);
 			} else {
 				const items = new Map<string, CompletionItem>();
 
@@ -63,22 +63,22 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 								};
 							});
 							this.cache.set(key, items);
-							resolve(items);
+							resolve(key);
 						}, () => {
-							resolve(items);
+							resolve("");
 						});
 					} else {
-						resolve(items);
+						resolve("");
 					}
-				}, () => resolve(items));
+				}, () => resolve(""));
 			}
 		});
 	}
 
-	findDocumentLinks(text: string): Thenable<Map<string, CompletionItem>> {
+	findDocumentLinks(text: string): Thenable<Set<string>> {
 		return new Promise(resolve => {
-			const items = new Map<string, CompletionItem>();
 			const findLinks = /<link([^>]+)>/gi;
+			const keys = new Set<string>();
 			const promises = [];
 
 			let link;
@@ -90,29 +90,25 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 					const href = this.findLinkHref.exec(link[1]);
 
 					if (href && href[2].startsWith("http")) {
-						promises.push(this.fetchRemoteStyleSheet(href[2]).then(items => {
-							items.forEach((value, key) => items.set(key, value));
-						}));
+						promises.push(this.fetchRemoteStyleSheet(href[2]).then(key => keys.add(key)));
 					}
 				}
 			}
 
-			Promise.all(promises).then(() => resolve(items));
+			Promise.all(promises).then(() => resolve(keys));
 		});
 	}
 
-	findRemoteStyles(): Thenable<Map<string, CompletionItem>> {
+	findRemoteStyles(): Thenable<Set<string>> {
 		return new Promise(resolve => {
-			const items = new Map<string, CompletionItem>();
+			const keys = new Set<string>();
 			const promises = [];
 
 			for (let i = 0; i < this.remoteStyles.length; i++) {
-				promises.push(this.fetchRemoteStyleSheet(this.remoteStyles[i]).then(found => {
-					found.forEach((value, key) => items.set(key, value));
-				}));
+				promises.push(this.fetchRemoteStyleSheet(this.remoteStyles[i]).then(key => keys.add(key)));
 			}
 
-			Promise.all(promises).then(() => resolve(items));
+			Promise.all(promises).then(() => resolve(keys));
 		});
 	}
 
@@ -145,13 +141,13 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 			const canComplete = this.canComplete.test(text);
 
 			if (canComplete) {
-				const styles = this.findDocumentStyles(text);
+				const items = this.findDocumentStyles(text);
 
-				this.findRemoteStyles().then(items => {
-					styles.forEach((value, key) => items.set(key, value));
-
+				this.findRemoteStyles().then(styles => {
 					this.findDocumentLinks(text).then(links => {
-						links.forEach((value, key) => items.set(key, value));
+						links.forEach(key => styles.add(key));
+
+						styles.forEach(key => this.cache.get(key)?.forEach((value, name) => items.set(name, value)));
 
 						resolve([...items.values()]);
 					});
