@@ -36,20 +36,16 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 			} else {
 				const selectors = new Map<string, CompletionItem>();
 
-				fetch(href).then(res => {
+				fetch(href).then(res => {					
 					if (res.status === 200) {
 						res.text().then(text => {
-
 							walk(parse(text), (node) => {
 								if (node.type === "ClassSelector") {
 									selectors.set(node.name, new CompletionItem(node.name));
 								};
 							});
-
 							this.cache.set(href, selectors);
-							
 							resolve(selectors);
-
 						}, () => {
 							resolve(selectors);
 						});
@@ -108,7 +104,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 					walk(parse(style[1]), (node) => {
 						if (node.type === "ClassSelector") {
 							styles.set(node.name, new CompletionItem(node.name));
-						};
+						}
 					});
 				}
 

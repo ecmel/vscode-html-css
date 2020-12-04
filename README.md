@@ -4,8 +4,8 @@ Missing CSS support for HTML documents.
 
 ## Features
 
-- Class attribute completion.
-- Scans workspace folder for css files.
+- Html class attribute completion.
+- Parses `html<link rel="stylesheet">` and `html<style></style>` tags.
 - Supports remote css files.
 
 ## Supported Languages
