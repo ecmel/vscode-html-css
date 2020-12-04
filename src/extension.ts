@@ -34,7 +34,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 
 	parseConfig() {
 		const config = workspace.getConfiguration("css");
-		const remoteStyleSheets = config?.get<string[]>("remoteStyleSheets");
+		const remoteStyleSheets = config.get<string[]>("remoteStyleSheets");
 
 		if (remoteStyleSheets) {
 			this.remoteStyleSheets = remoteStyleSheets;
