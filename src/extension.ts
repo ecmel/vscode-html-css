@@ -1,3 +1,7 @@
+import fetch from "node-fetch";
+
+import { parse, walk } from "css-tree";
+
 import {
 	languages,
 	Range,
@@ -13,12 +17,7 @@ import {
 	CompletionList
 } from "vscode";
 
-import {
-	parse,
-	walk
-} from "css-tree";
-
-import fetch from "node-fetch";
+const NONE = "<NONE>";
 
 class ClassCompletionItemProvider implements CompletionItemProvider {
 
@@ -33,7 +32,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 	constructor(context: ExtensionContext) {
 		this.parseRemoteConfig();
 
-		context.subscriptions.push(workspace.onDidChangeConfiguration(e => this.parseRemoteConfig()));
+		context.subscriptions.push(workspace
+			.onDidChangeConfiguration(e => this.parseRemoteConfig()));
 	}
 
 	parseRemoteConfig() {
@@ -47,6 +47,12 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 
 	fetchRemoteStyleSheet(key: string): Thenable<string> {
 		return new Promise(resolve => {
+
+			if (key === NONE) {
+				resolve(NONE);
+				return;
+			}
+
 			const items = this.cache.get(key);
 
 			if (items) {
@@ -55,7 +61,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 				const items = new Map<string, CompletionItem>();
 
 				fetch(key).then(res => {
-					if (res.status === 200) {
+					if (res.status < 400) {
 						res.text().then(text => {
 							walk(parse(text), (node) => {
 								if (node.type === "ClassSelector") {
@@ -65,12 +71,12 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 							this.cache.set(key, items);
 							resolve(key);
 						}, () => {
-							resolve("");
+							resolve(NONE);
 						});
 					} else {
-						resolve("");
+						resolve(NONE);
 					}
-				}, () => resolve(""));
+				}, () => resolve(NONE));
 			}
 		});
 	}
@@ -90,7 +96,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 					const href = this.findLinkHref.exec(link[1]);
 
 					if (href && href[2].startsWith("http")) {
-						promises.push(this.fetchRemoteStyleSheet(href[2]).then(key => keys.add(key)));
+						promises.push(this.fetchRemoteStyleSheet(href[2])
+							.then(key => keys.add(key)));
 					}
 				}
 			}
@@ -105,7 +112,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 			const promises = [];
 
 			for (let i = 0; i < this.remoteStyles.length; i++) {
-				promises.push(this.fetchRemoteStyleSheet(this.remoteStyles[i]).then(key => keys.add(key)));
+				promises.push(this.fetchRemoteStyleSheet(this.remoteStyles[i])
+					.then(key => keys.add(key)));
 			}
 
 			Promise.all(promises).then(() => resolve(keys));
@@ -133,7 +141,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 		document: TextDocument,
 		position: Position,
 		token: CancellationToken,
-		context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
+		context: CompletionContext)
+		: ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 
 		return new Promise((resolve, reject) => {
 			const range = new Range(this.start, position);
@@ -147,7 +156,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 					this.findDocumentLinks(text).then(links => {
 						links.forEach(key => styles.add(key));
 
-						styles.forEach(key => this.cache.get(key)?.forEach((value, name) => items.set(name, value)));
+						styles.forEach(key => this.cache.get(key)
+							?.forEach((value, name) => items.set(name, value)));
 
 						resolve([...items.values()]);
 					});
