@@ -22,8 +22,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 	readonly start = new Position(0, 0);
 	readonly cache = new Map<string, Map<string, CompletionItem>>();
 	readonly canComplete = /class\s*=\s*(["'])(?:(?!\1).)*$/si;
-	readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).))+\1/si;
-	readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).))+\1/si;
+	readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
+	readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
 	remoteStyles: string[] = [];
 
