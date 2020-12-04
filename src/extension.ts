@@ -1,6 +1,7 @@
 import {
 	languages,
 	Range,
+	workspace,
 	ExtensionContext,
 	CompletionItemProvider,
 	TextDocument,
@@ -27,8 +28,26 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 	readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 	readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
+	remoteStyles: string[] = [];
+
+	constructor(context: ExtensionContext) {
+		this.parseRemoteConfig();
+
+		context.subscriptions.push(workspace.onDidChangeConfiguration(e => this.parseRemoteConfig()));
+	}
+
+	parseRemoteConfig() {
+		const config = workspace.getConfiguration('css');
+		const hrefs = config.get('remoteStyleSheets') as string[];
+
+		if (hrefs) {
+			this.remoteStyles = hrefs;
+		}
+	}
+
 	fetchRemoteStyleSheet(href: string): Thenable<Map<string, CompletionItem>> {
-		return new Promise((resolve) => {
+
+		return new Promise(resolve => {
 			const selectors = this.cache.get(href);
 
 			if (selectors) {
@@ -36,7 +55,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 			} else {
 				const selectors = new Map<string, CompletionItem>();
 
-				fetch(href).then(res => {					
+				fetch(href).then(res => {
 					if (res.status === 200) {
 						res.text().then(text => {
 							walk(parse(text), (node) => {
@@ -57,8 +76,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 		});
 	}
 
-	findRemoteStyleSheets(text: string): Thenable<Map<string, CompletionItem>> {
-		return new Promise((resolve) => {
+	findDocumentLinks(text: string): Thenable<Map<string, CompletionItem>> {
+		return new Promise(resolve => {
 			const links = new Map<string, CompletionItem>();
 			const findLinks = /<link([^>]+)>/gi;
 			const promises = [];
@@ -77,6 +96,21 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 						}));
 					}
 				}
+			}
+
+			Promise.all(promises).then(() => resolve(links));
+		});
+	}
+
+	findRemoteStyles(): Thenable<Map<string, CompletionItem>> {
+		return new Promise(resolve => {
+			const links = new Map<string, CompletionItem>();
+			const promises = [];
+
+			for (let i = 0; i < this.remoteStyles.length; i++) {
+				promises.push(this.fetchRemoteStyleSheet(this.remoteStyles[i]).then(items => {
+					items.forEach((value, key) => links.set(key, value));
+				}));
 			}
 
 			Promise.all(promises).then(() => resolve(links));
@@ -108,9 +142,13 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 					});
 				}
 
-				this.findRemoteStyleSheets(text).then(links => {
+				this.findDocumentLinks(text).then(links => {
 					styles.forEach((value, key) => links.set(key, value));
-					resolve([...links.values()]);
+
+					this.findRemoteStyles().then(styles => {
+						styles.forEach((value, key) => links.set(key, value));
+						resolve([...links.values()]);
+					});
 				});
 			} else {
 				reject();
@@ -122,7 +160,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 export function activate(context: ExtensionContext) {
 	context.subscriptions.push(
 		languages.registerCompletionItemProvider("html",
-			new ClassCompletionItemProvider(), "\"", "'"));
+			new ClassCompletionItemProvider(context), "\"", "'"));
 }
 
 export function deactivate() { }

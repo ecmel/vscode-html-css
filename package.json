@@ -28,6 +28,18 @@
 	"activationEvents": [
 		"onLanguage:html"
 	],
+	"contributes": {
+		"configuration": {
+			"title": "CSS Settings",
+			"properties": {
+				"css.remoteStyleSheets": {
+					"type": "array",
+					"default": [],
+					"description": "A list of remote style sheets."
+				}
+			}
+		}
+	},
 	"main": "./out/extension.js",
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

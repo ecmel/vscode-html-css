@@ -5,10 +5,22 @@ Missing CSS support for HTML documents.
 ## Features
 
 - Html class attribute completion.
-- Parses `html<link rel="stylesheet">` and `html<style></style>` tags.
-- Supports remote css files.
+- Parses `<link rel="stylesheet">` and `<style></style>` tags.
+- Supports remote style sheets.
+
+## Remote Style Sheets
+
+Remote style sheets can be specified in VS Code settings:
+
+```json
+"css.remoteStyleSheets": [
+  "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+]
+```
 
 ## Supported Languages
+
+Support for other types of html like documents can be added in VS Code settings:
 
 ```json
 "files.associations": {
