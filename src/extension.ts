@@ -129,7 +129,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 		let style;
 
 		while ((style = findStyles.exec(text)) !== null) {
-			this.parseTextToItems(text, items);
+			this.parseTextToItems(style[1], items);
 		}
 
 		return items;
