@@ -25,21 +25,19 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 	readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 	readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
-	remoteStyles: string[] = [];
+	remoteStyleSheets: string[] = [];
 
 	constructor(context: ExtensionContext) {
-		this.parseRemoteConfig();
-
-		context.subscriptions.push(workspace
-			.onDidChangeConfiguration(e => this.parseRemoteConfig()));
+		this.parseConfig();
+		context.subscriptions.push(workspace.onDidChangeConfiguration(e => this.parseConfig()));
 	}
 
-	parseRemoteConfig() {
+	parseConfig() {
 		const config = workspace.getConfiguration("css");
-		const keys = config.get("remoteStyleSheets") as string[];
+		const remoteStyleSheets = config?.get<string[]>("remoteStyleSheets");
 
-		if (keys) {
-			this.remoteStyles = keys;
+		if (remoteStyleSheets) {
+			this.remoteStyleSheets = remoteStyleSheets;
 		}
 	}
 
@@ -112,8 +110,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 			const keys = new Set<string>();
 			const promises = [];
 
-			for (let i = 0; i < this.remoteStyles.length; i++) {
-				promises.push(this.fetchRemoteStyleSheet(this.remoteStyles[i])
+			for (let i = 0; i < this.remoteStyleSheets.length; i++) {
+				promises.push(this.fetchRemoteStyleSheet(this.remoteStyleSheets[i])
 					.then(key => keys.add(key)));
 			}
 
@@ -152,10 +150,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 				this.findRemoteStyles().then(styles => {
 					this.findDocumentLinks(text).then(links => {
 						links.forEach(key => styles.add(key));
-
 						styles.forEach(key => this.cache.get(key)
 							?.forEach((value, name) => items.set(name, value)));
-
 						resolve([...items.values()]);
 					});
 				});
