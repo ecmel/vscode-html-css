@@ -29,9 +29,9 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 	remoteStyleSheets: string[] = [];
 
 	parseTextToItems(text: string, items: Map<string, CompletionItem>) {
-		walk(parse(text), (node) => {
-			if (node.type === "ClassSelector") {
-				items.set(node.name, new CompletionItem(node.name, CompletionItemKind.EnumMember));
+		walk(parse(text), v => {
+			if (v.type === "ClassSelector") {
+				items.set(v.name, new CompletionItem(v.name, CompletionItemKind.EnumMember));
 			}
 		});
 	}
@@ -41,28 +41,27 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 
 			if (key === NONE) {
 				resolve(NONE);
-				return;
-			}
-
-			const items = this.cache.get(key);
-
-			if (items) {
-				resolve(key);
 			} else {
-				const items = new Map<string, CompletionItem>();
+				const items = this.cache.get(key);
 
-				fetch(key).then(res => {
-					if (res.ok) {
-						res.text().then(text => {
-							this.parseTextToItems(text, items);
+				if (items) {
+					resolve(key);
+				} else {
+					const items = new Map<string, CompletionItem>();
+
+					fetch(key).then(res => {
+						if (res.ok) {
+							res.text().then(text => {
+								this.parseTextToItems(text, items);
+								this.cache.set(key, items);
+								resolve(key);
+							}, () => resolve(NONE));
+						} else {
 							this.cache.set(key, items);
 							resolve(key);
-						}, () => resolve(NONE));
-					} else {
-						this.cache.set(key, items);
-						resolve(key);
-					}
-				}, () => resolve(NONE));
+						}
+					}, () => resolve(NONE));
+				}
 			}
 		});
 	}
@@ -82,8 +81,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 					const href = this.findLinkHref.exec(link[1]);
 
 					if (href && href[2].startsWith("http")) {
-						promises.push(this.fetchRemoteStyleSheet(href[2])
-							.then(key => keys.add(key)));
+						promises.push(this.fetchRemoteStyleSheet(href[2]).then(k => keys.add(k)));
 					}
 				}
 			}
@@ -97,9 +95,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 			const keys = new Set<string>();
 			const promises = [];
 
-			for (let i = 0; i < this.remoteStyleSheets.length; i++) {
-				promises.push(this.fetchRemoteStyleSheet(this.remoteStyleSheets[i])
-					.then(key => keys.add(key)));
+			for (const sheet of this.remoteStyleSheets) {
+				promises.push(this.fetchRemoteStyleSheet(sheet).then(k => keys.add(k)));
 			}
 
 			Promise.all(promises).then(() => resolve(keys));
@@ -119,33 +116,37 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 		return items;
 	}
 
+	buildItems(items: Map<string, CompletionItem>, ...sets: Set<string>[]): CompletionItem[] {
+		const keys = new Set<string>();
+		sets.forEach(v => v.forEach(v => keys.add(v)));
+		keys.forEach(k => this.cache.get(k)?.forEach((v, k) => items.set(k, v)));
+
+		return [...items.values()];
+	}
+
 	provideCompletionItems(
 		document: TextDocument,
 		position: Position,
 		token: CancellationToken,
-		context: CompletionContext)
-		: ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
+		context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 
 		return new Promise((resolve, reject) => {
-			const range = new Range(this.start, position);
-			const text = document.getText(range);
-			const canComplete = this.canComplete.test(text);
-
-			if (canComplete) {
-				const items = this.findDocumentStyles(text);
-
-				this.findRemoteStyles().then(styles => {
-					this.findDocumentLinks(text).then(links => {
-						links.forEach(key => styles.add(key));
-
-						styles.forEach(key => this.cache.get(key)
-							?.forEach((value, name) => items.set(name, value)));
-
-						resolve([...items.values()]);
-					});
-				});
-			} else {
+			if (token.isCancellationRequested) {
 				reject();
+			} else {
+				const range = new Range(this.start, position);
+				const text = document.getText(range);
+				const canComplete = this.canComplete.test(text);
+
+				if (canComplete) {
+					const items = this.findDocumentStyles(text);
+
+					this.findRemoteStyles().then(styles =>
+						this.findDocumentLinks(text).then(links =>
+							resolve(this.buildItems(items, styles, links))));
+				} else {
+					reject();
+				}
 			}
 		});
 	}
