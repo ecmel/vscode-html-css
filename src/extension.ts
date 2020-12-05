@@ -22,6 +22,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 
     readonly start = new Position(0, 0);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
+    readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /class\s*=\s*(["'])(?:(?!\1).)*$/si;
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
@@ -36,7 +37,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
-    fetchRemoteStyleSheet(key: string): Thenable<string> {
+    fetchStyleSheet(key: string): Thenable<string> {
         return new Promise(resolve => {
             if (key === NONE) {
                 resolve(NONE);
@@ -45,7 +46,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 
                 if (items) {
                     resolve(key);
-                } else {
+                } else if (this.isRemote.test(key)) {
                     const items = new Map<string, CompletionItem>();
 
                     fetch(key).then(res => {
@@ -60,6 +61,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                             resolve(key);
                         }
                     }, () => resolve(NONE));
+                } else {
+                    resolve(NONE);
                 }
             }
         });
@@ -79,8 +82,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                 if (rel && rel[2] === "stylesheet") {
                     const href = this.findLinkHref.exec(link[1]);
 
-                    if (href && href[2].startsWith("http")) {
-                        promises.push(this.fetchRemoteStyleSheet(href[2]).then(k => keys.add(k)));
+                    if (href) {
+                        promises.push(this.fetchStyleSheet(href[2]).then(k => keys.add(k)));
                     }
                 }
             }
@@ -94,8 +97,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
             const keys = new Set<string>();
             const promises = [];
 
-            for (const sheet of this.remoteStyleSheets) {
-                promises.push(this.fetchRemoteStyleSheet(sheet).then(k => keys.add(k)));
+            for (const href of this.remoteStyleSheets) {
+                promises.push(this.fetchStyleSheet(href).then(k => keys.add(k)));
             }
 
             Promise.all(promises).then(() => resolve(keys));
