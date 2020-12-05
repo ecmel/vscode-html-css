@@ -18,7 +18,7 @@ import {
 
 const NONE = "__!NONE!__";
 
-class ClassCompletionItemProvider implements CompletionItemProvider {
+export class ClassCompletionItemProvider implements CompletionItemProvider {
 
 	readonly start = new Position(0, 0);
 	readonly cache = new Map<string, Map<string, CompletionItem>>();
@@ -26,20 +26,14 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 	readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 	readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
-	remoteStyleSheets: string[] = [];
+	#remoteStyleSheets: string[] = [];
 
-	constructor(context: ExtensionContext) {
-		this.parseConfig();
-		context.subscriptions.push(workspace.onDidChangeConfiguration(e => this.parseConfig()));
+	get remoteStyleSheets(): string[] {
+		return this.#remoteStyleSheets;
 	}
 
-	parseConfig() {
-		const config = workspace.getConfiguration("css");
-		const remoteStyleSheets = config.get<string[]>("remoteStyleSheets");
-
-		if (remoteStyleSheets) {
-			this.remoteStyleSheets = remoteStyleSheets;
-		}
+	set remoteStyleSheets(value: string[]) {
+		this.#remoteStyleSheets = value;
 	}
 
 	parseTextToItems(text: string, items: Map<string, CompletionItem>) {
@@ -111,8 +105,8 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 			const keys = new Set<string>();
 			const promises = [];
 
-			for (let i = 0; i < this.remoteStyleSheets.length; i++) {
-				promises.push(this.fetchRemoteStyleSheet(this.remoteStyleSheets[i])
+			for (let i = 0; i < this.#remoteStyleSheets.length; i++) {
+				promises.push(this.fetchRemoteStyleSheet(this.#remoteStyleSheets[i])
 					.then(key => keys.add(key)));
 			}
 
@@ -163,10 +157,22 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 	}
 }
 
+function parseConfig(provider: ClassCompletionItemProvider) {
+	const config = workspace.getConfiguration("css");
+	const remoteStyleSheets = config.get<string[]>("remoteStyleSheets");
+
+	if (remoteStyleSheets) {
+		provider.remoteStyleSheets = remoteStyleSheets;
+	}
+}
+
 export function activate(context: ExtensionContext) {
-	context.subscriptions.push(languages
-		.registerCompletionItemProvider("html",
-			new ClassCompletionItemProvider(context), "\"", "'"));
+	const provider = new ClassCompletionItemProvider();
+
+	parseConfig(provider);
+
+	context.subscriptions.push(workspace.onDidChangeConfiguration(e => parseConfig(provider)));
+	context.subscriptions.push(languages.registerCompletionItemProvider("html", provider, "\"", "'"));
 }
 
 export function deactivate() { }
