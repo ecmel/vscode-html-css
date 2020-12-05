@@ -26,20 +26,12 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 	readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 	readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
-	#remoteStyleSheets: string[] = [];
-
-	get remoteStyleSheets(): string[] {
-		return this.#remoteStyleSheets;
-	}
-
-	set remoteStyleSheets(value: string[]) {
-		this.#remoteStyleSheets = value;
-	}
+	remoteStyleSheets: string[] = [];
 
 	parseTextToItems(text: string, items: Map<string, CompletionItem>) {
 		walk(parse(text), (node) => {
 			if (node.type === "ClassSelector") {
-				items.set(node.name, new CompletionItem(node.name, CompletionItemKind.Value));
+				items.set(node.name, new CompletionItem(node.name, CompletionItemKind.EnumMember));
 			}
 		});
 	}
@@ -105,8 +97,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 			const keys = new Set<string>();
 			const promises = [];
 
-			for (let i = 0; i < this.#remoteStyleSheets.length; i++) {
-				promises.push(this.fetchRemoteStyleSheet(this.#remoteStyleSheets[i])
+			for (let i = 0; i < this.remoteStyleSheets.length; i++) {
+				promises.push(this.fetchRemoteStyleSheet(this.remoteStyleSheets[i])
 					.then(key => keys.add(key)));
 			}
 
@@ -145,8 +137,10 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 				this.findRemoteStyles().then(styles => {
 					this.findDocumentLinks(text).then(links => {
 						links.forEach(key => styles.add(key));
+
 						styles.forEach(key => this.cache.get(key)
 							?.forEach((value, name) => items.set(name, value)));
+
 						resolve([...items.values()]);
 					});
 				});
