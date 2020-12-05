@@ -12,10 +12,11 @@ import {
 	CompletionContext,
 	ProviderResult,
 	CompletionItem,
-	CompletionList
+	CompletionList,
+	CompletionItemKind
 } from "vscode";
 
-const NONE = "<NONE>";
+const NONE = "__!NONE!__";
 
 class ClassCompletionItemProvider implements CompletionItemProvider {
 
@@ -44,7 +45,7 @@ class ClassCompletionItemProvider implements CompletionItemProvider {
 	parseTextToItems(text: string, items: Map<string, CompletionItem>) {
 		walk(parse(text), (node) => {
 			if (node.type === "ClassSelector") {
-				items.set(node.name, new CompletionItem(node.name));
+				items.set(node.name, new CompletionItem(node.name, CompletionItemKind.Value));
 			}
 		});
 	}
