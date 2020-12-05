@@ -1,173 +1,173 @@
 import fetch from "node-fetch";
 import { parse, walk } from "css-tree";
 import {
-	languages,
-	Range,
-	workspace,
-	ExtensionContext,
-	CompletionItemProvider,
-	TextDocument,
-	Position,
-	CancellationToken,
-	CompletionContext,
-	ProviderResult,
-	CompletionItem,
-	CompletionList,
-	CompletionItemKind
+    languages,
+    Range,
+    workspace,
+    ExtensionContext,
+    CompletionItemProvider,
+    TextDocument,
+    Position,
+    CancellationToken,
+    CompletionContext,
+    ProviderResult,
+    CompletionItem,
+    CompletionList,
+    CompletionItemKind
 } from "vscode";
 
 const NONE = "__!NONE!__";
 
 export class ClassCompletionItemProvider implements CompletionItemProvider {
 
-	readonly start = new Position(0, 0);
-	readonly cache = new Map<string, Map<string, CompletionItem>>();
-	readonly canComplete = /class\s*=\s*(["'])(?:(?!\1).)*$/si;
-	readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
-	readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
+    readonly start = new Position(0, 0);
+    readonly cache = new Map<string, Map<string, CompletionItem>>();
+    readonly canComplete = /class\s*=\s*(["'])(?:(?!\1).)*$/si;
+    readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
+    readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
-	remoteStyleSheets: string[] = [];
+    remoteStyleSheets: string[] = [];
 
-	parseTextToItems(text: string, items: Map<string, CompletionItem>) {
-		walk(parse(text), v => {
-			if (v.type === "ClassSelector") {
-				items.set(v.name, new CompletionItem(v.name, CompletionItemKind.EnumMember));
-			}
-		});
-	}
+    parseTextToItems(text: string, items: Map<string, CompletionItem>) {
+        walk(parse(text), node => {
+            if (node.type === "ClassSelector") {
+                items.set(node.name, new CompletionItem(node.name, CompletionItemKind.EnumMember));
+            }
+        });
+    }
 
-	fetchRemoteStyleSheet(key: string): Thenable<string> {
-		return new Promise(resolve => {
+    fetchRemoteStyleSheet(key: string): Thenable<string> {
+        return new Promise(resolve => {
+            if (key === NONE) {
+                resolve(NONE);
+            } else {
+                const items = this.cache.get(key);
 
-			if (key === NONE) {
-				resolve(NONE);
-			} else {
-				const items = this.cache.get(key);
+                if (items) {
+                    resolve(key);
+                } else {
+                    const items = new Map<string, CompletionItem>();
 
-				if (items) {
-					resolve(key);
-				} else {
-					const items = new Map<string, CompletionItem>();
+                    fetch(key).then(res => {
+                        if (res.ok) {
+                            res.text().then(text => {
+                                this.parseTextToItems(text, items);
+                                this.cache.set(key, items);
+                                resolve(key);
+                            }, () => resolve(NONE));
+                        } else {
+                            this.cache.set(key, items);
+                            resolve(key);
+                        }
+                    }, () => resolve(NONE));
+                }
+            }
+        });
+    }
 
-					fetch(key).then(res => {
-						if (res.ok) {
-							res.text().then(text => {
-								this.parseTextToItems(text, items);
-								this.cache.set(key, items);
-								resolve(key);
-							}, () => resolve(NONE));
-						} else {
-							this.cache.set(key, items);
-							resolve(key);
-						}
-					}, () => resolve(NONE));
-				}
-			}
-		});
-	}
+    findDocumentLinks(text: string): Thenable<Set<string>> {
+        return new Promise(resolve => {
+            const findLinks = /<link([^>]+)>/gi;
+            const keys = new Set<string>();
+            const promises = [];
 
-	findDocumentLinks(text: string): Thenable<Set<string>> {
-		return new Promise(resolve => {
-			const findLinks = /<link([^>]+)>/gi;
-			const keys = new Set<string>();
-			const promises = [];
+            let link;
 
-			let link;
+            while ((link = findLinks.exec(text)) !== null) {
+                const rel = this.findLinkRel.exec(link[1]);
 
-			while ((link = findLinks.exec(text)) !== null) {
-				const rel = this.findLinkRel.exec(link[1]);
+                if (rel && rel[2] === "stylesheet") {
+                    const href = this.findLinkHref.exec(link[1]);
 
-				if (rel && rel[2] === "stylesheet") {
-					const href = this.findLinkHref.exec(link[1]);
+                    if (href && href[2].startsWith("http")) {
+                        promises.push(this.fetchRemoteStyleSheet(href[2]).then(k => keys.add(k)));
+                    }
+                }
+            }
 
-					if (href && href[2].startsWith("http")) {
-						promises.push(this.fetchRemoteStyleSheet(href[2]).then(k => keys.add(k)));
-					}
-				}
-			}
+            Promise.all(promises).then(() => resolve(keys));
+        });
+    }
 
-			Promise.all(promises).then(() => resolve(keys));
-		});
-	}
+    findRemoteStyles(): Thenable<Set<string>> {
+        return new Promise(resolve => {
+            const keys = new Set<string>();
+            const promises = [];
 
-	findRemoteStyles(): Thenable<Set<string>> {
-		return new Promise(resolve => {
-			const keys = new Set<string>();
-			const promises = [];
+            for (const sheet of this.remoteStyleSheets) {
+                promises.push(this.fetchRemoteStyleSheet(sheet).then(k => keys.add(k)));
+            }
 
-			for (const sheet of this.remoteStyleSheets) {
-				promises.push(this.fetchRemoteStyleSheet(sheet).then(k => keys.add(k)));
-			}
+            Promise.all(promises).then(() => resolve(keys));
+        });
+    }
 
-			Promise.all(promises).then(() => resolve(keys));
-		});
-	}
+    findDocumentStyles(text: string): Map<string, CompletionItem> {
+        const items = new Map<string, CompletionItem>();
+        const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
 
-	findDocumentStyles(text: string): Map<string, CompletionItem> {
-		const items = new Map<string, CompletionItem>();
-		const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
+        let style;
 
-		let style;
+        while ((style = findStyles.exec(text)) !== null) {
+            this.parseTextToItems(style[1], items);
+        }
 
-		while ((style = findStyles.exec(text)) !== null) {
-			this.parseTextToItems(style[1], items);
-		}
+        return items;
+    }
 
-		return items;
-	}
+    buildItems(items: Map<string, CompletionItem>, ...sets: Set<string>[]): CompletionItem[] {
+        const keys = new Set<string>();
 
-	buildItems(items: Map<string, CompletionItem>, ...sets: Set<string>[]): CompletionItem[] {
-		const keys = new Set<string>();
-		sets.forEach(v => v.forEach(v => keys.add(v)));
-		keys.forEach(k => this.cache.get(k)?.forEach((v, k) => items.set(k, v)));
+        sets.forEach(v => v.forEach(v => keys.add(v)));
+        keys.forEach(k => this.cache.get(k)?.forEach((v, k) => items.set(k, v)));
 
-		return [...items.values()];
-	}
+        return [...items.values()];
+    }
 
-	provideCompletionItems(
-		document: TextDocument,
-		position: Position,
-		token: CancellationToken,
-		context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
+    provideCompletionItems(
+        document: TextDocument,
+        position: Position,
+        token: CancellationToken,
+        context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 
-		return new Promise((resolve, reject) => {
-			if (token.isCancellationRequested) {
-				reject();
-			} else {
-				const range = new Range(this.start, position);
-				const text = document.getText(range);
-				const canComplete = this.canComplete.test(text);
+        return new Promise((resolve, reject) => {
+            if (token.isCancellationRequested) {
+                reject();
+            } else {
+                const range = new Range(this.start, position);
+                const text = document.getText(range);
+                const canComplete = this.canComplete.test(text);
 
-				if (canComplete) {
-					const items = this.findDocumentStyles(text);
+                if (canComplete) {
+                    const items = this.findDocumentStyles(text);
 
-					this.findRemoteStyles().then(styles =>
-						this.findDocumentLinks(text).then(links =>
-							resolve(this.buildItems(items, styles, links))));
-				} else {
-					reject();
-				}
-			}
-		});
-	}
+                    this.findRemoteStyles().then(styles =>
+                        this.findDocumentLinks(text).then(links =>
+                            resolve(this.buildItems(items, styles, links))));
+                } else {
+                    reject();
+                }
+            }
+        });
+    }
 }
 
 function parseConfig(provider: ClassCompletionItemProvider) {
-	const config = workspace.getConfiguration("css");
-	const remoteStyleSheets = config.get<string[]>("remoteStyleSheets");
+    const config = workspace.getConfiguration("css");
+    const remoteStyleSheets = config.get<string[]>("remoteStyleSheets");
 
-	if (remoteStyleSheets) {
-		provider.remoteStyleSheets = remoteStyleSheets;
-	}
+    if (remoteStyleSheets) {
+        provider.remoteStyleSheets = remoteStyleSheets;
+    }
 }
 
 export function activate(context: ExtensionContext) {
-	const provider = new ClassCompletionItemProvider();
+    const provider = new ClassCompletionItemProvider();
 
-	parseConfig(provider);
+    parseConfig(provider);
 
-	context.subscriptions.push(workspace.onDidChangeConfiguration(e => parseConfig(provider)));
-	context.subscriptions.push(languages.registerCompletionItemProvider("html", provider, "\"", "'"));
+    context.subscriptions.push(workspace.onDidChangeConfiguration(e => parseConfig(provider)));
+    context.subscriptions.push(languages.registerCompletionItemProvider("html", provider, "\"", "'"));
 }
 
 export function deactivate() { }
