@@ -1,7 +1,6 @@
 import * as assert from 'assert';
 import { ClassCompletionItemProvider } from '../../extension';
 import {
-	window,
 	TextDocument,
 	Position,
 	CancellationToken,
