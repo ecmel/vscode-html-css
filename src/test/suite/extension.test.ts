@@ -72,21 +72,40 @@ class MockTextDocument implements TextDocument {
 }
 
 suite('Extension Test Suite', () => {
+
+	const position = new Position(0, 0);
+	const token = new MockCancellationToken(false);
+	const context = new MockCompletionContext();
+
 	window.showInformationMessage('Start all tests.');
 
-	test('Completes empty document with no items.', done => {
+	test('Rejects empty documents.', done => {
 		const provider = new ClassCompletionItemProvider();
-
 		const document = new MockTextDocument("");
-		const position = new Position(0, 0);
-		const token = new MockCancellationToken(false);
-		const context = new MockCompletionContext();
-
 		const result = provider.provideCompletionItems(document, position, token, context) as Thenable<CompletionItem[]>;
 
-		result.then((items) => {
-			assert.strictEqual(items.length, 0);
-			done();
-		}, done);
+		result.then(items => { }, (e) => {
+			try {
+				assert.strictEqual(e, undefined);
+				done();
+			} catch (e) {
+				done(e);
+			}
+		});
+	});
+
+	test('Rejects outside class attribute.', done => {
+		const provider = new ClassCompletionItemProvider();
+		const document = new MockTextDocument("<a class=''>");
+		const result = provider.provideCompletionItems(document, position, token, context) as Thenable<CompletionItem[]>;
+
+		result.then(items => { }, (e) => {
+			try {
+				assert.strictEqual(e, undefined);
+				done();
+			} catch (e) {
+				done(e);
+			}
+		});
 	});
 });
