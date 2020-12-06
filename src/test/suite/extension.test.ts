@@ -86,6 +86,7 @@ suite('Extension Test Suite', () => {
 
 		result.then((items) => {
 			assert.strictEqual(items.length, 0);
+			done();
 		}, done);
 	});
 });
