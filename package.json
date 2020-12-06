@@ -50,7 +50,8 @@
 		"pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js",
-		"deploy": "vsce publish"
+		"deploy": "vsce publish",
+		"package": "vsce package"
 	},
 	"devDependencies": {
 		"@types/css-tree": "^1.0.4",
