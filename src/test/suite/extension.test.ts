@@ -77,6 +77,13 @@ suite('Extension Test Suite', () => {
 	const token = new MockCancellationToken(false);
 	const context = new MockCompletionContext();
 
+	test('RegEx: isRemote', () => {
+		const provider = new ClassCompletionItemProvider();
+
+		assert.strictEqual(provider.isRemote.test("http://example.com/example.css"), true);
+		assert.strictEqual(provider.isRemote.test("https://example.com/example.css"), true);
+	});
+
 	test('Rejects empty documents', done => {
 		const provider = new ClassCompletionItemProvider();
 		const document = new MockTextDocument(``);
@@ -93,17 +100,15 @@ suite('Extension Test Suite', () => {
 		result.then(items => done(items), () => done());
 	});
 
-	test('Completes from config', done => {
+	test('Completes from style tag', done => {
 		const provider = new ClassCompletionItemProvider();
-		const document = new MockTextDocument(`<a class="`);
-
-		provider.remoteStyleSheets = ["https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"];
+		const document = new MockTextDocument(`<style>.test{}</style><a class="`);
 
 		const result = provider.provideCompletionItems(document, position, token, context) as Thenable<CompletionItem[]>;
 
 		result.then(items => {
 			try {
-				assert.notStrictEqual(items.length, 0);
+				assert.strictEqual(items.length, 1);
 				done();
 			} catch (e) {
 				done(e);
@@ -127,15 +132,17 @@ suite('Extension Test Suite', () => {
 		}, done);
 	});
 
-	test('Completes from style tag', done => {
+	test('Completes from remote config', done => {
 		const provider = new ClassCompletionItemProvider();
-		const document = new MockTextDocument(`<style>.test{}</style><a class="`);
+		const document = new MockTextDocument(`<a class="`);
+
+		provider.remoteStyleSheets = ["https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"];
 
 		const result = provider.provideCompletionItems(document, position, token, context) as Thenable<CompletionItem[]>;
 
 		result.then(items => {
 			try {
-				assert.strictEqual(items.length, 1);
+				assert.notStrictEqual(items.length, 0);
 				done();
 			} catch (e) {
 				done(e);
