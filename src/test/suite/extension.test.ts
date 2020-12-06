@@ -84,6 +84,57 @@ suite('Extension Test Suite', () => {
 		assert.strictEqual(provider.isRemote.test("https://example.com/example.css"), true);
 	});
 
+	test('RegEx: canComplete', () => {
+		const provider = new ClassCompletionItemProvider();
+
+		assert.strictEqual(provider.canComplete.test(``), false);
+		assert.strictEqual(provider.canComplete.test(`class="`), true);
+		assert.strictEqual(provider.canComplete.test(`class=""`), false);
+		assert.strictEqual(provider.canComplete.test(`class = "`), true);
+		assert.strictEqual(provider.canComplete.test(`class = ""`), false);
+
+		assert.strictEqual(provider.canComplete.test(`
+			class = "someClass
+		`), true);
+
+		assert.strictEqual(provider.canComplete.test(`
+			class 
+			= "someClass
+		`), true);
+		assert.strictEqual(provider.canComplete.test(`
+			class = 
+					"someClass
+
+		`), true);
+		assert.strictEqual(provider.canComplete.test(`
+			class = 
+					"someClass
+					
+		"`), false);
+		assert.strictEqual(provider.canComplete.test(`
+			class = "some"
+			class = 
+					"someClass
+					
+		"`), false);
+	});
+
+	test('RegEx: findLinkRel', () => {
+		const provider = new ClassCompletionItemProvider();
+
+		assert.strictEqual(provider.findLinkRel.exec(`
+			<link rel="stylesheet" href="http://example.com/example.css">
+		"`)?.[2], "stylesheet");
+	});
+
+	test('RegEx: findLinkHref', () => {
+		const provider = new ClassCompletionItemProvider();
+
+		assert.strictEqual(provider.findLinkHref.exec(`
+			<link rel="stylesheet" href="http://example.com/example.css">
+		"`)?.[2], "http://example.com/example.css");
+	});
+
 	test('Rejects empty documents', done => {
 		const provider = new ClassCompletionItemProvider();
 		const document = new MockTextDocument(``);
