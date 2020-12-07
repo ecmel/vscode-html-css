@@ -37,6 +37,25 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
+    fetchRemote(key: string): Thenable<string> {
+        return new Promise(resolve => {
+            const items = new Map<string, CompletionItem>();
+
+            fetch(key).then(res => {
+                if (res.ok) {
+                    res.text().then(text => {
+                        this.parseTextToItems(text, items);
+                        this.cache.set(key, items);
+                        resolve(key);
+                    }, () => resolve(NONE));
+                } else {
+                    this.cache.set(key, items);
+                    resolve(key);
+                }
+            }, () => resolve(NONE));
+        });
+    }
+
     fetchStyleSheet(key: string): Thenable<string> {
         return new Promise(resolve => {
             if (key === NONE) {
@@ -47,20 +66,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                 if (items) {
                     resolve(key);
                 } else if (this.isRemote.test(key)) {
-                    const items = new Map<string, CompletionItem>();
-
-                    fetch(key).then(res => {
-                        if (res.ok) {
-                            res.text().then(text => {
-                                this.parseTextToItems(text, items);
-                                this.cache.set(key, items);
-                                resolve(key);
-                            }, () => resolve(NONE));
-                        } else {
-                            this.cache.set(key, items);
-                            resolve(key);
-                        }
-                    }, () => resolve(NONE));
+                    this.fetchRemote(key).then(key => resolve(key));
                 } else {
                     resolve(NONE);
                 }
