@@ -61,9 +61,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
             if (key === NONE) {
                 resolve(NONE);
             } else {
-                const items = this.cache.get(key);
-
-                if (items) {
+                if (this.cache.get(key)) {
                     resolve(key);
                 } else if (this.isRemote.test(key)) {
                     this.fetchRemote(key).then(key => resolve(key));
