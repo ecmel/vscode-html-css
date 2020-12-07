@@ -13,10 +13,11 @@ import {
     ProviderResult,
     CompletionItem,
     CompletionList,
-    CompletionItemKind
+    CompletionItemKind,
+    Uri
 } from "vscode";
 
-const NONE = "__!NONE!__";
+export const NONE = "__!NONE!__";
 
 export class ClassCompletionItemProvider implements CompletionItemProvider {
 
@@ -26,8 +27,6 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
     readonly canComplete = /class\s*=\s*(["'])(?:(?!\1).)*$/si;
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
-
-    remoteStyleSheets: string[] = [];
 
     parseTextToItems(text: string, items: Map<string, CompletionItem>) {
         walk(parse(text), node => {
@@ -96,16 +95,23 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
-    findRemoteStyles(): Thenable<Set<string>> {
+    findRemoteStyles(uri: Uri): Thenable<Set<string>> {
         return new Promise(resolve => {
             const keys = new Set<string>();
-            const promises = [];
+            const config = workspace.getConfiguration("css", uri);
+            const remoteStyleSheets = config.get<string[]>("remoteStyleSheets", []);
 
-            for (const href of this.remoteStyleSheets) {
-                promises.push(this.fetchStyleSheet(href).then(k => keys.add(k)));
+            if (remoteStyleSheets.length === 0) {
+                resolve(keys);
+            } else {
+                const promises = [];
+
+                for (const href of remoteStyleSheets) {
+                    promises.push(this.fetchStyleSheet(href).then(k => keys.add(k)));
+                }
+
+                Promise.all(promises).then(() => resolve(keys));
             }
-
-            Promise.all(promises).then(() => resolve(keys));
         });
     }
 
@@ -148,7 +154,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                 if (canComplete) {
                     const items = this.findDocumentStyles(text);
 
-                    this.findRemoteStyles().then(styles =>
+                    this.findRemoteStyles(document.uri).then(styles =>
                         this.findDocumentLinks(text).then(links =>
                             resolve(this.buildItems(items, styles, links))));
                 } else {
@@ -159,22 +165,10 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
     }
 }
 
-function parseConfig(provider: ClassCompletionItemProvider) {
-    const config = workspace.getConfiguration("css");
-    const remoteStyleSheets = config.get<string[]>("remoteStyleSheets");
-
-    if (remoteStyleSheets) {
-        provider.remoteStyleSheets = remoteStyleSheets;
-    }
-}
-
 export function activate(context: ExtensionContext) {
-    const provider = new ClassCompletionItemProvider();
-
-    parseConfig(provider);
-
-    context.subscriptions.push(workspace.onDidChangeConfiguration(e => parseConfig(provider)));
-    context.subscriptions.push(languages.registerCompletionItemProvider("html", provider, "\"", "'"));
+    context.subscriptions.push(languages
+        .registerCompletionItemProvider("html",
+            new ClassCompletionItemProvider(), "\"", "'"));
 }
 
 export function deactivate() { }

@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import { ClassCompletionItemProvider } from '../../extension';
 import {
+	workspace,
 	TextDocument,
 	Position,
 	CancellationToken,
@@ -169,24 +170,6 @@ suite('Extension Test Suite', () => {
 	test('Completes from link tag', done => {
 		const provider = new ClassCompletionItemProvider();
 		const document = new MockTextDocument(`<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" rel="stylesheet"><a class="`);
-
-		const result = provider.provideCompletionItems(document, position, token, context) as Thenable<CompletionItem[]>;
-
-		result.then(items => {
-			try {
-				assert.notStrictEqual(items.length, 0);
-				done();
-			} catch (e) {
-				done(e);
-			}
-		}, done);
-	});
-
-	test('Completes from remote config', done => {
-		const provider = new ClassCompletionItemProvider();
-		const document = new MockTextDocument(`<a class="`);
-
-		provider.remoteStyleSheets = ["https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"];
 
 		const result = provider.provideCompletionItems(document, position, token, context) as Thenable<CompletionItem[]>;
 
