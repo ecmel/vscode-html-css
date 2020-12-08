@@ -17,12 +17,11 @@ import {
     Uri
 } from "vscode";
 
-export const NONE = "__!NONE!__";
-
 export class ClassCompletionItemProvider implements CompletionItemProvider {
 
     readonly start = new Position(0, 0);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
+    readonly none = "__!NONE!__";
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /class\s*=\s*(["'])(?:(?!\1).)*$/si;
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
@@ -46,26 +45,26 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                         this.parseTextToItems(text, items);
                         this.cache.set(key, items);
                         resolve(key);
-                    }, () => resolve(NONE));
+                    }, () => resolve(this.none));
                 } else {
                     this.cache.set(key, items);
                     resolve(key);
                 }
-            }, () => resolve(NONE));
+            }, () => resolve(this.none));
         });
     }
 
     fetchStyleSheet(key: string): Thenable<string> {
         return new Promise(resolve => {
-            if (key === NONE) {
-                resolve(NONE);
+            if (key === this.none) {
+                resolve(this.none);
             } else {
                 if (this.cache.get(key)) {
                     resolve(key);
                 } else if (this.isRemote.test(key)) {
                     this.fetchRemote(key).then(key => resolve(key));
                 } else {
-                    resolve(NONE);
+                    resolve(this.none);
                 }
             }
         });
