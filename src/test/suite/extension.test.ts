@@ -1,13 +1,17 @@
 import * as assert from 'assert';
 import { ClassCompletionItemProvider } from '../../extension';
 import {
-	workspace,
 	Uri,
 	Event,
 	CancellationToken,
 	CompletionContext,
 	CompletionTriggerKind,
-	CompletionItem
+	CompletionItem,
+	TextDocument,
+	EndOfLine,
+	Position,
+	Range,
+	TextLine
 } from 'vscode';
 
 class MockCancellationToken implements CancellationToken {
@@ -24,8 +28,52 @@ class MockCompletionContext implements CompletionContext {
 	triggerCharacter?: string | undefined;
 }
 
+class MockDocument implements TextDocument {
+	uri!: Uri;
+	fileName!: string;
+	isUntitled!: boolean;
+	languageId!: string;
+	version!: number;
+	isDirty!: boolean;
+	isClosed!: boolean;
+	eol!: EndOfLine;
+	lineCount!: number;
+	text: string;
+
+	constructor(text: string) {
+		this.text = text;
+	}
+
+	getText(range?: Range): string {
+		return this.text;
+	}
+
+	save(): Thenable<boolean> {
+		throw new Error('Method not implemented.');
+	}
+	lineAt(position: Position | number | any): TextLine {
+		throw new Error('Method not implemented.');
+	}
+	offsetAt(position: Position): number {
+		throw new Error('Method not implemented.');
+	}
+	positionAt(offset: number): Position {
+		throw new Error('Method not implemented.');
+	}
+	getWordRangeAtPosition(position: Position, regex?: RegExp): Range | undefined {
+		throw new Error('Method not implemented.');
+	}
+	validateRange(range: Range): Range {
+		throw new Error('Method not implemented.');
+	}
+	validatePosition(position: Position): Position {
+		throw new Error('Method not implemented.');
+	}
+}
+
 suite('Extension Test Suite', () => {
 
+	const position = new Position(0, 0);
 	const token = new MockCancellationToken(false);
 	const context = new MockCompletionContext();
 
@@ -87,32 +135,26 @@ suite('Extension Test Suite', () => {
 		"`)?.[2], "http://example.com/example.css");
 	});
 
-	test('Rejects outside class attribute', async () => {
+	test('Rejects outside class attribute', (done) => {
 		const provider = new ClassCompletionItemProvider();
-		const content = `<a class=""></a>`;
-		const document = await workspace.openTextDocument({ content, language: "html" });
+		const document = new MockDocument(`<a class=""></a>`);
 
-		try {
-			const items = await (provider.provideCompletionItems(
-				document,
-				document.positionAt(content.length),
-				token,
-				context) as Thenable<CompletionItem[]>);
+		const result = provider.provideCompletionItems(
+			document,
+			position,
+			token,
+			context) as Thenable<CompletionItem[]>;
 
-			assert.strictEqual(items.length, 0);
-		} catch (e) {
-			assert.strictEqual(e, undefined);
-		}
+		result.then(items => done(new Error("Should reject!")), () => done());
 	});
 
 	test('Completes from style tag', async () => {
 		const provider = new ClassCompletionItemProvider();
-		const content = `<style>.test{}</style><a class="`;
-		const document = await workspace.openTextDocument({ content, language: "html" });
+		const document = new MockDocument(`<style>.test{}</style><a class="`);
 
 		const items = await (provider.provideCompletionItems(
 			document,
-			document.positionAt(content.length),
+			position,
 			token,
 			context) as Thenable<CompletionItem[]>);
 
@@ -121,23 +163,21 @@ suite('Extension Test Suite', () => {
 
 	test('Completes from link tag', async () => {
 		const provider = new ClassCompletionItemProvider();
-		const content = `
+		const document = new MockDocument(`
 			<link 
 				href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" 
 				rel="stylesheet"
 			>
-			<a class="`;
-		const document = await workspace.openTextDocument({ content, language: "html" });
+			<a class="`);
 
 		const items = await (provider.provideCompletionItems(
 			document,
-			document.positionAt(content.length),
+			position,
 			token,
 			context) as Thenable<CompletionItem[]>);
 
 		assert.notStrictEqual(items.length, 0);
 	});
-
 
 	test('Completes from remote style', async () => {
 		const provider = new class extends ClassCompletionItemProvider {
@@ -148,12 +188,11 @@ suite('Extension Test Suite', () => {
 			}
 		}();
 
-		const content = `<a class="`;
-		const document = await workspace.openTextDocument({ content, language: "html" });
+		const document = new MockDocument(`<a class="`);
 
 		const items = await (provider.provideCompletionItems(
 			document,
-			document.positionAt(content.length),
+			position,
 			token,
 			context) as Thenable<CompletionItem[]>);
 
