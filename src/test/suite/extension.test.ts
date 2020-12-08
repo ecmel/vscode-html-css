@@ -2,12 +2,11 @@ import * as assert from 'assert';
 import { ClassCompletionItemProvider } from '../../extension';
 import {
 	workspace,
-	Position,
-	CancellationToken,
+	Uri,
 	Event,
+	CancellationToken,
 	CompletionContext,
 	CompletionTriggerKind,
-	Uri,
 	CompletionItem
 } from 'vscode';
 
@@ -27,7 +26,6 @@ class MockCompletionContext implements CompletionContext {
 
 suite('Extension Test Suite', () => {
 
-	const position = new Position(0, 0);
 	const token = new MockCancellationToken(false);
 	const context = new MockCompletionContext();
 
