@@ -27,6 +27,10 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
+    getRemoteStyleSheets(uri: Uri): string[] {
+        return workspace.getConfiguration("css", uri).get<string[]>("remoteStyleSheets", []);
+    }
+
     parseTextToItems(text: string, items: Map<string, CompletionItem>) {
         walk(parse(text), node => {
             if (node.type === "ClassSelector") {
@@ -97,8 +101,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
     findRemoteStyles(uri: Uri): Thenable<Set<string>> {
         return new Promise(resolve => {
             const keys = new Set<string>();
-            const config = workspace.getConfiguration("css", uri);
-            const remoteStyleSheets = config.get<string[]>("remoteStyleSheets", []);
+            const remoteStyleSheets = this.getRemoteStyleSheets(uri);
 
             if (remoteStyleSheets.length === 0) {
                 resolve(keys);
