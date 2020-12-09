@@ -168,9 +168,13 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 }
 
 export function activate(context: ExtensionContext) {
+    const config = workspace.getConfiguration("css");
+    const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
+    const triggerCharacters = config.get<string[]>("triggerCharacters", ["\"", "'"]);
+
     context.subscriptions.push(languages
-        .registerCompletionItemProvider("html",
-            new ClassCompletionItemProvider(), "\"", "'"));
+        .registerCompletionItemProvider(enabledLanguages,
+            new ClassCompletionItemProvider(), ...triggerCharacters));
 }
 
 export function deactivate() { }

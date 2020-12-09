@@ -21,13 +21,13 @@ If it is not possible to specify remote styles with `<link rel="stylesheet">` ta
 
 ## Supported Languages
 
-Support for other types of html like documents can be added in VS Code settings:
+Supported languages can be configured with the `css.enabledLanguages` configuration setting. By
+default "html" is enabled:
 
 ```json
-"files.associations": {
-  "*.tpl": "html",
-  "*.master": "html"
-}
+"css.enabledLanguages": [
+  "html"
+]
 ```
 
 ## Installation

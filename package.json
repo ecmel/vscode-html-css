@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS support for HTML documents",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -26,7 +26,7 @@
 		"multi-root ready"
 	],
 	"activationEvents": [
-		"onLanguage:html"
+		"onStartupFinished"
 	],
 	"contributes": {
 		"configuration": {
@@ -37,6 +37,23 @@
 					"default": [],
 					"description": "A list of remote style sheets.",
 					"scope": "resource"
+				},
+				"css.enabledLanguages": {
+					"type": "array",
+					"description": "A list of languages where suggestions are desired.",
+					"default": [
+						"html"
+					],
+					"scope": "window"
+				},
+				"css.triggerCharacters": {
+					"type": "array",
+					"description": "A list of trigger characters to start completion.",
+					"default": [
+						"\"",
+						"'"
+					],
+					"scope": "window"
 				}
 			}
 		}
