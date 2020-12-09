@@ -22,7 +22,7 @@ If it is not possible to specify remote styles with `<link rel="stylesheet">` ta
 ## Supported Languages
 
 Supported languages can be configured with the `css.enabledLanguages` configuration setting. By
-default "html" is enabled:
+default `html` is enabled:
 
 ```json
 "css.enabledLanguages": [
