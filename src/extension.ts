@@ -1,20 +1,20 @@
 import fetch from "node-fetch";
 import { parse, walk } from "css-tree";
 import {
-    languages,
-    Range,
-    workspace,
-    ExtensionContext,
-    CompletionItemProvider,
-    TextDocument,
-    Position,
     CancellationToken,
     CompletionContext,
-    ProviderResult,
     CompletionItem,
-    CompletionList,
     CompletionItemKind,
-    Uri
+    CompletionItemProvider,
+    CompletionList,
+    ExtensionContext,
+    languages,
+    Position,
+    ProviderResult,
+    Range,
+    TextDocument,
+    Uri,
+    workspace
 } from "vscode";
 
 export class ClassCompletionItemProvider implements CompletionItemProvider {

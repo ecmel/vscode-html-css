@@ -1,17 +1,17 @@
 import * as assert from 'assert';
 import { ClassCompletionItemProvider } from '../../extension';
 import {
-	Uri,
-	Event,
 	CancellationToken,
 	CompletionContext,
-	CompletionTriggerKind,
 	CompletionItem,
-	TextDocument,
+	CompletionTriggerKind,
 	EndOfLine,
+	Event,
 	Position,
 	Range,
-	TextLine
+	TextDocument,
+	TextLine,
+	Uri
 } from 'vscode';
 
 class MockCancellationToken implements CancellationToken {
