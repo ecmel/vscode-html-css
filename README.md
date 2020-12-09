@@ -30,6 +30,11 @@ default "html" is enabled:
 ]
 ```
 
+Some languages are listed below:
+
+`django-html` `laravel-blade` `razor` `vue` `blade` `pug` `jade` `handlebars` `php` `twig` 
+`md` `nunjucks` `javascriptreact` `erb` `typescriptreact` `HTML (Eex)` `html-eex` `haml` `svelte`
+
 ## Installation
 
 [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css)
