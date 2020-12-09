@@ -30,10 +30,10 @@ default "html" is enabled:
 ]
 ```
 
-Some languages are listed below:
+Extension can be configured to support any language where it makes sense such as:
 
 `django-html` `laravel-blade` `razor` `vue` `blade` `pug` `jade` `handlebars` `php` `twig` 
-`md` `nunjucks` `javascriptreact` `erb` `typescriptreact` `HTML (Eex)` `html-eex` `haml` `svelte`
+`md` `nunjucks` `javascriptreact` `typescriptreact` `erb` `HTML (Eex)` `html-eex` `haml` `svelte`
 
 ## Installation
 
