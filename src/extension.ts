@@ -41,6 +41,18 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
+    fetchLocal(key: string): Thenable<string> {
+        return new Promise(resolve => {
+            const items = new Map<string, CompletionItem>();
+
+            workspace.fs.readFile(Uri.file(key)).then(content => {
+                this.parseTextToItems(content.toString(), items);
+                this.cache.set(key, items);
+                resolve(key);
+            }, () => resolve(this.none));
+        });
+    }
+
     fetchRemote(key: string): Thenable<string> {
         return new Promise(resolve => {
             const items = new Map<string, CompletionItem>();
@@ -60,32 +72,18 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
-    fetchLocal(key: string): Thenable<string> {
-        return new Promise(resolve => {
-            const items = new Map<string, CompletionItem>();
-
-            workspace.fs.readFile(Uri.file(key)).then(content => {
-                this.parseTextToItems(content.toString(), items);
-                this.cache.set(key, items);
-                resolve(key);
-            }, () => resolve(this.none));
-        });
-    }
-
     fetchStyleSheet(key: string): Thenable<string> {
         return new Promise(resolve => {
             if (key === this.none) {
                 resolve(this.none);
+            } else if (this.cache.get(key)) {
+                resolve(key);
+            } else if (key.startsWith("/")) {
+                this.fetchLocal(key).then(key => resolve(key));
+            } else if (this.isRemote.test(key)) {
+                this.fetchRemote(key).then(key => resolve(key));
             } else {
-                if (this.cache.get(key)) {
-                    resolve(key);
-                } else if (this.isRemote.test(key)) {
-                    this.fetchRemote(key).then(key => resolve(key));
-                } else if (key.startsWith("/")) {
-                    this.fetchLocal(key).then(key => resolve(key));
-                } else {
-                    resolve(this.none);
-                }
+                resolve(this.none);
             }
         });
     }
@@ -185,10 +183,11 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                 if (canComplete) {
                     const items = this.findDocumentStyles(text);
 
-                    this.findLocalStyles().then(locals =>
-                        this.findRemoteStyles(document.uri).then(styles =>
-                            this.findDocumentLinks(text).then(links =>
-                                resolve(this.buildItems(items, styles, links, locals)))));
+                    Promise.all([
+                        this.findLocalStyles(),
+                        this.findDocumentLinks(text),
+                        this.findRemoteStyles(document.uri),
+                    ]).then(keys => resolve(this.buildItems(items, ...keys)));
                 } else {
                     reject();
                 }
