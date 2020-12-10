@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { FSWatcher, watch } from "chokidar";
+import { watch } from "chokidar";
 import { parse, walk } from "css-tree";
 import {
     CancellationToken,
@@ -157,7 +157,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         return items;
     }
 
-    buildItems(items: Map<string, CompletionItem>, ...sets: Set<string>[]): CompletionItem[] {
+    buildItems(items: Map<string, CompletionItem>, sets: Set<string>[]): CompletionItem[] {
         const keys = new Set<string>();
 
         sets.forEach(v => v.forEach(v => keys.add(v)));
@@ -187,7 +187,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                         this.findLocalStyles(),
                         this.findDocumentLinks(text),
                         this.findRemoteStyles(document.uri),
-                    ]).then(keys => resolve(this.buildItems(items, ...keys)));
+                    ]).then(keys => resolve(this.buildItems(items, keys)));
                 } else {
                     reject();
                 }
@@ -195,8 +195,6 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 }
-
-export let watcher: FSWatcher;
 
 export function activate(context: ExtensionContext) {
     const provider = new ClassCompletionItemProvider();
@@ -212,12 +210,12 @@ export function activate(context: ExtensionContext) {
     const folders = workspace.workspaceFolders?.map(folder => `${folder.uri.fsPath}/${glob}`);
 
     if (folders) {
-        watcher = watch(folders, { ignored: ["**/node_modules/**", "**/test*/**"] })
+        const watcher = watch(folders, { ignored: ["**/node_modules/**", "**/test*/**"] })
             .on("add", key => provider.files.add(key))
             .on("unlink", key => provider.files.delete(key))
             .on("change", key => provider.cache.delete(key));
 
-        workspace.onDidChangeWorkspaceFolders(e => {
+        const changes = workspace.onDidChangeWorkspaceFolders(e => {
             e.removed.forEach(folder => {
                 watcher.unwatch(`${folder.uri.fsPath}/${glob}`);
 
@@ -230,9 +228,9 @@ export function activate(context: ExtensionContext) {
 
             e.added.forEach(folder => watcher.add(`${folder.uri.fsPath}/${glob}`));
         });
+
+        context.subscriptions.push(changes, { dispose: () => watcher.close() });
     }
 }
 
-export function deactivate() {
-    return watcher?.close();
-}
+export function deactivate() { }
