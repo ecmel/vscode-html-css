@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { FSWatcher, watch } from "chokidar";
 import { parse, walk } from "css-tree";
 import {
     CancellationToken,
@@ -20,6 +21,7 @@ import {
 export class ClassCompletionItemProvider implements CompletionItemProvider {
 
     readonly start = new Position(0, 0);
+    readonly files = new Set<string>();
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly none = "__!NONE!__";
     readonly isRemote = /^https?:\/\//i;
@@ -58,6 +60,18 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
+    fetchLocal(key: string): Thenable<string> {
+        return new Promise(resolve => {
+            const items = new Map<string, CompletionItem>();
+
+            workspace.fs.readFile(Uri.file(key)).then(content => {
+                this.parseTextToItems(content.toString(), items);
+                this.cache.set(key, items);
+                resolve(key);
+            }, () => resolve(this.none));
+        });
+    }
+
     fetchStyleSheet(key: string): Thenable<string> {
         return new Promise(resolve => {
             if (key === this.none) {
@@ -67,6 +81,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                     resolve(key);
                 } else if (this.isRemote.test(key)) {
                     this.fetchRemote(key).then(key => resolve(key));
+                } else if (key.startsWith("/")) {
+                    this.fetchLocal(key).then(key => resolve(key));
                 } else {
                     resolve(this.none);
                 }
@@ -117,6 +133,19 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
+    findLocalStyles(): Thenable<Set<string>> {
+        return new Promise(resolve => {
+            const promises = [];
+            const keys = new Set<string>();
+
+            for (const path of this.files) {
+                promises.push(this.fetchStyleSheet(path).then(k => keys.add(k)));
+            }
+
+            Promise.all(promises).then(() => resolve(keys));
+        });
+    }
+
     findDocumentStyles(text: string): Map<string, CompletionItem> {
         const items = new Map<string, CompletionItem>();
         const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
@@ -156,9 +185,10 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                 if (canComplete) {
                     const items = this.findDocumentStyles(text);
 
-                    this.findRemoteStyles(document.uri).then(styles =>
-                        this.findDocumentLinks(text).then(links =>
-                            resolve(this.buildItems(items, styles, links))));
+                    this.findLocalStyles().then(locals =>
+                        this.findRemoteStyles(document.uri).then(styles =>
+                            this.findDocumentLinks(text).then(links =>
+                                resolve(this.buildItems(items, styles, links, locals)))));
                 } else {
                     reject();
                 }
@@ -167,14 +197,45 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
     }
 }
 
+export let watcher: FSWatcher;
+
 export function activate(context: ExtensionContext) {
+    const provider = new ClassCompletionItemProvider();
+
     const config = workspace.getConfiguration("css");
     const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
     const triggerCharacters = config.get<string[]>("triggerCharacters", ["\"", "'"]);
 
     context.subscriptions.push(languages
-        .registerCompletionItemProvider(enabledLanguages,
-            new ClassCompletionItemProvider(), ...triggerCharacters));
+        .registerCompletionItemProvider(enabledLanguages, provider, ...triggerCharacters));
+
+    const glob = "**/*.css";
+    const folders = workspace.workspaceFolders?.map(folder => `${folder.uri.fsPath}/${glob}`);
+
+    if (folders) {
+        watcher = watch(folders, { ignored: ["**/node_modules/**", "**/test*/**"] })
+            .on("add", key => provider.files.add(key))
+            .on("unlink", key => provider.files.delete(key))
+            .on("change", key => provider.cache.delete(key));
+    }
+
+    workspace.onDidChangeWorkspaceFolders(e => {
+        if (watcher) {
+            e.removed.forEach(folder => {
+                watcher.unwatch(`${folder.uri.fsPath}/${glob}`);
+
+                for (const key of provider.files) {
+                    if (key.startsWith(folder.uri.fsPath)) {
+                        provider.files.delete(key);
+                    }
+                }
+            });
+
+            e.added.forEach(folder => watcher.add(`${folder.uri.fsPath}/${glob}`));
+        }
+    });
 }
 
-export function deactivate() { }
+export function deactivate() {
+    return watcher?.close();
+}
