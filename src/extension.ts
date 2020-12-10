@@ -197,14 +197,16 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 }
 
 export function activate(context: ExtensionContext) {
-    const provider = new ClassCompletionItemProvider();
-
     const config = workspace.getConfiguration("css");
     const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
     const triggerCharacters = config.get<string[]>("triggerCharacters", ["\"", "'"]);
 
-    context.subscriptions.push(languages
-        .registerCompletionItemProvider(enabledLanguages, provider, ...triggerCharacters));
+    const provider = new ClassCompletionItemProvider();
+
+    context.subscriptions.push(languages.registerCompletionItemProvider(
+        enabledLanguages,
+        provider,
+        ...triggerCharacters));
 
     const glob = "**/*.css";
     const folders = workspace.workspaceFolders?.map(folder => `${folder.uri.fsPath}/${glob}`);
@@ -229,7 +231,7 @@ export function activate(context: ExtensionContext) {
             e.added.forEach(folder => watcher.add(`${folder.uri.fsPath}/${glob}`));
         });
 
-        context.subscriptions.push(changes, { dispose: () => watcher.close() });
+        context.subscriptions.push(changes, { dispose: watcher.close });
     }
 }
 
