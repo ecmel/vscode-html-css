@@ -54,6 +54,14 @@
 						"'"
 					],
 					"scope": "window"
+				},
+				"css.ignoredFolders": {
+					"type": "array",
+					"description": "A list of folders to exclude from stylesheet parsing.",
+					"default": [
+						"**/node_modules/**"
+					],
+					"scope": "window"
 				}
 			}
 		}

@@ -197,7 +197,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 }
 
 export function activate(context: ExtensionContext) {
-    
+
     const config = workspace.getConfiguration("css");
     const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
     const triggerCharacters = config.get<string[]>("triggerCharacters", ["\"", "'"]);
@@ -213,10 +213,9 @@ export function activate(context: ExtensionContext) {
     const folders = workspace.workspaceFolders?.map(folder => `${folder.uri.fsPath}/${glob}`);
 
     if (folders) {
-        const watcher = watch(folders, {
-            ignoreInitial: false,
-            ignored: ["**/node_modules/**", "**/test*/**"]
-        })
+        const ignored = config.get<string[]>("ignoredFolders", ["**/node_modules/**"]);
+
+        const watcher = watch(folders, { ignored, ignoreInitial: false })
             .on("add", key => provider.files.add(key))
             .on("unlink", key => provider.files.delete(key))
             .on("change", key => provider.cache.delete(key));
