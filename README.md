@@ -6,8 +6,8 @@ Missing CSS support for HTML documents.
 
 - Html class attribute completion.
 - Supports `<link rel="stylesheet">` and `<style></style>` tags.
+- Supports local style sheets form workspace.
 - Supports other remote style sheets, see below.
-- Local workspace parsing for css files is deprecated.
 
 ## Remote Style Sheets
 
