@@ -217,10 +217,8 @@ export function activate(context: ExtensionContext) {
             .on("add", key => provider.files.add(key))
             .on("unlink", key => provider.files.delete(key))
             .on("change", key => provider.cache.delete(key));
-    }
 
-    workspace.onDidChangeWorkspaceFolders(e => {
-        if (watcher) {
+        workspace.onDidChangeWorkspaceFolders(e => {
             e.removed.forEach(folder => {
                 watcher.unwatch(`${folder.uri.fsPath}/${glob}`);
 
@@ -232,8 +230,8 @@ export function activate(context: ExtensionContext) {
             });
 
             e.added.forEach(folder => watcher.add(`${folder.uri.fsPath}/${glob}`));
-        }
-    });
+        });
+    }
 }
 
 export function deactivate() {
