@@ -215,11 +215,7 @@ export function activate(context: ExtensionContext) {
     if (folders) {
         const ignored = config.get<string[]>("ignoredFolders", ["**/node_modules/**"]);
 
-        const watcher = watch(folders, {
-            ignored,
-            ignoreInitial: false,
-            persistent: true
-        })
+        const watcher = watch(folders, { ignored, ignoreInitial: false })
             .on("add", key => provider.files.add(key))
             .on("unlink", key => provider.files.delete(key))
             .on("change", key => provider.cache.delete(key));
