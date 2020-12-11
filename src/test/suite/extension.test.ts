@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import { ClassCompletionItemProvider } from '../../extension';
 import {
 	CancellationToken,
+	commands,
 	CompletionContext,
 	CompletionItem,
 	CompletionTriggerKind,
@@ -9,9 +10,12 @@ import {
 	Event,
 	Position,
 	Range,
+	Selection,
 	TextDocument,
 	TextLine,
-	Uri
+	Uri,
+	window,
+	workspace
 } from 'vscode';
 
 class MockCancellationToken implements CancellationToken {
@@ -197,5 +201,24 @@ suite('Extension Test Suite', () => {
 			context) as Thenable<CompletionItem[]>);
 
 		assert.notStrictEqual(items.length, 0);
+	});
+
+	test('Integration: Completes', async () => {
+		const doc = await workspace.openTextDocument({
+			language: "html",
+			content: `<style>.test{}</style>\n<a class="te"></a>`
+		});
+
+		const pos = new Position(1, 12);
+		const editor = await window.showTextDocument(doc);
+		editor.selection = new Selection(pos, pos);
+
+		await commands.executeCommand('editor.action.triggerSuggest');
+		await commands.executeCommand('insertBestCompletion');
+
+		const text = doc.getText(new Range(pos.translate(0, -2), pos.translate(0, 2)));
+
+		// This does not work!
+		assert.strictEqual(text, "test");
 	});
 });
