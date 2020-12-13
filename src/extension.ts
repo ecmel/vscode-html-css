@@ -200,7 +200,7 @@ export function activate(context: ExtensionContext) {
 
     const config = workspace.getConfiguration("css");
     const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
-    const triggerCharacters = config.get<string[]>("triggerCharacters", ["\"", "'"]);
+    const triggerCharacters = ["\"", "'"];
 
     const provider = new ClassCompletionItemProvider();
 
