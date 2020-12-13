@@ -4,7 +4,8 @@ Missing CSS support for HTML documents.
 
 ## Features
 
-- Html class attribute completion.
+- HTML class attribute completion.
+- HTML id attribute completion.
 - Supports `<link rel="stylesheet">` and `<style></style>` tags.
 - Supports local style sheets form workspace.
 - Supports other remote style sheets, see below.
@@ -16,6 +17,16 @@ If it is not possible to specify remote styles with `<link rel="stylesheet">` ta
 ```json
 "css.remoteStyleSheets": [
   "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+]
+```
+
+## Local Style Sheets
+
+Workspace CSS parsing can be disabled for unwanted locations in VS Code settings:
+
+```json
+"css.ignoredFolders": [
+  "**/node_modules/**"
 ]
 ```
 
