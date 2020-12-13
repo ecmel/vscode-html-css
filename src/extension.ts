@@ -25,7 +25,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly none = "__!NONE!__";
     readonly isRemote = /^https?:\/\//i;
-    readonly canComplete = /class\s*=\s*(["'])(?:(?!\1).)*$/si;
+    readonly canComplete = /(id|class|className)\s*=\s*(["'])(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
@@ -36,7 +36,9 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
     parseTextToItems(text: string, items: Map<string, CompletionItem>) {
         walk(parse(text), node => {
             if (node.type === "ClassSelector") {
-                items.set(node.name, new CompletionItem(node.name, CompletionItemKind.EnumMember));
+                items.set(node.name, new CompletionItem(node.name, CompletionItemKind.Enum));
+            } else if (node.type === "IdSelector") {
+                items.set(node.name, new CompletionItem(node.name, CompletionItemKind.Value));
             }
         });
     }
@@ -157,11 +159,16 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         return items;
     }
 
-    buildItems(items: Map<string, CompletionItem>, sets: Set<string>[]): CompletionItem[] {
+    buildItems(items: Map<string, CompletionItem>, sets: Set<string>[], type: CompletionItemKind): CompletionItem[] {
         const keys = new Set<string>();
 
         sets.forEach(v => v.forEach(v => keys.add(v)));
-        keys.forEach(k => this.cache.get(k)?.forEach((v, k) => items.set(k, v)));
+
+        keys.forEach(k => this.cache.get(k)?.forEach((v, k) => {
+            if (type === v.kind) {
+                items.set(k, v);
+            }
+        }));
 
         return [...items.values()];
     }
@@ -178,16 +185,20 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
             } else {
                 const range = new Range(this.start, position);
                 const text = document.getText(range);
-                const canComplete = this.canComplete.test(text);
+                const canComplete = this.canComplete.exec(text);
 
                 if (canComplete) {
+                    const type = canComplete[1] === "id"
+                        ? CompletionItemKind.Value
+                        : CompletionItemKind.Enum;
+
                     const items = this.findDocumentStyles(text);
 
                     Promise.all([
                         this.findLocalStyles(),
                         this.findDocumentLinks(text),
                         this.findRemoteStyles(document.uri),
-                    ]).then(keys => resolve(this.buildItems(items, keys)));
+                    ]).then(keys => resolve(this.buildItems(items, keys, type)));
                 } else {
                     reject();
                 }
