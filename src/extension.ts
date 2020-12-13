@@ -48,9 +48,9 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 
     fetchLocal(key: string): Thenable<string> {
         return new Promise(resolve => {
-            const items = new Map<string, CompletionItem>();
-
             workspace.fs.readFile(Uri.file(key)).then(content => {
+                const items = new Map<string, CompletionItem>();
+
                 this.parseTextToItems(content.toString(), items);
                 this.cache.set(key, items);
                 resolve(key);
@@ -60,9 +60,9 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
 
     fetchRemote(key: string): Thenable<string> {
         return new Promise(resolve => {
-            const items = new Map<string, CompletionItem>();
-
             fetch(key).then(res => {
+                const items = new Map<string, CompletionItem>();
+
                 if (res.ok) {
                     res.text().then(text => {
                         this.parseTextToItems(text, items);
