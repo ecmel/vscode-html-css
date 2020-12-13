@@ -20,10 +20,13 @@ import {
 
 export class ClassCompletionItemProvider implements CompletionItemProvider {
 
+
+    readonly none = "__!NONE!__";
+    readonly fixed = "__!FIXED!__";
     readonly start = new Position(0, 0);
     readonly files = new Set<string>();
+    readonly styles = new Set<string>([this.fixed]);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
-    readonly none = "__!NONE!__";
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*(["'])(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
@@ -146,20 +149,25 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
-    findDocumentStyles(text: string): Map<string, CompletionItem> {
-        const items = new Map<string, CompletionItem>();
-        const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
+    findDocumentStyles(text: string): Thenable<Set<string>> {
+        return new Promise(resolve => {
+            const items = new Map<string, CompletionItem>();
+            const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
 
-        let style;
+            let style;
 
-        while ((style = findStyles.exec(text)) !== null) {
-            this.parseTextToItems(style[1], items);
-        }
+            while ((style = findStyles.exec(text)) !== null) {
+                this.parseTextToItems(style[1], items);
+            }
 
-        return items;
+            this.cache.set(this.fixed, items);
+
+            resolve(this.styles);
+        });
     }
 
-    buildItems(items: Map<string, CompletionItem>, sets: Set<string>[], type: CompletionItemKind): CompletionItem[] {
+    buildItems(sets: Set<string>[], type: CompletionItemKind): CompletionItem[] {
+        const items = new Map<string, CompletionItem>();
         const keys = new Set<string>();
 
         sets.forEach(v => v.forEach(v => keys.add(v)));
@@ -192,13 +200,12 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                         ? CompletionItemKind.Value
                         : CompletionItemKind.Enum;
 
-                    const items = this.findDocumentStyles(text);
-
                     Promise.all([
                         this.findLocalStyles(),
                         this.findDocumentLinks(text),
+                        this.findDocumentStyles(text),
                         this.findRemoteStyles(document.uri),
-                    ]).then(keys => resolve(this.buildItems(items, keys, type)));
+                    ]).then(keys => resolve(this.buildItems(keys, type)));
                 } else {
                     reject();
                 }
