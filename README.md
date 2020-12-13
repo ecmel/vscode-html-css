@@ -4,11 +4,11 @@ Missing CSS support for HTML documents.
 
 ## Features
 
-- HTML class attribute completion.
-- HTML id attribute completion.
+- HTML `class` attribute completion.
+- HTML `id` attribute completion.
 - Supports `<link rel="stylesheet">` and `<style></style>` tags.
+- Supports remote style sheets.
 - Supports local style sheets form workspace.
-- Supports other remote style sheets, see below.
 
 ## Remote Style Sheets
 
@@ -32,8 +32,8 @@ Workspace CSS parsing can be disabled for unwanted locations in VS Code settings
 
 ## Supported Languages
 
-Supported languages can be configured with the `css.enabledLanguages` configuration setting. By
-default `html` is enabled:
+Supported languages can be configured with the `css.enabledLanguages` setting. By default 
+`html` is enabled:
 
 ```json
 "css.enabledLanguages": [
