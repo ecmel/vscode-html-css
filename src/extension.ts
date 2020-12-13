@@ -20,7 +20,6 @@ import {
 
 export class ClassCompletionItemProvider implements CompletionItemProvider {
 
-
     readonly none = "__!NONE!__";
     readonly fixed = "__!FIXED!__";
     readonly start = new Position(0, 0);
