@@ -16,7 +16,7 @@
         "no-throw-literal": "warn",
         "semi": "off",
         "quotes": [
-            "error",
+            "warn",
             "double"
         ]
     }
