@@ -30,6 +30,12 @@ Workspace CSS parsing can be disabled for unwanted locations in VS Code settings
 ]
 ```
 
+Also, it can be disabled for all files with:
+
+```json
+"css.watcherEnabled": false
+```
+
 ## Supported Languages
 
 Supported languages can be configured with the `css.enabledLanguages` setting. By default 
