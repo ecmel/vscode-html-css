@@ -21,10 +21,8 @@ import {
 export class ClassCompletionItemProvider implements CompletionItemProvider {
 
     readonly none = "__!NONE!__";
-    readonly fixed = "__!FIXED!__";
     readonly start = new Position(0, 0);
     readonly files = new Set<string>();
-    readonly styles = new Set<string>([this.fixed]);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*(["'])(?:(?!\2).)*$/si;
@@ -148,8 +146,10 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
-    findDocumentStyles(text: string): Thenable<Set<string>> {
+    findDocumentStyles(text: string, uri: Uri): Thenable<Set<string>> {
         return new Promise(resolve => {
+            const key = uri.toString();
+            const keys = new Set<string>([key]);
             const items = new Map<string, CompletionItem>();
             const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
 
@@ -159,9 +159,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                 this.parseTextToItems(style[1], items);
             }
 
-            this.cache.set(this.fixed, items);
-
-            resolve(this.styles);
+            this.cache.set(key, items);
+            resolve(keys);
         });
     }
 
@@ -199,11 +198,13 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                         ? CompletionItemKind.Value
                         : CompletionItemKind.Enum;
 
+                    const uri = document.uri;
+
                     Promise.all([
                         this.findLocalStyles(),
+                        this.findRemoteStyles(uri),
                         this.findDocumentLinks(text),
-                        this.findDocumentStyles(text),
-                        this.findRemoteStyles(document.uri),
+                        this.findDocumentStyles(text, uri)
                     ]).then(keys => resolve(this.buildItems(keys, type)));
                 } else {
                     reject();

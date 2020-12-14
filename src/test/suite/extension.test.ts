@@ -33,7 +33,6 @@ class MockCompletionContext implements CompletionContext {
 }
 
 class MockDocument implements TextDocument {
-	uri!: Uri;
 	fileName!: string;
 	isUntitled!: boolean;
 	languageId!: string;
@@ -43,6 +42,8 @@ class MockDocument implements TextDocument {
 	eol!: EndOfLine;
 	lineCount!: number;
 	text: string;
+
+	uri = Uri.parse("/test/test.css");
 
 	constructor(text: string) {
 		this.text = text;
