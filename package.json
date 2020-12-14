@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS support for HTML documents",
-	"version": "1.1.4",
+	"version": "1.1.5",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -52,6 +52,12 @@
 					"default": [
 						"**/node_modules/**"
 					],
+					"scope": "window"
+				},
+				"css.watcherEnabled": {
+					"type": "boolean",
+					"description": "Whether workspace scanning is enabled.",
+					"default": true,
 					"scope": "window"
 				}
 			}

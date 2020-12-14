@@ -226,38 +226,42 @@ export function activate(context: ExtensionContext) {
         provider,
         ...triggerCharacters));
 
-    const glob = "**/*.css";
-    const folders = workspace.workspaceFolders?.map(folder => `${folder.uri.fsPath}/${glob}`);
+    const watcherEnabled = config.get<boolean>("watcherEnabled", true);
 
-    if (folders) {
-        const ignored = config.get<string[]>("ignoredFolders", ["**/node_modules/**"]);
+    if (watcherEnabled) {
+        const glob = "**/*.css";
+        const folders = workspace.workspaceFolders?.map(folder => `${folder.uri.fsPath}/${glob}`);
 
-        const watcher = watch(folders, {
-            ignored,
-            ignoreInitial: false,
-            ignorePermissionErrors: true,
-            useFsEvents: true,
-            followSymlinks: false
-        })
-            .on("add", key => provider.files.add(key))
-            .on("unlink", key => provider.files.delete(key))
-            .on("change", key => provider.cache.delete(key));
+        if (folders) {
+            const ignored = config.get<string[]>("ignoredFolders", ["**/node_modules/**"]);
 
-        const changes = workspace.onDidChangeWorkspaceFolders(e => {
-            e.removed.forEach(folder => {
-                watcher.unwatch(`${folder.uri.fsPath}/${glob}`);
+            const watcher = watch(folders, {
+                ignored,
+                ignoreInitial: false,
+                ignorePermissionErrors: true,
+                useFsEvents: true,
+                followSymlinks: false
+            })
+                .on("add", key => provider.files.add(key))
+                .on("unlink", key => provider.files.delete(key))
+                .on("change", key => provider.cache.delete(key));
 
-                for (const key of provider.files) {
-                    if (key.startsWith(folder.uri.fsPath)) {
-                        provider.files.delete(key);
+            const changes = workspace.onDidChangeWorkspaceFolders(e => {
+                e.removed.forEach(folder => {
+                    watcher.unwatch(`${folder.uri.fsPath}/${glob}`);
+
+                    for (const key of provider.files) {
+                        if (key.startsWith(folder.uri.fsPath)) {
+                            provider.files.delete(key);
+                        }
                     }
-                }
+                });
+
+                e.added.forEach(folder => watcher.add(`${folder.uri.fsPath}/${glob}`));
             });
 
-            e.added.forEach(folder => watcher.add(`${folder.uri.fsPath}/${glob}`));
-        });
-
-        context.subscriptions.push(changes, { dispose: watcher.close });
+            context.subscriptions.push(changes, { dispose: watcher.close });
+        }
     }
 }
 
