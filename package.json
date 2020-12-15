@@ -86,7 +86,7 @@
 		"@types/vscode": "^1.51.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/parser": "^4.1.1",
-		"chokidar": "^3.4.3",
+		"chokidar": "3.4.2",
 		"css-tree": "^1.1.2",
 		"eslint": "^7.9.0",
 		"glob": "^7.1.6",
