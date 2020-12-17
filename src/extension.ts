@@ -1,5 +1,4 @@
 import fetch from "node-fetch";
-import { watch } from "chokidar";
 import { parse, walk } from "css-tree";
 import {
     CancellationToken,
@@ -8,6 +7,7 @@ import {
     CompletionItemKind,
     CompletionItemProvider,
     CompletionList,
+    Disposable,
     ExtensionContext,
     languages,
     Position,
@@ -18,19 +18,23 @@ import {
     workspace
 } from "vscode";
 
-export class ClassCompletionItemProvider implements CompletionItemProvider {
+export class ClassCompletionItemProvider implements CompletionItemProvider, Disposable {
 
     readonly none = "__!NONE!__";
     readonly start = new Position(0, 0);
-    readonly files = new Set<string>();
     readonly cache = new Map<string, Map<string, CompletionItem>>();
+    readonly disposables: Disposable[] = [];
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*(["'])(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
-    getRemoteStyleSheets(uri: Uri): string[] {
-        return workspace.getConfiguration("css", uri).get<string[]>("remoteStyleSheets", []);
+    dispose() {
+        this.disposables.forEach(e => e.dispose());
+    }
+
+    getStyleSheets(uri: Uri): string[] {
+        return workspace.getConfiguration("css", uri).get<string[]>("styleSheets", []);
     }
 
     parseTextToItems(text: string, items: Map<string, CompletionItem>) {
@@ -43,54 +47,72 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
-    fetchLocal(key: string): Thenable<string> {
+    fetchLocal(key: string, uri: Uri): Thenable<string> {
         return new Promise(resolve => {
-            workspace.fs.readFile(Uri.file(key)).then(content => {
-                const items = new Map<string, CompletionItem>();
-
-                this.parseTextToItems(content.toString(), items);
-                this.cache.set(key, items);
+            if (this.cache.has(key)) {
                 resolve(key);
-            }, () => resolve(this.none));
+            } else {
+                const folder = workspace.getWorkspaceFolder(uri);
+                const file = folder ? Uri.joinPath(folder.uri, key) : Uri.file(key);
+
+                workspace.fs.readFile(file).then(content => {
+                    const items = new Map<string, CompletionItem>();
+                    const watcher = workspace.createFileSystemWatcher(file.fsPath);
+                    const listener = (e: Uri) => this.cache.delete(key);
+
+                    watcher.onDidCreate(listener);
+                    watcher.onDidChange(listener);
+                    watcher.onDidDelete(listener);
+
+                    this.disposables.push(watcher);
+                    this.parseTextToItems(content.toString(), items);
+                    this.cache.set(key, items);
+                    resolve(key);
+                }, () => resolve(this.none));
+            }
         });
     }
 
     fetchRemote(key: string): Thenable<string> {
         return new Promise(resolve => {
-            fetch(key).then(res => {
-                const items = new Map<string, CompletionItem>();
+            if (this.cache.has(key)) {
+                resolve(key);
+            } else {
+                fetch(key).then(res => {
+                    const items = new Map<string, CompletionItem>();
 
-                if (res.ok) {
-                    res.text().then(text => {
-                        this.parseTextToItems(text, items);
+                    if (res.ok) {
+                        res.text().then(text => {
+                            this.parseTextToItems(text, items);
+                            this.cache.set(key, items);
+                            resolve(key);
+                        }, () => resolve(this.none));
+                    } else {
                         this.cache.set(key, items);
                         resolve(key);
-                    }, () => resolve(this.none));
-                } else {
-                    this.cache.set(key, items);
-                    resolve(key);
-                }
-            }, () => resolve(this.none));
-        });
-    }
-
-    fetchStyleSheet(key: string): Thenable<string> {
-        return new Promise(resolve => {
-            if (key === this.none) {
-                resolve(this.none);
-            } else if (this.cache.get(key)) {
-                resolve(key);
-            } else if (key.startsWith("/")) {
-                this.fetchLocal(key).then(key => resolve(key));
-            } else if (this.isRemote.test(key)) {
-                this.fetchRemote(key).then(key => resolve(key));
-            } else {
-                resolve(this.none);
+                    }
+                }, () => resolve(this.none));
             }
         });
     }
 
-    findDocumentLinks(text: string): Thenable<Set<string>> {
+    findStyleSheets(uri: Uri): Thenable<Set<string>> {
+        return new Promise(resolve => {
+            const keys = new Set<string>();
+            const styleSheets = this.getStyleSheets(uri);
+            const promises = [];
+
+            for (const key of styleSheets) {
+                promises.push(this.isRemote.test(key)
+                    ? this.fetchRemote(key).then(k => keys.add(k))
+                    : this.fetchLocal(key, uri).then(k => keys.add(k)));
+            }
+
+            Promise.all(promises).then(() => resolve(keys));
+        });
+    }
+
+    findDocumentLinks(uri: Uri, text: string): Thenable<Set<string>> {
         return new Promise(resolve => {
             const findLinks = /<link([^>]+)>/gi;
             const keys = new Set<string>();
@@ -105,7 +127,11 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                     const href = this.findLinkHref.exec(link[1]);
 
                     if (href) {
-                        promises.push(this.fetchStyleSheet(href[2]).then(k => keys.add(k)));
+                        const key = href[2];
+
+                        promises.push(this.isRemote.test(key)
+                            ? this.fetchRemote(key).then(k => keys.add(k))
+                            : this.fetchLocal(key, uri).then(k => keys.add(k)));
                     }
                 }
             }
@@ -114,39 +140,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
         });
     }
 
-    findRemoteStyles(uri: Uri): Thenable<Set<string>> {
-        return new Promise(resolve => {
-            const keys = new Set<string>();
-            const remoteStyleSheets = this.getRemoteStyleSheets(uri);
-
-            if (remoteStyleSheets.length === 0) {
-                resolve(keys);
-            } else {
-                const promises = [];
-
-                for (const href of remoteStyleSheets) {
-                    promises.push(this.fetchStyleSheet(href).then(k => keys.add(k)));
-                }
-
-                Promise.all(promises).then(() => resolve(keys));
-            }
-        });
-    }
-
-    findLocalStyles(): Thenable<Set<string>> {
-        return new Promise(resolve => {
-            const promises = [];
-            const keys = new Set<string>();
-
-            for (const path of this.files) {
-                promises.push(this.fetchStyleSheet(path).then(k => keys.add(k)));
-            }
-
-            Promise.all(promises).then(() => resolve(keys));
-        });
-    }
-
-    findDocumentStyles(text: string, uri: Uri): Thenable<Set<string>> {
+    findDocumentStyles(uri: Uri, text: string): Thenable<Set<string>> {
         return new Promise(resolve => {
             const key = uri.toString();
             const keys = new Set<string>([key]);
@@ -201,10 +195,9 @@ export class ClassCompletionItemProvider implements CompletionItemProvider {
                     const uri = document.uri;
 
                     Promise.all([
-                        this.findLocalStyles(),
-                        this.findRemoteStyles(uri),
-                        this.findDocumentLinks(text),
-                        this.findDocumentStyles(text, uri)
+                        this.findStyleSheets(uri),
+                        this.findDocumentLinks(uri, text),
+                        this.findDocumentStyles(uri, text)
                     ]).then(keys => resolve(this.buildItems(keys, type)));
                 } else {
                     reject();
@@ -225,45 +218,7 @@ export function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerCompletionItemProvider(
         enabledLanguages,
         provider,
-        ...triggerCharacters));
-
-    const watcherEnabled = config.get<boolean>("watcherEnabled", true);
-
-    if (watcherEnabled) {
-        const glob = "**/*.css";
-        const folders = workspace.workspaceFolders?.map(folder => `${folder.uri.fsPath}/${glob}`);
-
-        if (folders) {
-            const ignored = config.get<string[]>("ignoredFolders", ["**/node_modules/**"]);
-
-            const watcher = watch(folders, {
-                ignored,
-                ignoreInitial: false,
-                ignorePermissionErrors: true,
-                useFsEvents: true,
-                followSymlinks: false
-            })
-                .on("add", key => provider.files.add(key))
-                .on("unlink", key => provider.files.delete(key))
-                .on("change", key => provider.cache.delete(key));
-
-            const changes = workspace.onDidChangeWorkspaceFolders(e => {
-                e.removed.forEach(folder => {
-                    watcher.unwatch(`${folder.uri.fsPath}/${glob}`);
-
-                    for (const key of provider.files) {
-                        if (key.startsWith(folder.uri.fsPath)) {
-                            provider.files.delete(key);
-                        }
-                    }
-                });
-
-                e.added.forEach(folder => watcher.add(`${folder.uri.fsPath}/${glob}`));
-            });
-
-            context.subscriptions.push(changes, { dispose: watcher.close });
-        }
-    }
+        ...triggerCharacters), provider);
 }
 
 export function deactivate() { }

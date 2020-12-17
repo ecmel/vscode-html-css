@@ -7,34 +7,7 @@ Missing CSS support for HTML documents.
 - HTML `class` attribute completion.
 - HTML `id` attribute completion.
 - Supports `<link rel="stylesheet">` and `<style></style>` tags.
-- Supports remote style sheets.
-- Supports local style sheets form workspace.
-
-## Remote Style Sheets
-
-If it is not possible to specify remote styles with `<link rel="stylesheet">` tag, they can be specified in VS Code settings:
-
-```json
-"css.remoteStyleSheets": [
-  "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
-]
-```
-
-## Local Style Sheets
-
-Workspace CSS parsing can be disabled for unwanted locations in VS Code settings:
-
-```json
-"css.ignoredFolders": [
-  "**/node_modules/**"
-]
-```
-
-Also, it can be disabled for all files with:
-
-```json
-"css.watcherEnabled": false
-```
+- Supports completion from additional style sheets.
 
 ## Supported Languages
 
@@ -51,6 +24,17 @@ Extension can be configured to support any language where it makes sense such as
 
 `django-html` `laravel-blade` `razor` `vue` `blade` `pug` `jade` `handlebars` `php` `twig` 
 `md` `nunjucks` `javascriptreact` `typescriptreact` `erb` `HTML (Eex)` `html-eex` `haml` `svelte`
+
+## Additional Style Sheets
+
+If it is not possible to specify local or remote styles with `<link rel="stylesheet">` tag, they can be specified in VS Code settings:
+
+```json
+"css.styleSheets": [
+  "css/bootstrap.css",
+  "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+]
+```
 
 ## Installation
 
