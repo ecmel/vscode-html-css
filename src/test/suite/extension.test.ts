@@ -186,7 +186,7 @@ suite("Extension Test Suite", () => {
 
 	test("Completes from remote style", async () => {
 		const provider = new class extends ClassCompletionItemProvider {
-			getRemoteStyleSheets(uri: Uri): string[] {
+			getStyleSheets(uri: Uri): string[] {
 				return [
 					"https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
 				];
