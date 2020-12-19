@@ -57,7 +57,7 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 ```
 (2), (3) and (4) are equivalent and points to the same file in the root of workspace folder.
 
-If it is not possible to specify local or remote styles within HTML file, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within workspace.
+If it is not possible to specify local or remote styles within HTML file, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace foler:
 
 ```js
 "css.styleSheets": [
@@ -91,17 +91,6 @@ Extension can be configured to support any language where it makes sense such as
 
 `django-html` `laravel-blade` `razor` `vue` `blade` `pug` `jade` `handlebars` `php` `twig` 
 `md` `nunjucks` `javascriptreact` `typescriptreact` `erb` `HTML (Eex)` `html-eex` `haml` `svelte`
-
-## Additional Style Sheets
-
-If it is not possible to specify local or remote styles with `<link rel="stylesheet">` tag, they can be specified in VS Code settings:
-
-```json
-"css.styleSheets": [
-  "css/bootstrap.css",
-  "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
-]
-```
 
 ## Installation
 
