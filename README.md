@@ -59,7 +59,7 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 
 If it is not possible to specify local or remote styles within HTML file, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json`:
 
-```json
+```js
 "css.styleSheets": [
 
   // 1
