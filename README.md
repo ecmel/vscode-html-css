@@ -6,7 +6,7 @@ Missing CSS support for HTML documents.
 
 - HTML `class` attribute completion.
 - HTML `id` attribute completion.
-- Supports `<link rel="stylesheet">` and `<style></style>` tags.
+- Supports completion from `<link rel="stylesheet">` and `<style></style>` tags.
 - Supports completion from additional style sheets.
 
 ## Example
@@ -18,21 +18,21 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 <html>
 
 <head>
-    <!-- 1 -->
+    <!-- (1) -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
         rel="stylesheet">
 
-    <!-- 2 -->
+    <!-- (2) -->
     <link href="site.css" rel="stylesheet">
 
-    <!-- 3 -->
+    <!-- (3) -->
     <link href="./site.css" rel="stylesheet">
 
-    <!-- 4 -->
+    <!-- (4) -->
     <link href="/site.css" rel="stylesheet">
 
-    <!-- 5 -->
+    <!-- (5) -->
     <style>
         #content {
             display: block;
@@ -45,7 +45,7 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 </head>
 
 <body>
-    <div id="content" class="container external internal">
+    <div class="container external internal" id="content">
         <div class="row">
             <div class="col">1 of 2</div>
             <div class="col">2 of 2</div>
@@ -64,21 +64,21 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 }
 ```
 
-If it is not possible to specify local or remote styles within HTML file, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder:
+If it is not possible to specify local or remote styles within each HTML file, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder:
 
 ```js
 "css.styleSheets": [
 
-  // 1
+  // (1)
   "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css",
 
-  // 2
+  // (2)
   "site.css",
 
-  // 3
+  // (3)
   "./site.css",
 
-  // 4
+  // (4)
   "/site.css"
 ]
 ```
