@@ -45,7 +45,7 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 </head>
 
 <body>
-    <div id="content" class="container site embedded">
+    <div id="content" class="container external embedded">
         <div class="row">
             <div class="col">1 of 2</div>
             <div class="col">2 of 2</div>
@@ -55,7 +55,14 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 
 </html>
 ```
-(2), (3) and (4) are equivalent and points to the same file in the root of workspace folder.
+
+(2), (3) and (4) are equivalent and points to the same file in the root of workspace folder:
+
+```css
+.external {
+    display: block;
+}
+```
 
 If it is not possible to specify local or remote styles within HTML file, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace foler:
 
