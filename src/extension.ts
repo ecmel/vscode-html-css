@@ -57,15 +57,16 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
 
                 workspace.fs.readFile(file).then(content => {
                     const items = new Map<string, CompletionItem>();
-                    const watcher = workspace.createFileSystemWatcher(file.fsPath);
-                    const listener = (e: Uri) => this.cache.delete(key);
-
-                    watcher.onDidCreate(listener);
-                    watcher.onDidChange(listener);
-                    watcher.onDidDelete(listener);
-
-                    this.disposables.push(watcher);
                     this.parseTextToItems(content.toString(), items);
+
+                    const watcher = workspace.createFileSystemWatcher(file.fsPath);
+                    const updater = (e: Uri) => this.cache.delete(key);
+                    this.disposables.push(
+                        watcher.onDidCreate(updater),
+                        watcher.onDidChange(updater),
+                        watcher.onDidDelete(updater),
+                        watcher);
+
                     this.cache.set(key, items);
                     resolve(key);
                 }, () => resolve(this.none));
