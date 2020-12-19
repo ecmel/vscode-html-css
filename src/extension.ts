@@ -39,11 +39,21 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
 
     parseTextToItems(text: string, items: Map<string, CompletionItem>) {
         walk(parse(text), node => {
-            if (node.type === "ClassSelector") {
-                items.set(node.name, new CompletionItem(node.name, CompletionItemKind.Enum));
-            } else if (node.type === "IdSelector") {
-                items.set(node.name, new CompletionItem(node.name, CompletionItemKind.Value));
+
+            let kind: CompletionItemKind;
+
+            switch (node.type) {
+                case "ClassSelector":
+                    kind = CompletionItemKind.Enum;
+                    break;
+                case "IdSelector":
+                    kind = CompletionItemKind.Value;
+                    break;
+                default:
+                    return;
             }
+
+            items.set(node.name, new CompletionItem(node.name, kind));
         });
     }
 
