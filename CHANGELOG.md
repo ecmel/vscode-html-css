@@ -4,9 +4,10 @@ All notable changes to the extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [1.3.0] - 2020-12-21
 
-- Update dependencies.
+- Update documentation.
+- Update to VS Code 1.52
 
 ## [1.2.5] - 2020-12-20
 
