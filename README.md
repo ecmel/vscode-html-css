@@ -25,14 +25,10 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 
     <!-- (2) -->
     <link href="site.css" rel="stylesheet">
-
-    <!-- (3) -->
     <link href="./site.css" rel="stylesheet">
-
-    <!-- (4) -->
     <link href="/site.css" rel="stylesheet">
 
-    <!-- (5) -->
+    <!-- (3) -->
     <style>
         #content {
             display: block;
@@ -56,7 +52,9 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 </html>
 ```
 
-(2), (3) and (4) are all equivalent and points to the `site.css` file in the root of workspace folder:
+(1) External style sheet which will be fetched from `href`
+(2) Local style sheets which are all equivalent and points to the following `site.css` file in the root of workspace folder:
+(3) Embedded style
 
 ```css
 .external {
@@ -74,11 +72,7 @@ If it is not possible to specify local or remote styles within each HTML file, t
 
   // (2)
   "site.css",
-
-  // (3)
   "./site.css",
-
-  // (4)
   "/site.css"
 ]
 ```
@@ -94,10 +88,11 @@ Supported languages can be configured with the `css.enabledLanguages` setting. B
 ]
 ```
 
-Extension can be configured to support any language where it makes sense such as:
+Extension can be configured to support any language where it makes sense such as `handlebars`, 
+`php`, `javascriptreact`, `nunjucks` etc. You should install corresponding language extension
+which registers choosen language id in VS Code.
 
-`django-html` `laravel-blade` `razor` `vue` `blade` `pug` `jade` `handlebars` `php` `twig` 
-`md` `nunjucks` `javascriptreact` `typescriptreact` `erb` `HTML (Eex)` `html-eex` `haml` `svelte`
+This setting is application scoped so it should be set in global settings.
 
 ## Installation
 
@@ -105,4 +100,4 @@ Extension can be configured to support any language where it makes sense such as
 
 ## Usage
 
-You can view a list of class attributes via `ctrl + space`.
+You can view a list of class and id attributes via `ctrl + space`.
