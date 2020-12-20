@@ -11,7 +11,8 @@ Missing CSS support for HTML documents.
 
 ## Example
 
-In the following HTML file, completion will suggest for all `id` and `class` attributes.
+In the following HTML file, completion will suggest for all `id` and `class` attributes. All
+local links point to `site.css`.
 
 **`index.html`**
 ```html
@@ -19,17 +20,20 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 <html>
 
 <head>
-    <!-- (1) -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+    <!-- (1) Remote style sheet -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
 
-    <!-- (2) -->
-    <link href="site.css" rel="stylesheet">
-    <link href="./site.css" rel="stylesheet">
-    <link href="/site.css" rel="stylesheet">
+    <!-- (2) Local style sheet relative to workspace folder -->
+    <link rel="stylesheet" href="/site.css">
 
-    <!-- (3) -->
+    <!-- (3) Local style sheet relative to this file -->
+    <link rel="stylesheet" href="site.css">
+
+    <!-- (4) Local style sheet relative to this file -->
+    <link rel="stylesheet" href="./site.css">
+    
+    <!-- (5) Embedded style sheet -->
     <style>
         #content {
             display: block;
@@ -52,9 +56,6 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 
 </html>
 ```
-1. External style sheet which will be fetched from `href`.
-2. Local style sheets which are all equivalent and points to `site.css` file in the root of workspace folder.
-3. Embedded style tag.
 
 **`site.css`**
 ```css
@@ -73,9 +74,13 @@ If it is not possible to specify local or remote styles within each HTML file, t
   "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css",
 
   // (2)
+  "/site.css",
+
+  // (3)
   "site.css",
-  "./site.css",
-  "/site.css"
+
+  // (4)
+  "./site.css"
 ]
 ```
 
@@ -94,7 +99,8 @@ Extension can be configured to support any language where it makes sense such as
 `php`, `javascriptreact`, `nunjucks` etc. You should install corresponding language extension
 which registers choosen language id in VS Code.
 
-This setting is application scoped so it should be set in global settings.
+This setting is application scoped so it should be set in global settings and changes requires 
+restarting VS Code.
 
 ## Installation
 

@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { isAbsolute, join, dirname } from "path";
 import { parse, walk } from "css-tree";
 import {
     CancellationToken,
@@ -69,7 +70,12 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
                 resolve(key);
             } else {
                 const folder = workspace.getWorkspaceFolder(uri);
-                const file = folder ? Uri.joinPath(folder.uri, key) : Uri.file(key);
+
+                const file = Uri.file(folder
+                    ? join(isAbsolute(key)
+                        ? folder.uri.fsPath
+                        : dirname(uri.fsPath), key)
+                    : key);
 
                 workspace.fs.readFile(file).then(content => {
                     const items = new Map<string, CompletionItem>();
