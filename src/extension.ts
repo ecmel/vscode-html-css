@@ -30,7 +30,13 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
 
     dispose() {
-        this.disposables.forEach(e => e.dispose());
+        let e;
+
+        while (e = this.disposables.pop()) {
+            e.dispose();
+        }
+
+        this.cache.clear();
     }
 
     getStyleSheets(uri: Uri): string[] {
