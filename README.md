@@ -13,7 +13,7 @@ Missing CSS support for HTML documents.
 
 In the following HTML file, completion will suggest for all `id` and `class` attributes.
 
-#### **`index.html`**
+**`index.html`**
 ```html
 <!DOCTYPE html>
 <html>
@@ -52,21 +52,20 @@ In the following HTML file, completion will suggest for all `id` and `class` att
 
 </html>
 ```
+1. External style sheet which will be fetched from `href`.
+2. Local style sheets which are all equivalent and points to `site.css` file in the root of workspace folder.
+3. Embedded style tag.
 
-#### **`site.css`**
+**`site.css`**
 ```css
 .external {
     display: block;
 }
 ```
 
-1. External style sheet which will be fetched from `href`.
-2. Local style sheets which are all equivalent and points to `site.css` file in the root of workspace folder.
-3. Embedded style.
-
 If it is not possible to specify local or remote styles within each HTML file, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder:
 
-#### **`.vscode/settings.json`**
+**`.vscode/settings.json`**
 ```js
 "css.styleSheets": [
 
