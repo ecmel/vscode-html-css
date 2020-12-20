@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { parse, walk } from "css-tree";
-import { isAbsolute, join, dirname } from "path";
+import { basename, dirname, extname, isAbsolute, join } from "path";
 import {
     CancellationToken,
     CompletionContext,
@@ -16,7 +16,7 @@ import {
     Range,
     TextDocument,
     Uri,
-    workspace
+    workspace,
 } from "vscode";
 
 export class ClassCompletionItemProvider implements CompletionItemProvider, Disposable {
@@ -24,11 +24,14 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly none = "__!NONE!__";
     readonly start = new Position(0, 0);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
+    readonly empty = new Set<string>();
+    readonly extends = new Map<string, Set<string>>();
     readonly disposables: Disposable[] = [];
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*(["'])(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
+    readonly findExtends = /(?:{{<|{{>|{%)\s*(?:extends)?\s*"?([\.0-9_a-z-A-Z]+)"?\s*(?:%}|}})/i;
 
     dispose() {
         let e;
@@ -38,6 +41,16 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
         }
 
         this.cache.clear();
+        this.extends.clear();
+    }
+
+    watchFile(uri: Uri, listener: (e: Uri) => any) {
+        const watcher = workspace.createFileSystemWatcher(uri.fsPath, true);
+
+        this.disposables.push(
+            watcher.onDidChange(listener),
+            watcher.onDidDelete(listener),
+            watcher);
     }
 
     getStyleSheets(uri: Uri): string[] {
@@ -79,15 +92,9 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
 
                 workspace.fs.readFile(file).then(content => {
                     const items = new Map<string, CompletionItem>();
+
                     this.parseTextToItems(content.toString(), items);
-
-                    const watcher = workspace.createFileSystemWatcher(file.fsPath, true);
-                    const updater = (e: Uri) => this.cache.delete(key);
-                    this.disposables.push(
-                        watcher.onDidChange(updater),
-                        watcher.onDidDelete(updater),
-                        watcher);
-
+                    this.watchFile(file, e => this.cache.delete(key));
                     this.cache.set(key, items);
                     resolve(key);
                 }, () => resolve(this.none));
@@ -180,6 +187,45 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
         });
     }
 
+    findExtendedStyles(uri: Uri, text: string): Thenable<Set<string>> {
+        return new Promise(resolve => {
+            const parent = this.findExtends.exec(text);
+
+            if (parent) {
+                const path = uri.fsPath;
+                const ext = extname(path);
+                const key = join(dirname(path), basename(parent[1], ext) + ext);
+                const extend = this.extends.get(key);
+
+                if (extend) {
+                    resolve(extend);
+                } else {
+                    const file = Uri.file(key);
+
+                    workspace.fs.readFile(file).then(content => {
+                        const text = content.toString();
+
+                        Promise.all([
+                            this.findDocumentLinks(file, text),
+                            this.findDocumentStyles(file, text),
+                            this.findExtendedStyles(file, text)
+                        ]).then(sets => {
+                            const keys = new Set<string>();
+
+                            sets.forEach(set => set.forEach(k => keys.add(k)));
+                            this.watchFile(file, e => this.extends.delete(key));
+                            this.extends.set(key, keys);
+                            resolve(keys);
+                        });
+
+                    }, () => resolve(this.empty));
+                }
+            } else {
+                resolve(this.empty);
+            }
+        });
+    }
+
     buildItems(sets: Set<string>[], kind: CompletionItemKind): CompletionItem[] {
         const items = new Map<string, CompletionItem>();
         const keys = new Set<string>();
@@ -219,7 +265,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
                     Promise.all([
                         this.findStyleSheets(uri),
                         this.findDocumentLinks(uri, text),
-                        this.findDocumentStyles(uri, text)
+                        this.findDocumentStyles(uri, text),
+                        this.findExtendedStyles(uri, text)
                     ]).then(keys => resolve(this.buildItems(keys, type)));
                 } else {
                     reject();

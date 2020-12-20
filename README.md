@@ -84,6 +84,10 @@ If it is not possible to specify local or remote styles within each HTML file, t
 ]
 ```
 
+## Template Inheritance
+
+Template inheritance is supported for **`{% extends "base" %}`** and **`{{< base }}`** tags. Inheritance hierarchy will be scanned for `<link rel="stylesheet">` and `<style></style>` tags.
+
 ## Supported Languages
 
 Supported languages can be configured with the `css.enabledLanguages` setting. By default 
