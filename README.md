@@ -4,9 +4,9 @@ Missing `id` and `class` attribute completion support for HTML documents.
 
 ## Features
 
-- HTML `class` attribute completion.
 - HTML `id` attribute completion.
-- Supports linked [`<link rel="stylesheet">`] and embedded [`<style></style>`] style sheets.
+- HTML `class` attribute completion.
+- Supports linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets.
 - Supports template inheritance.
 - Supports additional style sheets.
 - Supports other HTML like languages.
@@ -14,7 +14,7 @@ Missing `id` and `class` attribute completion support for HTML documents.
 ## Linked and Embedded Style Sheets
 
 In the following HTML file, completion will suggest for all `id` and `class` attributes. All
-local links point to the same file.
+local links point to the same file which is in the root of workspace folder.
 
 **`index.html`**
 ```html
@@ -95,7 +95,7 @@ If it is not possible to specify local or remote styles within each HTML file or
 ## Supported Languages
 
 Supported languages can be configured with the `css.enabledLanguages` setting. By default 
-`html` is enabled:
+`html` is enabled.
 
 ```json
 "css.enabledLanguages": [
@@ -103,9 +103,7 @@ Supported languages can be configured with the `css.enabledLanguages` setting. B
 ]
 ```
 
-Extension can be configured to support any language where it makes sense such as `handlebars`, 
-`php`, `javascriptreact`, `nunjucks` etc. You should also install corresponding language 
-extension which registers choosen language id in VS Code.
+Extension can be configured to support any language where it makes sense such as `nunjucks`, `twig`, `mustache`, etc. You should also install corresponding language extension which registers choosen language id in VS Code.
 
 This setting is application scoped so it should be set in global settings and changing the 
 setting requires restarting VS Code.

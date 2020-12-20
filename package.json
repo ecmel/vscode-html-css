@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS support for HTML documents",
-	"version": "1.2.5",
+	"version": "1.3.0",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -69,22 +69,22 @@
 	"devDependencies": {
 		"@types/css-tree": "^1.0.4",
 		"@types/glob": "^7.1.3",
-		"@types/mocha": "^8.0.0",
+		"@types/mocha": "^8.0.4",
 		"@types/node-fetch": "^2.5.7",
 		"@types/node": "^12.11.7",
 		"@types/vscode": "^1.52.0",
-		"@typescript-eslint/eslint-plugin": "^4.1.1",
-		"@typescript-eslint/parser": "^4.1.1",
+		"@typescript-eslint/eslint-plugin": "^4.9.0",
+		"@typescript-eslint/parser": "^4.9.0",
 		"css-tree": "^1.1.2",
-		"eslint": "^7.9.0",
+		"eslint": "^7.15.0",
 		"glob": "^7.1.6",
 		"mocha": "^8.1.3",
 		"node-fetch": "^2.6.1",
 		"ts-loader": "^8.0.11",
-		"typescript": "^4.0.2",
+		"typescript": "^4.1.2",
 		"vsce": "^1.83.0",
-		"vscode-test": "^1.4.0",
+		"vscode-test": "^1.4.1",
 		"webpack-cli": "^4.2.0",
-		"webpack": "^5.11.0"
+		"webpack": "^5.10.0"
 	}
 }
