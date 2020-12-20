@@ -3,7 +3,7 @@ import { ClassCompletionItemProvider } from "../../completion";
 import { MockCancellationToken, MockCompletionContext, MockDocument } from "./mocks";
 import { CompletionItem, Position, Uri } from "vscode";
 
-suite("Unit Tests Suite", () => {
+suite("ClassCompletionItemProvider Test Suite", () => {
 
     const position = new Position(0, 0);
     const token = new MockCancellationToken(false);
