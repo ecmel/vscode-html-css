@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS support for HTML documents",
-	"version": "1.2.3",
+	"version": "1.2.4",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -13,7 +13,7 @@
 		"url": "https://github.com/ecmel/vscode-html-css.git"
 	},
 	"engines": {
-		"vscode": "^1.51.0"
+		"vscode": "^1.52.0"
 	},
 	"categories": [
 		"Programming Languages",
@@ -68,7 +68,7 @@
 		"@types/mocha": "^8.0.0",
 		"@types/node-fetch": "^2.5.7",
 		"@types/node": "^12.11.7",
-		"@types/vscode": "^1.51.0",
+		"@types/vscode": "^1.52.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/parser": "^4.1.1",
 		"css-tree": "^1.1.2",

@@ -12,7 +12,7 @@ Missing CSS support for HTML documents.
 ## Example
 
 In the following HTML file, completion will suggest for all `id` and `class` attributes. All
-local links point to `site.css`.
+local links point to same `site.css` file.
 
 **`index.html`**
 ```html
@@ -96,11 +96,11 @@ Supported languages can be configured with the `css.enabledLanguages` setting. B
 ```
 
 Extension can be configured to support any language where it makes sense such as `handlebars`, 
-`php`, `javascriptreact`, `nunjucks` etc. You should install corresponding language extension
-which registers choosen language id in VS Code.
+`php`, `javascriptreact`, `nunjucks` etc. You should also install corresponding language 
+extension which registers choosen language id in VS Code.
 
-This setting is application scoped so it should be set in global settings and changes requires 
-restarting VS Code.
+This setting is application scoped so it should be set in global settings and changing the 
+setting requires restarting VS Code.
 
 ## Installation
 
