@@ -1,12 +1,12 @@
 # Visual Studio Code CSS Support for HTML Documents
 
-Missing CSS support for HTML documents.
+Missing `id` and `class` attribute completion support for HTML documents.
 
 ## Features
 
 - HTML `class` attribute completion.
 - HTML `id` attribute completion.
-- Supports `<link rel="stylesheet">` and `<style></style>` tags.
+- Supports linked [`<link rel="stylesheet">`] and embedded [`<style></style>`] style sheets.
 - Supports template inheritance.
 - Supports additional style sheets.
 - Supports other HTML like languages.
@@ -14,7 +14,7 @@ Missing CSS support for HTML documents.
 ## Linked and Embedded Style Sheets
 
 In the following HTML file, completion will suggest for all `id` and `class` attributes. All
-local links point to same `site.css` file.
+local links point to the same file.
 
 **`index.html`**
 ```html
@@ -116,4 +116,4 @@ setting requires restarting VS Code.
 
 ## Usage
 
-You can view a list of class and id attributes via `ctrl + space`.
+You can view a list of class and id attributes via `ctrl + space`. Note that, extension will be activated a few seconds after VS Code starts.
