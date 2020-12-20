@@ -69,10 +69,9 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
                     const items = new Map<string, CompletionItem>();
                     this.parseTextToItems(content.toString(), items);
 
-                    const watcher = workspace.createFileSystemWatcher(file.fsPath);
+                    const watcher = workspace.createFileSystemWatcher(file.fsPath, true);
                     const updater = (e: Uri) => this.cache.delete(key);
                     this.disposables.push(
-                        watcher.onDidCreate(updater),
                         watcher.onDidChange(updater),
                         watcher.onDidDelete(updater),
                         watcher);
@@ -169,14 +168,14 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
         });
     }
 
-    buildItems(sets: Set<string>[], type: CompletionItemKind): CompletionItem[] {
+    buildItems(sets: Set<string>[], kind: CompletionItemKind): CompletionItem[] {
         const items = new Map<string, CompletionItem>();
         const keys = new Set<string>();
 
         sets.forEach(v => v.forEach(v => keys.add(v)));
 
         keys.forEach(k => this.cache.get(k)?.forEach((v, k) => {
-            if (type === v.kind) {
+            if (kind === v.kind) {
                 items.set(k, v);
             }
         }));
