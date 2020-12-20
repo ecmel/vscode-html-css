@@ -9,7 +9,7 @@ Missing CSS support for HTML documents.
 - Supports completion from `<link rel="stylesheet">` and `<style></style>` tags.
 - Supports completion from additional style sheets.
 
-## Example
+## Including Style Sheets
 
 In the following HTML file, completion will suggest for all `id` and `class` attributes. All
 local links point to same `site.css` file.
@@ -64,7 +64,13 @@ local links point to same `site.css` file.
 }
 ```
 
-If it is not possible to specify local or remote styles within each HTML file, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder:
+## Template Inheritance
+
+Template inheritance is supported for **`{% extends "base" %}`** and **`{{< base }}`** tags. 
+
+## Additional Style Sheets
+
+If it is not possible to specify local or remote styles within each HTML file or via template inheritance, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder:
 
 **`.vscode/settings.json`**
 ```js
@@ -83,10 +89,6 @@ If it is not possible to specify local or remote styles within each HTML file, t
   "./site.css"
 ]
 ```
-
-## Template Inheritance
-
-Template inheritance is supported for **`{% extends "base" %}`** and **`{{< base }}`** tags. Inheritance hierarchy will be scanned for `<link rel="stylesheet">` and `<style></style>` tags.
 
 ## Supported Languages
 
