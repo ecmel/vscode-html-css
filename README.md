@@ -68,11 +68,11 @@ local links point to the same file which is in the root of workspace folder.
 
 ## Template Inheritance
 
-Template inheritance is supported for `{% extends "base" %}` and `{{< base }}` tags. 
+Template inheritance is supported for `{% extends "base" %}` and `{{< base }}` tags. Only one level of inheritance is supported.
 
 ## Additional Style Sheets
 
-If it is not possible to specify local or remote styles within each HTML file or via template inheritance, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder.
+If it is not possible to specify local or remote styles in HTML file or via template inheritance, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder.
 
 **`.vscode/settings.json`**
 ```js
@@ -105,8 +105,7 @@ Supported languages can be configured with the `css.enabledLanguages` setting. B
 
 Extension can be configured to support any language where it makes sense such as `nunjucks`, `twig`, `mustache`, etc. You should also install corresponding language extension which registers choosen language id in VS Code.
 
-This setting is application scoped so it should be set in global settings and changing the 
-setting requires restarting VS Code.
+This setting is application scoped and changing the setting requires restarting VS Code.
 
 ## Installation
 

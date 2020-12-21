@@ -22,7 +22,6 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly none = "__!NONE!__";
     readonly start = new Position(0, 0);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
-    readonly empty = new Set<string>();
     readonly extends = new Map<string, Set<string>>();
     readonly disposables: Disposable[] = [];
     readonly isRemote = /^https?:\/\//i;
@@ -187,6 +186,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
 
     findExtendedStyles(uri: Uri, text: string): Thenable<Set<string>> {
         return new Promise(resolve => {
+            const keys = new Set<string>();
             const parent = this.findExtends.exec(text);
 
             if (parent) {
@@ -205,21 +205,17 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
 
                         Promise.all([
                             this.findDocumentLinks(file, text),
-                            this.findDocumentStyles(file, text),
-                            this.findExtendedStyles(file, text)
+                            this.findDocumentStyles(file, text)
                         ]).then(sets => {
-                            const keys = new Set<string>();
-
                             sets.forEach(set => set.forEach(k => keys.add(k)));
                             this.watchFile(file, e => this.extends.delete(key));
                             this.extends.set(key, keys);
                             resolve(keys);
                         });
-
-                    }, () => resolve(this.empty));
+                    }, () => resolve(keys));
                 }
             } else {
-                resolve(this.empty);
+                resolve(keys);
             }
         });
     }
