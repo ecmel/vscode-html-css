@@ -68,7 +68,7 @@ All local links point to the same file which is in the root of workspace folder:
 
 ## Template Inheritance
 
-Template inheritance is supported for `{% extends "base" %}`, `{{< base }}` and `{{> base }}` tags. Only one level of inheritance is supported:
+Template inheritance is supported for `{% extends "base" %}` and `{{< base }}` tags. Only one level of inheritance is supported:
 
 **`base.html`**
 ```html
@@ -145,7 +145,7 @@ Supported languages can be configured with the `css.enabledLanguages` setting. B
 ]
 ```
 
-Extension can be configured to support any language where it makes sense such as `nunjucks`, `twig`, `mustache`, etc. You should also install corresponding language extension which registers choosen language id in VS Code.
+Extension can be configured to support any language where it makes sense such as `nunjucks`, `twig`, `mustache`, etc. You should also install corresponding language extension which registers the language id in VS Code.
 
 This setting is application scoped and changing the setting requires restarting VS Code.
 
