@@ -13,8 +13,7 @@ Missing `id` and `class` attribute completion support for HTML documents.
 
 ## Linked and Embedded Style Sheets
 
-In the following HTML file, completion will suggest for all `id` and `class` attributes. All
-local links point to the same file which is in the root of workspace folder.
+In the following HTML file, completion will suggest for all `id` and `class` attributes. 
 
 **`index.html`**
 ```html
@@ -58,6 +57,7 @@ local links point to the same file which is in the root of workspace folder.
 
 </html>
 ```
+All local links point to the same file which is in the root of workspace folder:
 
 **`site.css`**
 ```css
@@ -99,7 +99,7 @@ Template inheritance is supported for `{% extends "base" %}` and `{{< base }}` t
 </html>
 ```
 
-Styles defined in `base.html` will also be available for `home.html`.
+Styles defined in `base.html` will also be available for completion in `home.html`:
 
 **`home.html`**
 ```html
