@@ -1,6 +1,6 @@
-# Visual Studio Code CSS Support for HTML Documents
+# Visual Studio Code CSS Intellisense for HTML
 
-Missing `id` and `class` attribute completion support for HTML documents.
+HTML `id` and `class` attribute completion for VS Code.
 
 ## Features
 
@@ -136,8 +136,7 @@ If it is not possible to specify local or remote styles in HTML or via template 
 
 ## Supported Languages
 
-Supported languages can be configured with the `css.enabledLanguages` setting. By default 
-`html` is enabled:
+Supported languages can be configured with the `css.enabledLanguages` setting. By default `html` is enabled:
 
 ```json
 "css.enabledLanguages": [

@@ -1,7 +1,7 @@
 {
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
-	"description": "CSS support for HTML documents",
+	"description": "CSS Intellisense for HTML",
 	"version": "1.3.1",
 	"publisher": "ecmel",
 	"license": "MIT",
