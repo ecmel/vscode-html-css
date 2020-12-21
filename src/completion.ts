@@ -28,7 +28,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly canComplete = /(id|class|className)\s*=\s*(["'])(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
-    readonly findExtends = /(?:{{<|{{>|{%)\s*(?:extends)?\s*"?([\/\.\\0-9_a-z-A-Z]+)"?\s*(?:%}|}})/i;
+    readonly findExtended = /(?:{{<|{{>|{%)\s*(?:extends)?\s*"?([\/\.\\0-9_a-z-A-Z]+)"?\s*(?:%}|}})/i;
 
     dispose() {
         let e;
@@ -54,15 +54,15 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
         return workspace.getConfiguration("css", uri).get<string[]>("styleSheets", []);
     }
 
-    getRelativeUri(uri: Uri, spec: string, ext?: string): Uri {
+    getRelativePath(uri: Uri, spec: string, ext?: string): string {
         const folder = workspace.getWorkspaceFolder(uri);
         const name = ext ? join(dirname(spec), basename(spec, ext) + ext) : spec;
 
-        return Uri.file(folder
+        return folder
             ? join(isAbsolute(spec)
                 ? folder.uri.fsPath
                 : dirname(uri.fsPath), name)
-            : join(dirname(uri.fsPath), name));
+            : join(dirname(uri.fsPath), name);
     }
 
     parseTextToItems(text: string, items: Map<string, CompletionItem>) {
@@ -90,7 +90,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
             if (this.cache.has(key)) {
                 resolve(key);
             } else {
-                const file = this.getRelativeUri(uri, key);
+                const file = Uri.file(this.getRelativePath(uri, key));
 
                 workspace.fs.readFile(file).then(content => {
                     const items = new Map<string, CompletionItem>();
@@ -192,16 +192,16 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     findExtendedStyles(uri: Uri, text: string): Thenable<Set<string>> {
         return new Promise(resolve => {
             const keys = new Set<string>();
-            const parent = this.findExtends.exec(text);
+            const extended = this.findExtended.exec(text);
 
-            if (parent) {
-                const key = uri.fsPath + parent[1];
-                const extend = this.extends.get(key);
+            if (extended) {
+                const key = this.getRelativePath(uri, extended[1], extname(uri.fsPath));
+                const cached = this.extends.get(key);
 
-                if (extend) {
-                    resolve(extend);
+                if (cached) {
+                    resolve(cached);
                 } else {
-                    const file = this.getRelativeUri(uri, parent[1], extname(uri.fsPath));
+                    const file = Uri.file(key);
 
                     workspace.fs.readFile(file).then(content => {
                         const text = content.toString();

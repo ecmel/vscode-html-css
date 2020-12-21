@@ -13,7 +13,7 @@ Missing `id` and `class` attribute completion support for HTML documents.
 
 ## Linked and Embedded Style Sheets
 
-Linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets are used in completion for `id` and `class` attributes. Links support local and remote files. Absolute local file paths are relative to the workspace folder while others are relative to HTML file.
+Linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets are used in completion for `id` and `class` attributes. Links support local and remote files. Absolute local file paths are relative to the workspace folder while others are relative to HTML file:
 
 **`index.html`**
 ```html
