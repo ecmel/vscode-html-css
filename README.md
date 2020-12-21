@@ -6,14 +6,14 @@ Missing `id` and `class` attribute completion support for HTML documents.
 
 - HTML `id` attribute completion.
 - HTML `class` attribute completion.
-- Supports linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets.
+- Supports linked and embedded style sheets.
 - Supports template inheritance.
 - Supports additional style sheets.
 - Supports other HTML like languages.
 
 ## Linked and Embedded Style Sheets
 
-In the following HTML file, completion will suggest for all `id` and `class` attributes. 
+Linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets are used in completion for `id` and `class` attributes. Links support local and remote files. Absolute local file paths are relative to the workspace folder. 
 
 **`index.html`**
 ```html
