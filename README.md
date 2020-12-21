@@ -70,6 +70,48 @@ local links point to the same file which is in the root of workspace folder.
 
 Template inheritance is supported for `{% extends "base" %}` and `{{< base }}` tags. Only one level of inheritance is supported.
 
+**`base.html`**
+```html
+<!doctype html>
+<html>
+
+<head>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+
+    <style>
+        #content {
+            display: block;
+        }
+
+        .internal {
+            display: block;
+        }
+    </style>
+
+    <title>{{ title }}</title>
+</head>
+
+<body>
+    {% block content %}{% endblock %}
+</body>
+
+</html>
+```
+
+Styles defined in `base.html` will also be available for `home.html`.
+
+**`home.html`**
+```html
+{% extends "base" %}
+
+{% block content %}
+<div id="content" class="container internal">
+    <h1>Home</h1>
+</div>
+{% endblock %}
+```
+
 ## Additional Style Sheets
 
 If it is not possible to specify local or remote styles in HTML file or via template inheritance, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder.
