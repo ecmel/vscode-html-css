@@ -96,8 +96,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
                     const items = new Map<string, CompletionItem>();
 
                     this.parseTextToItems(content.toString(), items);
-                    this.watchFile(file, e => this.cache.delete(key));
                     this.cache.set(key, items);
+                    this.watchFile(file, e => this.cache.delete(key));
                     resolve(key);
                 }, () => resolve(this.none));
             }
@@ -211,8 +211,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
                             this.findDocumentStyles(file, text)
                         ]).then(sets => {
                             sets.forEach(set => set.forEach(k => keys.add(k)));
-                            this.watchFile(file, e => this.extends.delete(key));
                             this.extends.set(key, keys);
+                            this.watchFile(file, e => this.extends.delete(key));
                             resolve(keys);
                         });
                     }, () => resolve(keys));

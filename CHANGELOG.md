@@ -8,6 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Update documentation.
 - Fixed recursion bug for template inheritance.
+- Unified path handling.
 
 ## [1.3.0] - 2020-12-21
 
