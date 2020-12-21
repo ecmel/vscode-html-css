@@ -68,7 +68,7 @@ All local links point to the same file which is in the root of workspace folder:
 
 ## Template Inheritance
 
-Template inheritance is supported for `{% extends "base" %}` and `{{< base }}` tags. Only one level of inheritance is supported.
+Template inheritance is supported for `{% extends "base" %}`, `{{< base }}` and `{{> base }}` tags. Only one level of inheritance is supported:
 
 **`base.html`**
 ```html
@@ -114,7 +114,7 @@ Styles defined in `base.html` will also be available for completion in `home.htm
 
 ## Additional Style Sheets
 
-If it is not possible to specify local or remote styles in HTML file or via template inheritance, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder.
+If it is not possible to specify local or remote styles in HTML or via template inheritance, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder:
 
 **`.vscode/settings.json`**
 ```js
@@ -137,7 +137,7 @@ If it is not possible to specify local or remote styles in HTML file or via temp
 ## Supported Languages
 
 Supported languages can be configured with the `css.enabledLanguages` setting. By default 
-`html` is enabled.
+`html` is enabled:
 
 ```json
 "css.enabledLanguages": [

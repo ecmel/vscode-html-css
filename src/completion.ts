@@ -14,7 +14,7 @@ import {
     Range,
     TextDocument,
     Uri,
-    workspace,
+    workspace
 } from "vscode";
 
 export class ClassCompletionItemProvider implements CompletionItemProvider, Disposable {
@@ -54,6 +54,17 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
         return workspace.getConfiguration("css", uri).get<string[]>("styleSheets", []);
     }
 
+    getRelativeUri(uri: Uri, spec: string, ext?: string): Uri {
+        const folder = workspace.getWorkspaceFolder(uri);
+        const name = ext ? join(dirname(spec), basename(spec, ext) + ext) : spec;
+
+        return Uri.file(folder
+            ? join(isAbsolute(spec)
+                ? folder.uri.fsPath
+                : dirname(uri.fsPath), name)
+            : join(dirname(uri.fsPath), name));
+    }
+
     parseTextToItems(text: string, items: Map<string, CompletionItem>) {
         walk(parse(text), node => {
 
@@ -79,13 +90,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
             if (this.cache.has(key)) {
                 resolve(key);
             } else {
-                const folder = workspace.getWorkspaceFolder(uri);
-
-                const file = Uri.file(folder
-                    ? join(isAbsolute(key)
-                        ? folder.uri.fsPath
-                        : dirname(uri.fsPath), key)
-                    : join(dirname(uri.fsPath), key));
+                const file = this.getRelativeUri(uri, key);
 
                 workspace.fs.readFile(file).then(content => {
                     const items = new Map<string, CompletionItem>();
@@ -190,15 +195,13 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
             const parent = this.findExtends.exec(text);
 
             if (parent) {
-                const path = uri.fsPath;
-                const ext = extname(path);
-                const key = join(dirname(path), basename(parent[1], ext) + ext);
+                const key = uri.fsPath + parent[1];
                 const extend = this.extends.get(key);
 
                 if (extend) {
                     resolve(extend);
                 } else {
-                    const file = Uri.file(key);
+                    const file = this.getRelativeUri(uri, parent[1], extname(uri.fsPath));
 
                     workspace.fs.readFile(file).then(content => {
                         const text = content.toString();
