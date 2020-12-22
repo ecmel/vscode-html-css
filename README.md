@@ -68,7 +68,17 @@ All local links point to the same file which is in the root of workspace folder:
 
 ## Template Inheritance
 
-Template inheritance is supported for `{% extends "base" %}` and `{{< base }}` tags. Only one level of inheritance is supported:
+Template inheritance is supported for the following tags:
+
+```
+{% extends "base" %}
+
+@extends('base')
+
+{{< base }} 
+```
+
+Only one level of inheritance is supported:
 
 **`base.html`**
 ```html
