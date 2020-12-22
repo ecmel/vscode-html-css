@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS Intellisense for HTML",
-	"version": "1.3.3",
+	"version": "1.3.4",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -22,6 +22,7 @@
 	"keywords": [
 		"html",
 		"twig",
+		"blade",
 		"django",
 		"nunjucks",
 		"mustache",

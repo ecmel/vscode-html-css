@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.3.4] - 
+
+- Added laravel blade inheritance.
+
 ## [1.3.3] - 2020-12-22
 
 - Fixed watcher bug.

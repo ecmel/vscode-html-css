@@ -28,7 +28,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly canComplete = /(id|class|className)\s*=\s*(["'])(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
-    readonly findExtended = /(?:{{\s*<|{%\s*extends)\s*"?([\/\.\\0-9_a-z-A-Z]+)"?\s*(?:%}|}})/i;
+    readonly findExtended = /(?:{{\s*<|{%\s*extends|@extends\s*\()\s*("|')?([\/\.\\0-9_a-z-A-Z]+)\1\s*(?:\)|%}|}})/i;
 
     dispose() {
         for (const watcher of this.watchers.values()) {
@@ -198,7 +198,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
             const extended = this.findExtended.exec(text);
 
             if (extended) {
-                const key = this.getRelativePath(uri, extended[1], extname(uri.fsPath));
+                const key = this.getRelativePath(uri, extended[2], extname(uri.fsPath));
                 const cached = this.extends.get(key);
 
                 if (cached) {
