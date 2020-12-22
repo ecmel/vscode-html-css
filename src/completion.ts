@@ -198,7 +198,9 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
             const extended = this.findExtended.exec(text);
 
             if (extended) {
-                const key = this.getRelativePath(uri, extended[2], extname(uri.fsPath));
+                const name = extended[2];
+                const ext = extname(name) || extname(uri.fsPath);
+                const key = this.getRelativePath(uri, name, ext);
                 const cached = this.extends.get(key);
 
                 if (cached) {
