@@ -31,8 +31,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly findExtended = /(?:{{\s*<|{%\s*extends)\s*"?([\/\.\\0-9_a-z-A-Z]+)"?\s*(?:%}|}})/i;
 
     dispose() {
-        for (const wathcer of this.watchers.values()) {
-            wathcer.dispose();
+        for (const watcher of this.watchers.values()) {
+            watcher.dispose();
         }
 
         this.cache.clear();
