@@ -23,7 +23,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly start = new Position(0, 0);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly extends = new Map<string, Set<string>>();
-    readonly disposables: Disposable[] = [];
+    readonly watchers = new Map<string, Disposable>();
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*(["'])(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
@@ -31,23 +31,26 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly findExtended = /(?:{{\s*<|{%\s*extends)\s*"?([\/\.\\0-9_a-z-A-Z]+)"?\s*(?:%}|}})/i;
 
     dispose() {
-        let e;
-
-        while (e = this.disposables.pop()) {
-            e.dispose();
+        for (const wathcer of this.watchers.values()) {
+            wathcer.dispose();
         }
 
         this.cache.clear();
         this.extends.clear();
+        this.watchers.clear();
     }
 
     watchFile(uri: Uri, listener: (e: Uri) => any) {
-        const watcher = workspace.createFileSystemWatcher(uri.fsPath, true);
+        const key = uri.toString();
 
-        this.disposables.push(
-            watcher.onDidChange(listener),
-            watcher.onDidDelete(listener),
-            watcher);
+        if (!this.watchers.has(key)) {
+            const watcher = workspace.createFileSystemWatcher(uri.fsPath, true);
+
+            watcher.onDidChange(listener);
+            watcher.onDidDelete(listener);
+
+            this.watchers.set(key, watcher);
+        }
     }
 
     getStyleSheets(uri: Uri): string[] {
@@ -253,7 +256,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
                 const canComplete = this.canComplete.exec(text);
 
                 if (canComplete) {
-                    const type = canComplete[1] === "id"
+                    const kind = canComplete[1] === "id"
                         ? CompletionItemKind.Value
                         : CompletionItemKind.Enum;
 
@@ -264,7 +267,7 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
                         this.findDocumentLinks(uri, text),
                         this.findDocumentStyles(uri, text),
                         this.findExtendedStyles(uri, text)
-                    ]).then(keys => resolve(this.buildItems(keys, type)));
+                    ]).then(keys => resolve(this.buildItems(keys, kind)));
                 } else {
                     reject();
                 }

@@ -2,14 +2,19 @@
 
 All notable changes to the extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [1.3.3] - 2020-12-22
+
+- Fixed watcher bug.
+- Fixed cleanup.
 
 ## [1.3.2] - 2020-12-22
 
 - Update documentation.
-- Fixed recursion bug for template inheritance.
-- Fixed inheritance RegEx.
+
+## [1.3.1] - 2020-12-22
+
 - Unified path handling.
+- Fixed recursion bug for template inheritance.
 
 ## [1.3.0] - 2020-12-21
 
