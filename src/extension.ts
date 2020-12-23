@@ -1,3 +1,4 @@
+import { clearCache } from "./commands";
 import { ClassCompletionItemProvider } from "./completion";
 import { ExtensionContext, languages, workspace, commands } from "vscode";
 
@@ -15,7 +16,7 @@ export function activate(context: ExtensionContext) {
             provider,
             ...triggerCharacters),
         provider,
-        commands.registerCommand("vscode-html-css.clearCache", () => provider.dispose()));
+        commands.registerCommand("vscode-html-css.clearCache", clearCache(provider)));
 }
 
 export function deactivate() { }
