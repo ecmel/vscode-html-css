@@ -158,6 +158,12 @@ Extension can be configured to support any language where it makes sense such as
 
 This setting is application scoped and changing the setting requires restarting VS Code.
 
+## Commands
+
+### CSS: Clear Cache
+
+Clears cache and disposes file watchers.
+
 ## Installation
 
 [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css)
