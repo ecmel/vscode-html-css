@@ -4,7 +4,7 @@ All notable changes to the extension will be documented in this file.
 
 ## [1.4.0] - 2020-12-23
 
-- Added laravel blade inheritance.
+- Added @extends('base') tag for inheritance.
 - Added clearCache command.
 - Added more tests.
 
