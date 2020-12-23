@@ -25,10 +25,10 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly extends = new Map<string, Set<string>>();
     readonly watchers = new Map<string, Disposable>();
     readonly isRemote = /^https?:\/\//i;
-    readonly canComplete = /(id|class|className)\s*=\s*(["'])(?:(?!\2).)*$/si;
-    readonly findLinkRel = /rel\s*=\s*(["'])((?:(?!\1).)+)\1/si;
-    readonly findLinkHref = /href\s*=\s*(["'])((?:(?!\1).)+)\1/si;
-    readonly findExtended = /(?:{{\s*<|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
+    readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
+    readonly findLinkRel = /rel\s*=\s*("|')((?:(?!\1).)+)\1/si;
+    readonly findLinkHref = /href\s*=\s*("|')((?:(?!\1).)+)\1/si;
+    readonly findExtended = /(?:{{<|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
 
     dispose() {
         for (const watcher of this.watchers.values()) {

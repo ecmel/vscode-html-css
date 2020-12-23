@@ -2,9 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [1.3.4] - 
+## [1.4.0] - 2020-12-23
 
 - Added laravel blade inheritance.
+- Added clearCache command.
 
 ## [1.3.3] - 2020-12-22
 

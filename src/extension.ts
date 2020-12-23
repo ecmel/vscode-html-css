@@ -1,5 +1,5 @@
 import { ClassCompletionItemProvider } from "./completion";
-import { ExtensionContext, languages, workspace } from "vscode";
+import { ExtensionContext, languages, workspace, commands } from "vscode";
 
 export function activate(context: ExtensionContext) {
 
@@ -9,10 +9,13 @@ export function activate(context: ExtensionContext) {
 
     const provider = new ClassCompletionItemProvider();
 
-    context.subscriptions.push(languages.registerCompletionItemProvider(
-        enabledLanguages,
+    context.subscriptions.push(
+        languages.registerCompletionItemProvider(
+            enabledLanguages,
+            provider,
+            ...triggerCharacters),
         provider,
-        ...triggerCharacters), provider);
+        commands.registerCommand("vscode-html-css.clearCache", () => provider.dispose()));
 }
 
 export function deactivate() { }
