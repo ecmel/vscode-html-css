@@ -67,6 +67,30 @@ suite("ClassCompletionItemProvider Test Suite", () => {
 		"`)?.[2], "http://example.com/example.css");
     });
 
+    test("RegEx: findExtended (Twig)", () => {
+        const provider = new ClassCompletionItemProvider();
+
+        assert.strictEqual(provider.findExtended.exec(`
+            {% extends "base" %}
+        `)?.[2], "base");
+    });
+
+    test("RegEx: findExtended (Mustache)", () => {
+        const provider = new ClassCompletionItemProvider();
+
+        assert.strictEqual(provider.findExtended.exec(`
+            {{< base }}
+        `)?.[2], "base");
+    });
+
+    test("RegEx: findExtended (Blade)", () => {
+        const provider = new ClassCompletionItemProvider();
+
+        assert.strictEqual(provider.findExtended.exec(`
+            @extends('base')
+        `)?.[2], "base");
+    });
+
     test("Rejects outside class attribute", (done) => {
         const provider = new ClassCompletionItemProvider();
         const document = new MockDocument("<a class=\"\"></a>");
