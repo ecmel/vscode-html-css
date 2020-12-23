@@ -160,13 +160,13 @@ This setting is application scoped and changing the setting requires restarting 
 
 ## Commands
 
-### CSS: Clear Cache
+### Clear Cache
 
 Clears cache and disposes file watchers.
 
 ## Installation
 
-[Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css)
+Extension can be installed from [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css).
 
 ## Usage
 
