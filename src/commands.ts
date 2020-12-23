@@ -1,5 +1,7 @@
 import { ClassCompletionItemProvider } from "./completion";
 
-export function clearCache(provider: ClassCompletionItemProvider): (...args: any[]) => any {
+export type Command = (...args: any[]) => any;
+
+export function clearCache(provider: ClassCompletionItemProvider): Command {
     return () => provider.dispose();
 }
