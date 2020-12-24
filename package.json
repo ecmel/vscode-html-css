@@ -56,7 +56,11 @@
 		},
 		"commands": [
 			{
-				"command": "vscode-html-css.clearCache",
+				"command": "vscode-html-css.validate",
+				"title": "CSS: Validate Attributes"
+			},
+			{
+				"command": "vscode-html-css.dispose",
 				"title": "CSS: Clear Cache"
 			}
 		]

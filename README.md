@@ -160,6 +160,10 @@ This setting is application scoped and changing the setting requires restarting 
 
 ## Commands
 
+### Validate Attributes
+
+Validates all `id` and `class` attributes in the document.
+
 ### Clear Cache
 
 Clears cache and disposes file watchers.

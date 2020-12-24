@@ -1,4 +1,4 @@
-import { clearCache } from "./commands";
+import { validate, dispose } from "./commands";
 import { ClassCompletionItemProvider } from "./completion";
 import { ExtensionContext, languages, workspace, commands } from "vscode";
 
@@ -14,9 +14,12 @@ export function activate(context: ExtensionContext) {
         languages.registerCompletionItemProvider(
             enabledLanguages,
             provider,
-            ...triggerCharacters),
+            ...triggerCharacters
+        ),
         provider,
-        commands.registerCommand("vscode-html-css.clearCache", clearCache(provider)));
+        commands.registerCommand("vscode-html-css.validate", validate(provider)),
+        commands.registerCommand("vscode-html-css.dispose", dispose(provider))
+    );
 }
 
 export function deactivate() { }

@@ -228,6 +228,15 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
         });
     }
 
+    findAll(uri: Uri, text: string): Thenable<Set<string>[]> {
+        return Promise.all([
+            this.findStyleSheets(uri),
+            this.findDocumentLinks(uri, text),
+            this.findDocumentStyles(uri, text),
+            this.findExtendedStyles(uri, text)
+        ]);
+    }
+
     buildItems(sets: Set<string>[], kind: CompletionItemKind): CompletionItem[] {
         const items = new Map<string, CompletionItem>();
         const keys = new Set<string>();
@@ -262,14 +271,8 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
                         ? CompletionItemKind.Value
                         : CompletionItemKind.Enum;
 
-                    const uri = document.uri;
-
-                    Promise.all([
-                        this.findStyleSheets(uri),
-                        this.findDocumentLinks(uri, text),
-                        this.findDocumentStyles(uri, text),
-                        this.findExtendedStyles(uri, text)
-                    ]).then(keys => resolve(this.buildItems(keys, kind)));
+                    this.findAll(document.uri, text)
+                        .then(keys => resolve(this.buildItems(keys, kind)));
                 } else {
                     reject();
                 }
