@@ -53,6 +53,10 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
         }
     }
 
+    getItems(key: string): Map<string, CompletionItem> | undefined {
+        return this.cache.get(key);
+    }
+
     getStyleSheets(uri: Uri): string[] {
         return workspace.getConfiguration("css", uri).get<string[]>("styleSheets", []);
     }
