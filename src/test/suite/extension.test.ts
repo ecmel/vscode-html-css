@@ -6,15 +6,15 @@ suite("Extension Test Suite", () => {
 	test("Completes for html", async () => {
 		const document = await workspace.openTextDocument({
 			language: "html",
-			content: "<style>.none{}</style>\n<a class='no'></a>"
+			content: "<style>.some{}</style>\n<a class='some'></a>"
 		});
 
 		const list = await commands.executeCommand<CompletionList>(
 			"vscode.executeCompletionItemProvider",
 			document.uri,
-			new Position(1, 12)
+			new Position(1, 14)
 		);
 
-	//	assert.strictEqual(list?.items[0].label, "none");
+		assert.strictEqual(list?.items[0].label, "some");
 	});
 });

@@ -27,7 +27,6 @@
 		"nunjucks",
 		"mustache",
 		"css",
-		"class",
 		"multi-root ready"
 	],
 	"activationEvents": [
