@@ -1,4 +1,4 @@
-import { TextDocument, workspace } from "vscode";
+import { TextDocument, workspace, window } from "vscode";
 import { ClassCompletionItemProvider } from "./completion";
 
 export type Command = (...args: any[]) => any;
@@ -8,14 +8,18 @@ export function dispose(provider: ClassCompletionItemProvider): Command {
 }
 
 export function validate(provider: ClassCompletionItemProvider): Command {
-    return (document: TextDocument) => {
-        const text = document.getText();
-        const findAttribute = /(id|class|className)\s*=\s*("|')((?:(?!\2).)+)\2/gsi;
+    return () => {
+        const editor = window.activeTextEditor;
 
-        let attribute;
+        if (editor) {
+            const text = editor.document.getText();
+            const findAttribute = /(id|class|className)\s*=\s*("|')((?:(?!\2).)+)\2/gsi;
 
-        while ((attribute = findAttribute.exec(text)) !== null) {
-            console.log(attribute[3]);
+            let attribute;
+
+            while ((attribute = findAttribute.exec(text)) !== null) {
+                console.log(attribute[3]);
+            }
         }
     };
 }
