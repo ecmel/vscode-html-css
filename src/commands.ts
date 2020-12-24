@@ -1,4 +1,4 @@
-import { TextDocument, workspace, window, CompletionItemKind } from "vscode";
+import { window, languages, CompletionItemKind, Diagnostic, Range } from "vscode";
 import { ClassCompletionItemProvider } from "./completion";
 
 export type Command = (...args: any[]) => any;
@@ -12,8 +12,9 @@ export function validate(provider: ClassCompletionItemProvider): Command {
         const editor = window.activeTextEditor;
 
         if (editor) {
-            const uri = editor.document.uri;
-            const text = editor.document.getText();
+            const doc = editor.document;
+            const uri = doc.uri;
+            const text = doc.getText();
             const ids = new Set<string>();
             const classes = new Set<string>();
 
@@ -38,18 +39,28 @@ export function validate(provider: ClassCompletionItemProvider): Command {
                 let attribute;
 
                 while ((attribute = findAttribute.exec(text)) !== null) {
-                    const findWords = /([^\s]+)/gi;
+                    const offset = findAttribute.lastIndex
+                        - attribute[3].length
+                        + attribute[3].indexOf(attribute[2]);
 
-                    let word;
+                    const findValue = /([^\s]+)/gi;
 
-                    while ((word = findWords.exec(attribute[3])) !== null) {
+                    let value;
+
+                    while ((value = findValue.exec(attribute[3])) !== null) {
+                        const anchor = findValue.lastIndex + offset;
+                        const end = doc.positionAt(anchor);
+                        const start = doc.positionAt(anchor - value[1].length);
+
                         if (attribute[1] === "id") {
-                            if (!ids.has(word[1])) {
-                                console.log(word[1]);
+                            if (!ids.has(value[1])) {
+
                             }
                         } else {
-                            if (!classes.has(word[1])) {
-                                console.log(word[1]);
+                            if (!classes.has(value[1])) {
+                                const d = languages.createDiagnosticCollection();
+                                const a = [new Diagnostic(new Range(start, end), "CSS selector not found.")];
+                                d.set(doc.uri, a);
                             }
                         }
                     }
