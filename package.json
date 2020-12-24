@@ -31,8 +31,7 @@
 		"multi-root ready"
 	],
 	"activationEvents": [
-		"onStartupFinished",
-		"onCommand:vscode-html-css.clearCache"
+		"*"
 	],
 	"contributes": {
 		"configuration": {

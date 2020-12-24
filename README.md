@@ -13,7 +13,7 @@ HTML `id` and `class` attribute completion for VS Code.
 
 ## Usage
 
-You can view a list of class and id attributes via `ctrl + space`. Note that, extension will be activated a few seconds after VS Code starts.
+You can view a list of class and id attributes via `ctrl + space`.
 
 ## Linked and Embedded Style Sheets
 
