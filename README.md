@@ -11,6 +11,10 @@ HTML `id` and `class` attribute completion for VS Code.
 - Supports additional style sheets.
 - Supports other HTML like languages.
 
+## Usage
+
+You can view a list of class and id attributes via `ctrl + space`. Note that, extension will be activated a few seconds after VS Code starts.
+
 ## Linked and Embedded Style Sheets
 
 Linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets are used in completion for `id` and `class` attributes. Links support local and remote files. Absolute local file paths are relative to the workspace folder while others are relative to HTML file:
@@ -171,7 +175,3 @@ Clears cache and disposes file watchers.
 ## Installation
 
 Extension can be installed from [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css).
-
-## Usage
-
-You can view a list of class and id attributes via `ctrl + space`. Note that, extension will be activated a few seconds after VS Code starts.

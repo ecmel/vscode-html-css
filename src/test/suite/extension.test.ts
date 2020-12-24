@@ -9,6 +9,8 @@ suite("Extension Test Suite", () => {
 			content: "<style>.none{}</style>\n<a class='no'></a>"
 		});
 
+		await commands.executeCommand<CompletionList>("vscode-html-css.dispose");		
+		
 		const list = await commands.executeCommand<CompletionList>(
 			"vscode.executeCompletionItemProvider",
 			document.uri,
