@@ -8,6 +8,8 @@ export function dispose(provider: ClassCompletionItemProvider): Command {
 }
 
 export function validate(provider: ClassCompletionItemProvider): Command {
+    const collection = languages.createDiagnosticCollection();
+
     return () => {
         const editor = window.activeTextEditor;
 
@@ -15,25 +17,20 @@ export function validate(provider: ClassCompletionItemProvider): Command {
             const doc = editor.document;
             const uri = doc.uri;
             const text = doc.getText();
-            const ids = new Set<string>();
-            const classes = new Set<string>();
 
             provider.findAll(uri, text).then(sets => {
-                for (const set of sets) {
-                    for (const key of set) {
-                        const items = provider.getItems(key);
-                        if (items) {
-                            for (const item of items.values()) {
-                                if (item.kind === CompletionItemKind.Value) {
-                                    ids.add(item.label);
-                                } else {
-                                    classes.add(item.label);
-                                }
-                            }
-                        }
-                    }
-                }
+                const ids = new Set<string>();
+                const classes = new Set<string>();
 
+                sets.forEach(set => set.forEach(key => provider.getItems(key)?.forEach((v, k) => {
+                    if (v.kind === CompletionItemKind.Value) {
+                        ids.add(k);
+                    } else {
+                        classes.add(k);
+                    }
+                })));
+
+                const diagnostics: Diagnostic[] = [];
                 const findAttribute = /(id|class|className)\s*=\s*("|')((?:(?!\2).)+)\2/gsi;
 
                 let attribute;
@@ -54,17 +51,19 @@ export function validate(provider: ClassCompletionItemProvider): Command {
 
                         if (attribute[1] === "id") {
                             if (!ids.has(value[1])) {
-
+                                diagnostics.push(new Diagnostic(new Range(start, end),
+                                    `CSS id selector '${value[1]}' not found.`));
                             }
                         } else {
                             if (!classes.has(value[1])) {
-                                const d = languages.createDiagnosticCollection();
-                                const a = [new Diagnostic(new Range(start, end), "CSS selector not found.")];
-                                d.set(doc.uri, a);
+                                diagnostics.push(new Diagnostic(new Range(start, end),
+                                    `CSS class selector '${value[1]}' not found.`));
                             }
                         }
                     }
                 }
+
+                collection.set(uri, diagnostics);
             });
         }
     };
