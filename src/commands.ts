@@ -1,5 +1,12 @@
-import { window, languages, CompletionItemKind, Diagnostic, Range } from "vscode";
 import { ClassCompletionItemProvider } from "./completion";
+import {
+    window,
+    languages,
+    CompletionItemKind,
+    Diagnostic,
+    DiagnosticSeverity,
+    Range
+} from "vscode";
 
 export type Command = (...args: any[]) => any;
 
@@ -8,7 +15,7 @@ export function dispose(provider: ClassCompletionItemProvider): Command {
 }
 
 export function validate(provider: ClassCompletionItemProvider): Command {
-    const collection = languages.createDiagnosticCollection();
+    const collection = languages.createDiagnosticCollection("vscode-html-css");
 
     return () => {
         const editor = window.activeTextEditor;
@@ -52,12 +59,14 @@ export function validate(provider: ClassCompletionItemProvider): Command {
                         if (attribute[1] === "id") {
                             if (!ids.has(value[1])) {
                                 diagnostics.push(new Diagnostic(new Range(start, end),
-                                    `CSS id selector '${value[1]}' not found.`));
+                                    `CSS id selector '${value[1]}' not found.`,
+                                    DiagnosticSeverity.Warning));
                             }
                         } else {
                             if (!classes.has(value[1])) {
                                 diagnostics.push(new Diagnostic(new Range(start, end),
-                                    `CSS class selector '${value[1]}' not found.`));
+                                    `CSS class selector '${value[1]}' not found.`,
+                                    DiagnosticSeverity.Warning));
                             }
                         }
                     }
