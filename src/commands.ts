@@ -2,10 +2,12 @@ import { ClassCompletionItemProvider } from "./completion";
 import {
     window,
     languages,
+    workspace,
     CompletionItemKind,
     Diagnostic,
     DiagnosticSeverity,
-    Range
+    Range,
+    TextDocumentChangeEvent
 } from "vscode";
 
 export type Command = (...args: any[]) => any;
@@ -16,6 +18,8 @@ export function dispose(provider: ClassCompletionItemProvider): Command {
 
 export function validate(provider: ClassCompletionItemProvider): Command {
     const collection = languages.createDiagnosticCollection("vscode-html-css");
+
+    workspace.onDidChangeTextDocument(e => collection.delete(e.document.uri));
 
     return () => {
         const editor = window.activeTextEditor;
