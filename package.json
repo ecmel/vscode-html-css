@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS Intellisense for HTML",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",

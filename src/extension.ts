@@ -4,8 +4,7 @@ import { ExtensionContext, languages, workspace, commands } from "vscode";
 export function activate(context: ExtensionContext) {
     const config = workspace.getConfiguration("css");
     const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
-    const collection = languages.createDiagnosticCollection();
-    const provider = new ClassCompletionItemProvider(collection);
+    const provider = new ClassCompletionItemProvider();
 
     workspace.textDocuments.forEach(document => {
         if (enabledLanguages.includes(document.languageId)) {
@@ -34,7 +33,6 @@ export function activate(context: ExtensionContext) {
             provider
         ),
 
-        collection,
         provider
     );
 }

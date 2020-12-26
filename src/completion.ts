@@ -9,7 +9,6 @@ import {
     CompletionItemProvider,
     CompletionList,
     Diagnostic,
-    DiagnosticCollection,
     DiagnosticSeverity,
     Disposable,
     languages,
@@ -28,22 +27,19 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly extends = new Map<string, Set<string>>();
     readonly watchers = new Map<string, Disposable>();
-    readonly collection: DiagnosticCollection;
+    readonly collection = languages.createDiagnosticCollection();
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findExtended = /(?:{{<|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
 
-    constructor(collection: DiagnosticCollection) {
-        this.collection = collection;
-    }
-
     dispose() {
         this.watchers.forEach(v => v.dispose());
         this.cache.clear();
         this.extends.clear();
         this.watchers.clear();
+        this.collection.dispose();
     }
 
     watchFile(uri: Uri, listener: (e: Uri) => any) {
