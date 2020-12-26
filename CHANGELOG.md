@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.4.1] - 2020-12-26
+
+- Validates startup and newly opened documents.
+
 ## [1.4.0] - 2020-12-26
 
 - Added validation.
