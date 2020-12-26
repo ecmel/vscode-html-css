@@ -8,7 +8,10 @@ import {
     CompletionItemKind,
     CompletionItemProvider,
     CompletionList,
+    Diagnostic,
+    DiagnosticSeverity,
     Disposable,
+    languages,
     Position,
     ProviderResult,
     Range,
@@ -24,17 +27,24 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly extends = new Map<string, Set<string>>();
     readonly watchers = new Map<string, Disposable>();
+    readonly collection = languages.createDiagnosticCollection("vscode-html-css");
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findExtended = /(?:{{<|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
 
-    dispose() {
-        for (const watcher of this.watchers.values()) {
-            watcher.dispose();
-        }
+    constructor() {
+        let debounce: NodeJS.Timeout;
 
+        this.watchers.set("changed", workspace.onDidChangeTextDocument(e => {
+            clearTimeout(debounce);
+            debounce = setTimeout(() => this.validate(e.document), 1000);
+        }));
+    }
+
+    dispose() {
+        this.watchers.forEach(v => v.dispose());
         this.cache.clear();
         this.extends.clear();
         this.watchers.clear();
@@ -281,6 +291,61 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
                     reject();
                 }
             }
+        });
+    }
+
+    validate(document: TextDocument) {
+        const uri = document.uri;
+        const text = document.getText();
+
+        this.findAll(uri, text).then(sets => {
+            const ids = new Set<string>();
+            const classes = new Set<string>();
+
+            sets.forEach(set => set.forEach(key => this.getItems(key)?.forEach((v, k) => {
+                if (v.kind === CompletionItemKind.Value) {
+                    ids.add(k);
+                } else {
+                    classes.add(k);
+                }
+            })));
+
+            const diagnostics: Diagnostic[] = [];
+            const findAttribute = /(id|class|className)\s*=\s*("|')(.+?)\2/gsi;
+
+            let attribute;
+
+            while ((attribute = findAttribute.exec(text)) !== null) {
+                const offset = findAttribute.lastIndex
+                    - attribute[3].length
+                    + attribute[3].indexOf(attribute[2]);
+
+                const findValue = /([^\s]+)/gi;
+
+                let value;
+
+                while ((value = findValue.exec(attribute[3])) !== null) {
+                    const anchor = findValue.lastIndex + offset;
+                    const end = document.positionAt(anchor);
+                    const start = document.positionAt(anchor - value[1].length);
+
+                    if (attribute[1] === "id") {
+                        if (!ids.has(value[1])) {
+                            diagnostics.push(new Diagnostic(new Range(start, end),
+                                `CSS id selector '${value[1]}' not found.`,
+                                DiagnosticSeverity.Warning));
+                        }
+                    } else {
+                        if (!classes.has(value[1])) {
+                            diagnostics.push(new Diagnostic(new Range(start, end),
+                                `CSS class selector '${value[1]}' not found.`,
+                                DiagnosticSeverity.Warning));
+                        }
+                    }
+                }
+            }
+
+            this.collection.set(uri, diagnostics);
         });
     }
 }

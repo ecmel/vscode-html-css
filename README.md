@@ -163,16 +163,6 @@ Extension can be configured to support any language where it makes sense such as
 
 This setting is application scoped and changing the setting requires restarting VS Code.
 
-## Commands
-
-### Validate Attributes
-
-Validates all `id` and `class` attributes in the document.
-
-### Clear Cache
-
-Clears cache and disposes file watchers.
-
 ## Installation
 
 Extension can be installed from [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css).

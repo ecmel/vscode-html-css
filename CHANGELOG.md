@@ -2,12 +2,11 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [1.4.0] - 
+## [1.4.0] - 2020-12-26
 
+- Added validation.
 - Added @extends('base') tag for inheritance.
-- Added [CSS: Validate Attributes] command.
-- Added [CSS: Clear Cache] command.
-- Added integration tests.
+- Added integration test.
 
 ## [1.3.3] - 2020-12-22
 
