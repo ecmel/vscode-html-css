@@ -4,13 +4,12 @@ HTML `id` and `class` attribute completion for VS Code.
 
 ## Features
 
-- HTML `id` attribute completion.
-- HTML `class` attribute completion.
+- HTML `id` attribute completion and validation.
+- HTML `class` attribute completion and validation.
 - Supports linked and embedded style sheets.
 - Supports template inheritance.
 - Supports additional style sheets.
 - Supports other HTML like languages.
-- Validates HTML `id` and `class` attributes.
 
 ## Usage
 
