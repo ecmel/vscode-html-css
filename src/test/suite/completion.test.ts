@@ -1,24 +1,24 @@
 import * as assert from "assert";
 import { ClassCompletionItemProvider } from "../../completion";
 import { MockCancellationToken, MockCompletionContext, MockDocument } from "./mocks";
-import { CompletionItem, Position, Uri } from "vscode";
+import { CompletionItem, Position, Uri, languages } from "vscode";
 
 suite("ClassCompletionItemProvider Test Suite", () => {
 
-    const langs = ["html"];
+    const collection = languages.createDiagnosticCollection();
     const position = new Position(0, 0);
     const token = new MockCancellationToken(false);
     const context = new MockCompletionContext();
 
     test("RegEx: isRemote", () => {
-        const provider = new ClassCompletionItemProvider(langs);
+        const provider = new ClassCompletionItemProvider(collection);
 
         assert.strictEqual(provider.isRemote.test("http://example.com/example.css"), true);
         assert.strictEqual(provider.isRemote.test("https://example.com/example.css"), true);
     });
 
     test("RegEx: canComplete", () => {
-        const provider = new ClassCompletionItemProvider(langs);
+        const provider = new ClassCompletionItemProvider(collection);
 
         assert.strictEqual(provider.canComplete.test(""), false);
         assert.strictEqual(provider.canComplete.test("class=\""), true);
@@ -53,7 +53,7 @@ suite("ClassCompletionItemProvider Test Suite", () => {
     });
 
     test("RegEx: findLinkRel", () => {
-        const provider = new ClassCompletionItemProvider(langs);
+        const provider = new ClassCompletionItemProvider(collection);
 
         assert.strictEqual(provider.findLinkRel.exec(`
 			<link rel="stylesheet" href="http://example.com/example.css">
@@ -61,7 +61,7 @@ suite("ClassCompletionItemProvider Test Suite", () => {
     });
 
     test("RegEx: findLinkHref", () => {
-        const provider = new ClassCompletionItemProvider(langs);
+        const provider = new ClassCompletionItemProvider(collection);
 
         assert.strictEqual(provider.findLinkHref.exec(`
 			<link rel="stylesheet" href="http://example.com/example.css">
@@ -69,7 +69,7 @@ suite("ClassCompletionItemProvider Test Suite", () => {
     });
 
     test("RegEx: findExtended (Twig)", () => {
-        const provider = new ClassCompletionItemProvider(langs);
+        const provider = new ClassCompletionItemProvider(collection);
 
         assert.strictEqual(provider.findExtended.exec(`
             {% extends "base" %}
@@ -77,7 +77,7 @@ suite("ClassCompletionItemProvider Test Suite", () => {
     });
 
     test("RegEx: findExtended (Mustache)", () => {
-        const provider = new ClassCompletionItemProvider(langs);
+        const provider = new ClassCompletionItemProvider(collection);
 
         assert.strictEqual(provider.findExtended.exec(`
             {{< base }}
@@ -85,7 +85,7 @@ suite("ClassCompletionItemProvider Test Suite", () => {
     });
 
     test("RegEx: findExtended (Blade)", () => {
-        const provider = new ClassCompletionItemProvider(langs);
+        const provider = new ClassCompletionItemProvider(collection);
 
         assert.strictEqual(provider.findExtended.exec(`
             @extends('base')
@@ -93,7 +93,7 @@ suite("ClassCompletionItemProvider Test Suite", () => {
     });
 
     test("Rejects outside class attribute", (done) => {
-        const provider = new ClassCompletionItemProvider(langs);
+        const provider = new ClassCompletionItemProvider(collection);
         const document = new MockDocument("<a class=\"\"></a>");
 
         const result = provider.provideCompletionItems(
@@ -106,7 +106,7 @@ suite("ClassCompletionItemProvider Test Suite", () => {
     });
 
     test("Completes from style tag", async () => {
-        const provider = new ClassCompletionItemProvider(langs);
+        const provider = new ClassCompletionItemProvider(collection);
         const document = new MockDocument("<style>.test{}</style><a class=\"");
 
         const items = await (provider.provideCompletionItems(
@@ -119,7 +119,7 @@ suite("ClassCompletionItemProvider Test Suite", () => {
     });
 
     test("Completes from link tag", async () => {
-        const provider = new ClassCompletionItemProvider(langs);
+        const provider = new ClassCompletionItemProvider(collection);
         const document = new MockDocument(`
 			<link 
 				href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" 
@@ -143,7 +143,7 @@ suite("ClassCompletionItemProvider Test Suite", () => {
                     "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
                 ];
             }
-        }(langs);
+        }(collection);
 
         const document = new MockDocument("<a class=\"");
 

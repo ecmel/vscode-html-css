@@ -9,6 +9,7 @@ import {
     CompletionItemProvider,
     CompletionList,
     Diagnostic,
+    DiagnosticCollection,
     DiagnosticSeverity,
     Disposable,
     languages,
@@ -27,22 +28,15 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly extends = new Map<string, Set<string>>();
     readonly watchers = new Map<string, Disposable>();
-    readonly collection = languages.createDiagnosticCollection();
+    readonly collection: DiagnosticCollection;
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findExtended = /(?:{{<|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
 
-    constructor(enabledLanguages: string[]) {
-        let debounce: NodeJS.Timeout;
-
-        workspace.onDidChangeTextDocument(e => {
-            if (enabledLanguages.includes(e.document.languageId)) {
-                clearTimeout(debounce);
-                debounce = setTimeout(() => this.validate(e.document), 1000);
-            }
-        });
+    constructor(collection: DiagnosticCollection) {
+        this.collection = collection;
     }
 
     dispose() {
