@@ -27,20 +27,22 @@ export class ClassCompletionItemProvider implements CompletionItemProvider, Disp
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly extends = new Map<string, Set<string>>();
     readonly watchers = new Map<string, Disposable>();
-    readonly collection = languages.createDiagnosticCollection("vscode-html-css");
+    readonly collection = languages.createDiagnosticCollection();
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findExtended = /(?:{{<|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
 
-    constructor() {
+    constructor(enabledLanguages: string[]) {
         let debounce: NodeJS.Timeout;
 
-        this.watchers.set("changed", workspace.onDidChangeTextDocument(e => {
-            clearTimeout(debounce);
-            debounce = setTimeout(() => this.validate(e.document), 1000);
-        }));
+        workspace.onDidChangeTextDocument(e => {
+            if (enabledLanguages.includes(e.document.languageId)) {
+                clearTimeout(debounce);
+                debounce = setTimeout(() => this.validate(e.document), 1000);
+            }
+        });
     }
 
     dispose() {

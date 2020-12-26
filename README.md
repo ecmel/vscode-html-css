@@ -1,6 +1,6 @@
 # Visual Studio Code CSS Intellisense for HTML
 
-HTML `id` and `class` attributes completion and validation for VS Code.
+HTML `id` and `class` attributes completion and validation for Visual Studio Code.
 
 ## Features
 
@@ -78,7 +78,7 @@ Template inheritance is supported for the following tags:
 
 @extends('base')
 
-{{< base }} 
+{{< base }}
 ```
 
 Only one level of inheritance is supported:
