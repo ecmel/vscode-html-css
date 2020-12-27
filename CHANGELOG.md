@@ -2,6 +2,14 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.4.3] - 2020-12-27
+
+- Fixed regex.
+
+## [1.4.2] - 2020-12-26
+
+- Update documentation.
+
 ## [1.4.1] - 2020-12-26
 
 - Validates startup and newly opened documents.
