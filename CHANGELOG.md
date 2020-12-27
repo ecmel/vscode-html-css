@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.4.5] - 2020-12-28
+
+- Update documentation.
+
 ## [1.4.4] - 2020-12-27
 
 - Fixed regex.
