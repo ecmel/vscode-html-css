@@ -1,38 +1,36 @@
 import { SelectorCompletionItemProvider } from "./completion";
-import { ExtensionContext, languages, workspace } from "vscode";
+import { ExtensionContext, languages, TextDocument, TextDocumentChangeEvent, workspace } from "vscode";
 
 export function activate(context: ExtensionContext) {
+    const timeouts = new Map<string, NodeJS.Timeout>();
     const config = workspace.getConfiguration("css");
     const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
     const provider = new SelectorCompletionItemProvider();
 
-    workspace.textDocuments.forEach(document => {
-        if (enabledLanguages.includes(document.languageId)) {
-            provider.validate(document);
-        }
-    });
+    const validate = (e: TextDocumentChangeEvent | TextDocument) => {
+        const document = (e as TextDocumentChangeEvent).document || e;
 
-    let timeout: NodeJS.Timeout;
+        if (enabledLanguages.includes(document.languageId)) {
+            const uri = document.uri.toString();
+            const timeout = timeouts.get(uri);
+
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+
+            timeouts.set(uri, setTimeout(() => {
+                timeouts.delete(uri);
+                provider.validate(document);
+            }, 500));
+        }
+    };
+
+    workspace.textDocuments.forEach(validate);
 
     context.subscriptions.push(
-        workspace.onDidOpenTextDocument(document => {
-            if (enabledLanguages.includes(document.languageId)) {
-                provider.validate(document);
-            }
-        }),
-
-        workspace.onDidChangeTextDocument(e => {
-            if (enabledLanguages.includes(e.document.languageId)) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => provider.validate(e.document), 500);
-            }
-        }),
-
-        languages.registerCompletionItemProvider(
-            enabledLanguages,
-            provider
-        ),
-
+        workspace.onDidOpenTextDocument(validate),
+        workspace.onDidChangeTextDocument(validate),
+        languages.registerCompletionItemProvider(enabledLanguages, provider),
         provider
     );
 }
