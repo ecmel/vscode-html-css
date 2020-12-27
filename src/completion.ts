@@ -312,7 +312,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                     - attribute[3].length
                     + attribute[3].indexOf(attribute[2]);
 
-                const findSelector = /([\w\-]+)(?![\w\-\s]*[%}]+)/gi;
+                const findSelector = /([a-zA-Z0-9_\-]+)(?![^%(){}[\]]*[%)}\]]+)/gi;
 
                 let value;
 
