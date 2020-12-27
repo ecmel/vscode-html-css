@@ -1,10 +1,16 @@
 import { SelectorCompletionItemProvider } from "./completion";
-import { ExtensionContext, languages, TextDocument, TextDocumentChangeEvent, workspace } from "vscode";
+import {
+    ExtensionContext,
+    languages,
+    TextDocument,
+    TextDocumentChangeEvent,
+    workspace
+} from "vscode";
 
 export function activate(context: ExtensionContext) {
-    const timeouts = new Map<string, NodeJS.Timeout>();
     const config = workspace.getConfiguration("css");
     const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
+    const timeouts = new Map<string, NodeJS.Timeout>();
     const provider = new SelectorCompletionItemProvider();
 
     const validate = (e: TextDocumentChangeEvent | TextDocument) => {
