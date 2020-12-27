@@ -1,10 +1,10 @@
-import { ClassCompletionItemProvider } from "./completion";
-import { ExtensionContext, languages, workspace, commands } from "vscode";
+import { SelectorCompletionItemProvider } from "./completion";
+import { ExtensionContext, languages, workspace } from "vscode";
 
 export function activate(context: ExtensionContext) {
     const config = workspace.getConfiguration("css");
     const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
-    const provider = new ClassCompletionItemProvider();
+    const provider = new SelectorCompletionItemProvider();
 
     workspace.textDocuments.forEach(document => {
         if (enabledLanguages.includes(document.languageId)) {

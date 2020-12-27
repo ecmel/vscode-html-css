@@ -15,6 +15,6 @@ suite("Extension Test Suite", () => {
 			new Position(1, 14)
 		);
 
-		//assert.strictEqual(list?.items[0].label, "some");
+		assert.strictEqual(list?.items[0].label, "some");
 	});
 });

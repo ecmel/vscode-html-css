@@ -20,7 +20,7 @@ import {
     workspace
 } from "vscode";
 
-export class ClassCompletionItemProvider implements CompletionItemProvider, Disposable {
+export class SelectorCompletionItemProvider implements CompletionItemProvider, Disposable {
 
     readonly none = "__!NONE!__";
     readonly start = new Position(0, 0);
