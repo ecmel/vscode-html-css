@@ -133,18 +133,28 @@ If it is not possible to specify local or remote styles in HTML or via template 
 ```js
 "css.styleSheets": [
 
-  // (1)
-  "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css",
+    // (1)
+    "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css",
 
-  // (2)
-  "/site.css",
+    // (2)
+    "/site.css",
 
-  // (3)
-  "site.css",
+    // (3)
+    "site.css",
 
-  // (4)
-  "./site.css"
+    // (4)
+    "./site.css"
 ]
+```
+## Selector Validation
+
+Validated selectors can be configured with the `css.validation` setting. By default `class` selectors are validated:
+
+```json
+"css.validation": {
+    "id": false,
+    "class": true
+}
 ```
 
 ## Supported Languages
@@ -153,7 +163,7 @@ Supported languages can be configured with the `css.enabledLanguages` setting. B
 
 ```json
 "css.enabledLanguages": [
-  "html"
+    "html"
 ]
 ```
 

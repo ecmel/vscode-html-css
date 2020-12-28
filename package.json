@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS Intellisense for HTML",
-	"version": "1.4.5",
+	"version": "1.5.0",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -48,6 +48,15 @@
 					"type": "array",
 					"default": [],
 					"description": "A list of local or remote style sheets for suggestions.",
+					"scope": "resource"
+				},
+				"css.validation": {
+					"type": "object",
+					"default": {
+						"id": false,
+						"class": true
+					},
+					"description": "Choose selectors for validation.",
 					"scope": "resource"
 				}
 			}
