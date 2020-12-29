@@ -20,11 +20,6 @@ import {
     workspace
 } from "vscode";
 
-type Validation = {
-    id: boolean;
-    class: boolean;
-};
-
 export class SelectorCompletionItemProvider implements CompletionItemProvider, Disposable {
 
     readonly none = "__!NONE!__";
@@ -68,8 +63,12 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         return workspace.getConfiguration("css", uri).get<string[]>("styleSheets", []);
     }
 
-    getValidation(uri: Uri): Validation {
-        return workspace.getConfiguration("css", uri).get<Validation>("validation", { id: false, class: true });
+    isValidateId(uri: Uri): boolean {
+        return workspace.getConfiguration("css", uri).get<boolean>("validation.id", false);
+    }
+
+    isValidateClass(uri: Uri): boolean {
+        return workspace.getConfiguration("css", uri).get<boolean>("validation.class", true);
     }
 
     getRelativePath(uri: Uri, spec: string, ext?: string): string {
@@ -302,7 +301,8 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         this.findAll(uri, text).then(sets => {
             const ids = new Set<string>();
             const classes = new Set<string>();
-            const validation = this.getValidation(uri);
+            const isValidateId = this.isValidateId(uri);
+            const isValidateClass = this.isValidateClass(uri);
 
             sets.forEach(set => set.forEach(key => this.getItems(key)?.forEach((v, k) => {
                 if (v.kind === CompletionItemKind.Value) {
@@ -332,13 +332,13 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                     const start = document.positionAt(anchor - value[1].length);
 
                     if (attribute[1] === "id") {
-                        if (validation.id && !ids.has(value[1])) {
+                        if (isValidateId && !ids.has(value[1])) {
                             diagnostics.push(new Diagnostic(new Range(start, end),
                                 `CSS id selector '${value[1]}' not found.`,
                                 DiagnosticSeverity.Information));
                         }
                     } else {
-                        if (validation.class && !classes.has(value[1])) {
+                        if (isValidateClass && !classes.has(value[1])) {
                             diagnostics.push(new Diagnostic(new Range(start, end),
                                 `CSS class selector '${value[1]}' not found.`,
                                 DiagnosticSeverity.Warning));

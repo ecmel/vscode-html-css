@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS Intellisense for HTML",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -38,26 +38,35 @@
 			"properties": {
 				"css.enabledLanguages": {
 					"type": "array",
-					"description": "A list of languages where suggestions are desired.",
+					"scope": "application",
+					"description": "List of languages where suggestions are desired.",
 					"default": [
 						"html"
-					],
-					"scope": "application"
-				},
-				"css.styleSheets": {
-					"type": "array",
-					"default": [],
-					"description": "A list of local or remote style sheets for suggestions.",
-					"scope": "resource"
+					]
 				},
 				"css.validation": {
 					"type": "object",
-					"default": {
-						"id": false,
-						"class": true
-					},
-					"description": "Choose selectors for validation.",
-					"scope": "resource"
+					"scope": "resource",
+					"description": "Map of selectors to validate.",
+					"default": {},
+					"properties": {
+						"id": {
+							"type": "boolean",
+							"description": "Whether to validate 'id' selectors.",
+							"default": false
+						},
+						"class": {
+							"type": "boolean",
+							"description": "Whether to validate 'class' selectors.",
+							"default": true
+						}
+					}
+				},
+				"css.styleSheets": {
+					"type": "array",
+					"scope": "resource",
+					"description": "List of local or remote style sheets for suggestions.",
+					"default": []
 				}
 			}
 		}

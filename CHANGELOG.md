@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.6.0] - 2020-12-29
+
+- Updated settings.
+
 ## [1.5.0] - 2020-12-28
 
 - Added `css.validation` setting.
