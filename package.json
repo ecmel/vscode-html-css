@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS Intellisense for HTML",
-	"version": "1.6.0",
+	"version": "1.6.1",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -20,13 +20,16 @@
 		"Other"
 	],
 	"keywords": [
+		"css",
 		"html",
 		"twig",
 		"blade",
 		"django",
 		"nunjucks",
 		"mustache",
-		"css",
+		"angular",
+		"react",
+		"vue",
 		"multi-root ready"
 	],
 	"activationEvents": [
