@@ -141,7 +141,7 @@ If it is not possible to specify local or remote styles in HTML or via template 
 }
 ```
 
-This configuration is same as the first example. All relative paths will be evaluated relative to the HTML file being edited.
+This configuration is same as the [first](#linked-and-embedded-style-sheets) example. All relative paths will be evaluated relative to the HTML file being edited.
 
 ## Selector Validation
 
