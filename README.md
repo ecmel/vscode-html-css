@@ -29,13 +29,13 @@ Linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets
           href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
 
     <!-- (2) Local style sheet relative to workspace folder -->
-    <link rel="stylesheet" href="/site.css">
+    <link rel="stylesheet" href="/style.css">
 
     <!-- (3) Local style sheet relative to this file -->
-    <link rel="stylesheet" href="site.css">
+    <link rel="stylesheet" href="style.css">
 
     <!-- (4) Local style sheet relative to this file -->
-    <link rel="stylesheet" href="./site.css">
+    <link rel="stylesheet" href="./style.css">
     
     <!-- (5) Embedded style sheet -->
     <style>
@@ -62,7 +62,7 @@ Linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets
 ```
 All local links point to the same file which is in the root of workspace folder:
 
-**`site.css`**
+**`style.css`**
 ```css
 .external {
     display: block;
@@ -130,33 +130,29 @@ Styles defined in `base.html` will also be available for completion in `home.htm
 If it is not possible to specify local or remote styles in HTML or via template inheritance, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder:
 
 **`.vscode/settings.json`**
-```js
-"css.styleSheets": [
-
-    // (1)
-    "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css",
-
-    // (2)
-    "/site.css",
-
-    // (3)
-    "site.css",
-
-    // (4)
-    "./site.css"
-]
+```json
+{
+    "css.styleSheets": [
+        "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css",
+        "/style.css",
+        "style.css",
+        "./style.css"
+    ]
+}
 ```
 
-All relative paths will be evaluated relative to the HTML file being edited.
+This configuration is same as the first example. All relative paths will be evaluated relative to the HTML file being edited.
 
 ## Selector Validation
 
 Validated selectors can be configured with the `css.validation` setting. By default `class` selectors are validated:
 
 ```json
-"css.validation": {
-    "id": false,
-    "class": true
+{
+    "css.validation": {
+        "id": false,
+        "class": true
+    }
 }
 ```
 
@@ -165,9 +161,11 @@ Validated selectors can be configured with the `css.validation` setting. By defa
 Supported languages can be configured with the `css.enabledLanguages` setting. By default `html` is enabled:
 
 ```json
-"css.enabledLanguages": [
-    "html"
-]
+{
+    "css.enabledLanguages": [
+        "html"
+    ]
+}
 ```
 
 Extension can be configured to support any language where it makes sense such as `nunjucks`, `twig`, `mustache`, etc. You should also install corresponding language extension which registers the language id in VS Code.
