@@ -144,6 +144,10 @@ If it is not possible to specify local or remote styles in HTML or via template 
 
     // (4)
     "./site.css"
+    
+    //(5)
+    "./style.css"
+
 ]
 ```
 
