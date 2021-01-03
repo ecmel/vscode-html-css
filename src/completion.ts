@@ -51,8 +51,9 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         const key = uri.toString();
 
         if (!this.watchers.has(key)) {
-            const watcher = workspace.createFileSystemWatcher(uri.fsPath, true);
+            const watcher = workspace.createFileSystemWatcher(uri.fsPath);
 
+            watcher.onDidCreate(listener);
             watcher.onDidChange(listener);
             watcher.onDidDelete(listener);
 
