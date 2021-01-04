@@ -114,16 +114,19 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             if (this.cache.has(key)) {
                 resolve(key);
             } else {
+                const items = new Map<string, CompletionItem>();
                 const file = Uri.file(this.getRelativePath(uri, key));
 
                 workspace.fs.readFile(file).then(content => {
-                    const items = new Map<string, CompletionItem>();
-
                     this.parseTextToItems(content.toString(), items);
                     this.cache.set(key, items);
-                    this.watchFile(file, e => this.cache.delete(key));
                     resolve(key);
-                }, () => resolve(this.none));
+                }, () => {
+                    this.cache.set(key, items);
+                    resolve(key);
+                });
+
+                this.watchFile(file, e => this.cache.delete(key));
             }
         });
     }

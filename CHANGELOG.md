@@ -2,8 +2,9 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [1.6.2] - 
+## [1.6.2] - 2021-01-04
 
+- Handle file watcher create events.
 - Update documentation.
 
 ## [1.6.1] - 2020-12-31
