@@ -13,8 +13,6 @@ suite("Extension Test Suite", () => {
 			content: "<style>.some{}</style>\n<a class='some'></a>"
 		});
 
-		await sleep(1000);
-
 		const list = await commands.executeCommand<CompletionList>(
 			"vscode.executeCompletionItemProvider",
 			document.uri,

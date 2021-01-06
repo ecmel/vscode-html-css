@@ -27,7 +27,9 @@ export type Validation = {
 
 export type Selectors = {
     ids: Map<string, CompletionItem>,
-    classes: Map<string, CompletionItem>
+    idRanges: Range[],
+    classes: Map<string, CompletionItem>,
+    classRanges: Range[]
 };
 
 export class SelectorCompletionItemProvider implements CompletionItemProvider, Disposable {
@@ -38,7 +40,6 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     readonly selectors = new Map<string, Selectors>();
     readonly collection = languages.createDiagnosticCollection();
     readonly isRemote = /^https?:\/\//i;
-    readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findExtended = /(?:{{<|{{>|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
@@ -224,13 +225,15 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
         const ids = new Map<string, CompletionItem>();
         const classes = new Map<string, CompletionItem>();
+        const idRanges: Range[] = [];
+        const classRanges: Range[] = [];
 
         keys.forEach(key => this.cache.get(key)?.forEach((v, k) =>
             (v.kind === CompletionItemKind.Value ? ids : classes).set(k, v)));
 
         const validation = this.getValidation(uri);
         const diagnostics: Diagnostic[] = [];
-        const findAttribute = /(id|class|className)\s*=\s*("|')(.+?)\2/gsi;
+        const findAttribute = /(id|class|className)\s*=\s*("|')(.*?)\2/gsi;
 
         let attribute;
 
@@ -238,6 +241,10 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             const offset = findAttribute.lastIndex
                 - attribute[3].length
                 + attribute[3].indexOf(attribute[2]);
+
+            (attribute[1] === "id" ? idRanges : classRanges).push(new Range(
+                document.positionAt(offset),
+                document.positionAt(findAttribute.lastIndex - 1)));
 
             const findSelector = /([a-zA-Z0-9_\-]+)(?![^(\[{]*[}\])])/gi;
 
@@ -265,7 +272,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         }
 
         this.collection.set(uri, diagnostics);
-        this.selectors.set(uri.toString(), { ids, classes });
+        this.selectors.set(uri.toString(), { ids, idRanges, classes, classRanges });
     }
 
     provideCompletionItems(
@@ -275,13 +282,20 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         context: CompletionContext)
         : ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 
-        const range = new Range(this.start, position);
-        const text = document.getText(range);
-        const canComplete = this.canComplete.exec(text);
         const selector = this.selectors.get(document.uri.toString());
 
-        return canComplete && selector
-            ? [...(canComplete[1] === "id" ? selector.ids : selector.classes).values()]
-            : [];
+        if (selector) {
+            for (const range of selector.classRanges) {
+                if (range.contains(position)) {
+                    return [...selector.classes.values()];
+                }
+            }
+
+            for (const range of selector.idRanges) {
+                if (range.contains(position)) {
+                    return [...selector.ids.values()];
+                }
+            }
+        }
     }
 }

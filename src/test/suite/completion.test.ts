@@ -16,41 +16,6 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
         assert.strictEqual(provider.isRemote.test("https://example.com/example.css"), true);
     });
 
-    test("RegEx: canComplete", () => {
-        const provider = new SelectorCompletionItemProvider();
-
-        assert.strictEqual(provider.canComplete.test(""), false);
-        assert.strictEqual(provider.canComplete.test("class=\""), true);
-        assert.strictEqual(provider.canComplete.test("class=\"\""), false);
-        assert.strictEqual(provider.canComplete.test("class = \""), true);
-        assert.strictEqual(provider.canComplete.test("class = \"\""), false);
-
-        assert.strictEqual(provider.canComplete.test(`
-			class = "someClass
-		`), true);
-
-        assert.strictEqual(provider.canComplete.test(`
-			class 
-			= "someClass
-		`), true);
-        assert.strictEqual(provider.canComplete.test(`
-			class = 
-					"someClass
-
-		`), true);
-        assert.strictEqual(provider.canComplete.test(`
-			class = 
-					"someClass
-					
-		"`), false);
-        assert.strictEqual(provider.canComplete.test(`
-			class = "some"
-			class = 
-					"someClass
-					
-		"`), false);
-    });
-
     test("RegEx: findLinkRel", () => {
         const provider = new SelectorCompletionItemProvider();
 
