@@ -25,24 +25,26 @@ export type Validation = {
     class: boolean
 };
 
+export type Selectors = {
+    ids: Map<string, CompletionItem>,
+    classes: Map<string, CompletionItem>
+};
+
 export class SelectorCompletionItemProvider implements CompletionItemProvider, Disposable {
 
-    readonly none = "__!NONE!__";
     readonly start = new Position(0, 0);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
-    readonly extends = new Map<string, Set<string>>();
     readonly watchers = new Map<string, Disposable>();
     readonly collection = languages.createDiagnosticCollection();
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*("|')((?:(?!\1).)+)\1/si;
-    readonly findExtended = /(?:{{<|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
+    readonly findExtended = /(?:{{<|{{>|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
 
     dispose() {
         this.watchers.forEach(v => v.dispose());
         this.cache.clear();
-        this.extends.clear();
         this.watchers.clear();
         this.collection.dispose();
     }
@@ -59,10 +61,6 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
             this.watchers.set(key, watcher);
         }
-    }
-
-    getItems(key: string): Map<string, CompletionItem> | undefined {
-        return this.cache.get(key);
     }
 
     getStyleSheets(uri: Uri): string[] {
@@ -109,171 +107,173 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         });
     }
 
-    fetchLocal(key: string, uri: Uri): Thenable<string> {
-        return new Promise(resolve => {
-            if (this.cache.has(key)) {
-                resolve(key);
-            } else {
-                const items = new Map<string, CompletionItem>();
-                const file = Uri.file(this.getRelativePath(uri, key));
-
-                workspace.fs.readFile(file).then(content => {
-                    this.parseTextToItems(content.toString(), items);
-                    this.cache.set(key, items);
-                    resolve(key);
-                }, () => {
-                    this.cache.set(key, items);
-                    resolve(key);
-                });
-
-                this.watchFile(file, e => this.cache.delete(key));
-            }
-        });
-    }
-
-    fetchRemote(key: string): Thenable<string> {
-        return new Promise(resolve => {
-            if (this.cache.has(key)) {
-                resolve(key);
-            } else {
-                fetch(key).then(res => {
-                    const items = new Map<string, CompletionItem>();
-
-                    if (res.ok) {
-                        res.text().then(text => {
-                            this.parseTextToItems(text, items);
-                            this.cache.set(key, items);
-                            resolve(key);
-                        }, () => resolve(this.none));
-                    } else {
-                        this.cache.set(key, items);
-                        resolve(key);
-                    }
-                }, () => resolve(this.none));
-            }
-        });
-    }
-
-    findStyleSheets(uri: Uri): Thenable<Set<string>> {
-        return new Promise(resolve => {
-            const keys = new Set<string>();
-            const styleSheets = this.getStyleSheets(uri);
-            const promises = [];
-
-            for (const key of styleSheets) {
-                promises.push(this.isRemote.test(key)
-                    ? this.fetchRemote(key).then(k => keys.add(k))
-                    : this.fetchLocal(key, uri).then(k => keys.add(k)));
-            }
-
-            Promise.all(promises).then(() => resolve(keys));
-        });
-    }
-
-    findDocumentLinks(uri: Uri, text: string): Thenable<Set<string>> {
-        return new Promise(resolve => {
-            const findLinks = /<link([^>]+)>/gi;
-            const keys = new Set<string>();
-            const promises = [];
-
-            let link;
-
-            while ((link = findLinks.exec(text)) !== null) {
-                const rel = this.findLinkRel.exec(link[1]);
-
-                if (rel && rel[2] === "stylesheet") {
-                    const href = this.findLinkHref.exec(link[1]);
-
-                    if (href) {
-                        const key = href[2];
-
-                        promises.push(this.isRemote.test(key)
-                            ? this.fetchRemote(key).then(k => keys.add(k))
-                            : this.fetchLocal(key, uri).then(k => keys.add(k)));
-                    }
-                }
-            }
-
-            Promise.all(promises).then(() => resolve(keys));
-        });
-    }
-
-    findDocumentStyles(uri: Uri, text: string): Thenable<Set<string>> {
-        return new Promise(resolve => {
-            const key = uri.toString();
-            const keys = new Set<string>([key]);
+    async fetchLocal(key: string, uri: Uri): Promise<void> {
+        if (!this.cache.has(key)) {
             const items = new Map<string, CompletionItem>();
-            const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
+            const file = Uri.file(this.getRelativePath(uri, key));
 
-            let style;
-
-            while ((style = findStyles.exec(text)) !== null) {
-                this.parseTextToItems(style[1], items);
+            try {
+                const content = await workspace.fs.readFile(file);
+                this.parseTextToItems(content.toString(), items);
+            } catch (error) {
             }
 
             this.cache.set(key, items);
-            resolve(keys);
-        });
+            this.watchFile(file, e => this.cache.delete(key));
+        }
     }
 
-    findExtendedStyles(uri: Uri, text: string): Thenable<Set<string>> {
-        return new Promise(resolve => {
-            const keys = new Set<string>();
-            const extended = this.findExtended.exec(text);
+    async fetchRemote(key: string): Promise<void> {
+        if (!this.cache.has(key)) {
+            const items = new Map<string, CompletionItem>();
 
-            if (extended) {
-                const name = extended[2];
-                const ext = extname(name) || extname(uri.fsPath);
-                const key = this.getRelativePath(uri, name, ext);
-                const cached = this.extends.get(key);
+            try {
+                const res = await fetch(key);
 
-                if (cached) {
-                    resolve(cached);
-                } else {
-                    const file = Uri.file(key);
-
-                    workspace.fs.readFile(file).then(content => {
-                        const text = content.toString();
-
-                        Promise.all([
-                            this.findDocumentLinks(file, text),
-                            this.findDocumentStyles(file, text)
-                        ]).then(sets => {
-                            sets.forEach(set => set.forEach(k => keys.add(k)));
-                            this.extends.set(key, keys);
-                            this.watchFile(file, e => this.extends.delete(key));
-                            resolve(keys);
-                        });
-                    }, () => resolve(keys));
+                if (res.ok) {
+                    const text = await res.text();
+                    this.parseTextToItems(text, items);
                 }
-            } else {
-                resolve(keys);
+            } catch (error) {
             }
-        });
+
+            this.cache.set(key, items);
+        }
     }
 
-    findAll(uri: Uri, text: string): Thenable<Set<string>[]> {
-        return Promise.all([
-            this.findStyleSheets(uri),
-            this.findDocumentLinks(uri, text),
-            this.findDocumentStyles(uri, text),
-            this.findExtendedStyles(uri, text)
-        ]);
+    async fetchStyleSheet(key: string, uri: Uri): Promise<void> {
+        if (this.isRemote.test(key)) {
+            await this.fetchRemote(key);
+        } else {
+            await this.fetchLocal(key, uri);
+        }
     }
 
-    buildItems(sets: Set<string>[], kind: CompletionItemKind): CompletionItem[] {
+    findDocumentStyles(uri: Uri, keys: Set<string>, text: string) {
+        const key = uri.toString();
         const items = new Map<string, CompletionItem>();
+        const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
+
+        let style;
+
+        while ((style = findStyles.exec(text)) !== null) {
+            this.parseTextToItems(style[1], items);
+        }
+
+        this.cache.set(key, items);
+        keys.add(key);
+    }
+
+    async findStyleSheets(uri: Uri, keys: Set<string>): Promise<void> {
+        for (const key of this.getStyleSheets(uri)) {
+            await this.fetchStyleSheet(key, uri);
+            keys.add(key);
+        }
+    }
+
+    async findDocumentLinks(uri: Uri, keys: Set<string>, text: string): Promise<void> {
+        const findLinks = /<link([^>]+)>/gi;
+
+        let link;
+
+        while ((link = findLinks.exec(text)) !== null) {
+            const rel = this.findLinkRel.exec(link[1]);
+
+            if (rel && rel[2] === "stylesheet") {
+                const href = this.findLinkHref.exec(link[1]);
+
+                if (href) {
+                    const key = href[2];
+
+                    await this.fetchStyleSheet(key, uri);
+                    keys.add(key);
+                }
+            }
+        }
+    }
+
+    async findExtendedStyles(uri: Uri, keys: Set<string>, text: string): Promise<void> {
+        const extended = this.findExtended.exec(text);
+
+        if (extended) {
+            const name = extended[2];
+            const ext = extname(name) || extname(uri.fsPath);
+            const key = this.getRelativePath(uri, name, ext);
+            const file = Uri.file(key);
+
+            try {
+                const content = await workspace.fs.readFile(file);
+                const text = content.toString();
+
+                this.findDocumentStyles(file, keys, text);
+                await this.findDocumentLinks(file, keys, text);
+            } catch (error) {
+            }
+        }
+    }
+
+    async validate(document: TextDocument): Promise<Selectors> {
         const keys = new Set<string>();
+        const uri = document.uri;
+        const text = document.getText();
 
-        sets.forEach(v => v.forEach(v => keys.add(v)));
+        this.findDocumentStyles(uri, keys, text);
+        await this.findStyleSheets(uri, keys);
+        await this.findDocumentLinks(uri, keys, text);
+        await this.findExtendedStyles(uri, keys, text);
 
-        keys.forEach(k => this.cache.get(k)?.forEach((v, k) => {
-            if (kind === v.kind) {
-                items.set(k, v);
+        const ids = new Map<string, CompletionItem>();
+        const classes = new Map<string, CompletionItem>();
+        const validation = this.getValidation(uri);
+
+        keys.forEach(key => this.cache.get(key)?.forEach((v, k) => {
+            if (v.kind === CompletionItemKind.Value) {
+                ids.set(k, v);
+            } else {
+                classes.set(k, v);
             }
         }));
 
-        return [...items.values()];
+        const diagnostics: Diagnostic[] = [];
+        const findAttribute = /(id|class|className)\s*=\s*("|')(.+?)\2/gsi;
+
+        let attribute;
+
+        while ((attribute = findAttribute.exec(text)) !== null) {
+            const offset = findAttribute.lastIndex
+                - attribute[3].length
+                + attribute[3].indexOf(attribute[2]);
+
+            const findSelector = /([a-zA-Z0-9_\-]+)(?![^(\[{]*[}\])])/gi;
+
+            let value;
+
+            while ((value = findSelector.exec(attribute[3])) !== null) {
+                const anchor = findSelector.lastIndex + offset;
+                const end = document.positionAt(anchor);
+                const start = document.positionAt(anchor - value[1].length);
+
+                if (attribute[1] === "id") {
+                    if (validation.id && !ids.has(value[1])) {
+                        diagnostics.push(new Diagnostic(new Range(start, end),
+                            `CSS id selector '${value[1]}' not found.`,
+                            DiagnosticSeverity.Information));
+                    }
+                } else {
+                    if (validation.class && !classes.has(value[1])) {
+                        diagnostics.push(new Diagnostic(new Range(start, end),
+                            `CSS class selector '${value[1]}' not found.`,
+                            DiagnosticSeverity.Warning));
+                    }
+                }
+            }
+        }
+
+        this.collection.set(uri, diagnostics);
+
+        return {
+            ids, classes
+        };
     }
 
     provideCompletionItems(
@@ -291,72 +291,15 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                 const canComplete = this.canComplete.exec(text);
 
                 if (canComplete) {
-                    const kind = canComplete[1] === "id"
-                        ? CompletionItemKind.Value
-                        : CompletionItemKind.Enum;
-
-                    this.findAll(document.uri, text)
-                        .then(keys => resolve(this.buildItems(keys, kind)));
+                    this.validate(document).then(selectors => resolve([...
+                        canComplete[1] === "id"
+                            ? selectors.ids.values()
+                            : selectors.classes.values()
+                    ]));
                 } else {
                     reject();
                 }
             }
-        });
-    }
-
-    validate(document: TextDocument) {
-        const uri = document.uri;
-        const text = document.getText();
-
-        this.findAll(uri, text).then(sets => {
-            const ids = new Set<string>();
-            const classes = new Set<string>();
-            const validation = this.getValidation(uri);
-
-            sets.forEach(set => set.forEach(key => this.getItems(key)?.forEach((v, k) => {
-                if (v.kind === CompletionItemKind.Value) {
-                    ids.add(k);
-                } else {
-                    classes.add(k);
-                }
-            })));
-
-            const diagnostics: Diagnostic[] = [];
-            const findAttribute = /(id|class|className)\s*=\s*("|')(.+?)\2/gsi;
-
-            let attribute;
-
-            while ((attribute = findAttribute.exec(text)) !== null) {
-                const offset = findAttribute.lastIndex
-                    - attribute[3].length
-                    + attribute[3].indexOf(attribute[2]);
-
-                const findSelector = /([a-zA-Z0-9_\-]+)(?![^(\[{]*[}\])])/gi;
-
-                let value;
-
-                while ((value = findSelector.exec(attribute[3])) !== null) {
-                    const anchor = findSelector.lastIndex + offset;
-                    const end = document.positionAt(anchor);
-                    const start = document.positionAt(anchor - value[1].length);
-
-                    if (attribute[1] === "id") {
-                        if (validation.id && !ids.has(value[1])) {
-                            diagnostics.push(new Diagnostic(new Range(start, end),
-                                `CSS id selector '${value[1]}' not found.`,
-                                DiagnosticSeverity.Information));
-                        }
-                    } else {
-                        if (validation.class && !classes.has(value[1])) {
-                            diagnostics.push(new Diagnostic(new Range(start, end),
-                                `CSS class selector '${value[1]}' not found.`,
-                                DiagnosticSeverity.Warning));
-                        }
-                    }
-                }
-            }
-
-            this.collection.set(uri, diagnostics);
         });
     }
 }

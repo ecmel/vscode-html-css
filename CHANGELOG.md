@@ -2,6 +2,11 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.6.3] - 2021-01-06
+
+- Update documentation.
+- Internal refactoring.
+
 ## [1.6.2] - 2021-01-04
 
 - Handle file watcher create events.

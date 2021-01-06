@@ -79,6 +79,8 @@ Template inheritance is supported for the following tags:
 @extends('base')
 
 {{< base }}
+
+{{> base }}
 ```
 
 Only one level of inheritance is supported:
