@@ -108,44 +108,42 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     }
 
     async fetchLocal(key: string, uri: Uri): Promise<void> {
-        if (!this.cache.has(key)) {
-            const items = new Map<string, CompletionItem>();
-            const file = Uri.file(this.getRelativePath(uri, key));
+        const items = new Map<string, CompletionItem>();
+        const file = Uri.file(this.getRelativePath(uri, key));
 
-            try {
-                const content = await workspace.fs.readFile(file);
-                this.parseTextToItems(content.toString(), items);
-            } catch (error) {
-            }
-
-            this.cache.set(key, items);
-            this.watchFile(file, e => this.cache.delete(key));
+        try {
+            const content = await workspace.fs.readFile(file);
+            this.parseTextToItems(content.toString(), items);
+        } catch (error) {
         }
+
+        this.cache.set(key, items);
+        this.watchFile(file, e => this.cache.delete(key));
     }
 
     async fetchRemote(key: string): Promise<void> {
-        if (!this.cache.has(key)) {
-            const items = new Map<string, CompletionItem>();
+        const items = new Map<string, CompletionItem>();
 
-            try {
-                const res = await fetch(key);
+        try {
+            const res = await fetch(key);
 
-                if (res.ok) {
-                    const text = await res.text();
-                    this.parseTextToItems(text, items);
-                }
-            } catch (error) {
+            if (res.ok) {
+                const text = await res.text();
+                this.parseTextToItems(text, items);
             }
-
-            this.cache.set(key, items);
+        } catch (error) {
         }
+
+        this.cache.set(key, items);
     }
 
     async fetchStyleSheet(key: string, uri: Uri): Promise<void> {
-        if (this.isRemote.test(key)) {
-            await this.fetchRemote(key);
-        } else {
-            await this.fetchLocal(key, uri);
+        if (!this.cache.has(key)) {
+            if (this.isRemote.test(key)) {
+                await this.fetchRemote(key);
+            } else {
+                await this.fetchLocal(key, uri);
+            }
         }
     }
 
