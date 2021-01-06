@@ -224,11 +224,11 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
         const ids = new Map<string, CompletionItem>();
         const classes = new Map<string, CompletionItem>();
-        const validation = this.getValidation(uri);
 
         keys.forEach(key => this.cache.get(key)?.forEach((v, k) =>
             (v.kind === CompletionItemKind.Value ? ids : classes).set(k, v)));
 
+        const validation = this.getValidation(uri);
         const diagnostics: Diagnostic[] = [];
         const findAttribute = /(id|class|className)\s*=\s*("|')(.+?)\2/gsi;
 
