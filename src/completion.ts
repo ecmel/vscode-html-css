@@ -35,6 +35,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     readonly start = new Position(0, 0);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly watchers = new Map<string, Disposable>();
+    readonly selectors = new Map<string, Selectors>();
     readonly collection = languages.createDiagnosticCollection();
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
@@ -46,6 +47,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         this.watchers.forEach(v => v.dispose());
         this.cache.clear();
         this.watchers.clear();
+        this.selectors.clear();
         this.collection.dispose();
     }
 
@@ -210,7 +212,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         }
     }
 
-    async validate(document: TextDocument): Promise<Selectors> {
+    async validate(document: TextDocument): Promise<void> {
         const keys = new Set<string>();
         const uri = document.uri;
         const text = document.getText();
@@ -263,10 +265,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         }
 
         this.collection.set(uri, diagnostics);
-
-        return {
-            ids, classes
-        };
+        this.selectors.set(uri.toString(), { ids, classes });
     }
 
     provideCompletionItems(
@@ -282,13 +281,12 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                 const range = new Range(this.start, position);
                 const text = document.getText(range);
                 const canComplete = this.canComplete.exec(text);
+                const selector = this.selectors.get(document.uri.toString());
 
-                if (canComplete) {
-                    this.validate(document).then(selectors => resolve([
-                        ...(canComplete[1] === "id"
-                            ? selectors.ids
-                            : selectors.classes).values()
-                    ]));
+                if (canComplete && selector) {
+                    resolve([...(canComplete[1] === "id"
+                        ? selector.ids
+                        : selector.classes).values()]);
                 } else {
                     reject();
                 }
