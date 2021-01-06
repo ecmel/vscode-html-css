@@ -83,75 +83,19 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
         `)?.[2], "base");
     });
 
+    test("RegEx: findExtended (Handlebars)", () => {
+        const provider = new SelectorCompletionItemProvider();
+
+        assert.strictEqual(provider.findExtended.exec(`
+            {{> base }}
+        `)?.[2], "base");
+    });
+
     test("RegEx: findExtended (Blade)", () => {
         const provider = new SelectorCompletionItemProvider();
 
         assert.strictEqual(provider.findExtended.exec(`
             @extends('base')
         `)?.[2], "base");
-    });
-
-    test("Rejects outside class attribute", (done) => {
-        const provider = new SelectorCompletionItemProvider();
-        const document = new MockDocument("<a class=\"\"></a>");
-
-        const result = provider.provideCompletionItems(
-            document,
-            position,
-            token,
-            context) as Thenable<CompletionItem[]>;
-
-        result.then(items => done(new Error("Should reject!")), () => done());
-    });
-
-    test("Completes from style tag", async () => {
-        const provider = new SelectorCompletionItemProvider();
-        const document = new MockDocument("<style>.test{}</style><a class=\"");
-
-        const items = await (provider.provideCompletionItems(
-            document,
-            position,
-            token,
-            context) as Thenable<CompletionItem[]>);
-
-        assert.strictEqual(items.length, 1);
-    });
-
-    test("Completes from link tag", async () => {
-        const provider = new SelectorCompletionItemProvider();
-        const document = new MockDocument(`
-			<link 
-				href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" 
-				rel="stylesheet"
-			>
-			<a class="`);
-
-        const items = await (provider.provideCompletionItems(
-            document,
-            position,
-            token,
-            context) as Thenable<CompletionItem[]>);
-
-        assert.notStrictEqual(items.length, 0);
-    });
-
-    test("Completes from remote style", async () => {
-        const provider = new class extends SelectorCompletionItemProvider {
-            getStyleSheets(uri: Uri): string[] {
-                return [
-                    "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
-                ];
-            }
-        }();
-
-        const document = new MockDocument("<a class=\"");
-
-        const items = await (provider.provideCompletionItems(
-            document,
-            position,
-            token,
-            context) as Thenable<CompletionItem[]>);
-
-        assert.notStrictEqual(items.length, 0);
     });
 });
