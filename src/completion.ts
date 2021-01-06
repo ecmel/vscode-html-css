@@ -226,13 +226,8 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         const classes = new Map<string, CompletionItem>();
         const validation = this.getValidation(uri);
 
-        keys.forEach(key => this.cache.get(key)?.forEach((v, k) => {
-            if (v.kind === CompletionItemKind.Value) {
-                ids.set(k, v);
-            } else {
-                classes.set(k, v);
-            }
-        }));
+        keys.forEach(key => this.cache.get(key)?.forEach((v, k) =>
+            (v.kind === CompletionItemKind.Value ? ids : classes).set(k, v)));
 
         const diagnostics: Diagnostic[] = [];
         const findAttribute = /(id|class|className)\s*=\s*("|')(.+?)\2/gsi;
@@ -291,10 +286,10 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                 const canComplete = this.canComplete.exec(text);
 
                 if (canComplete) {
-                    this.validate(document).then(selectors => resolve([...
-                        canComplete[1] === "id"
-                            ? selectors.ids.values()
-                            : selectors.classes.values()
+                    this.validate(document).then(selectors => resolve([
+                        ...(canComplete[1] === "id"
+                            ? selectors.ids
+                            : selectors.classes).values()
                     ]));
                 } else {
                     reject();
