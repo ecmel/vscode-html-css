@@ -272,25 +272,16 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         document: TextDocument,
         position: Position,
         token: CancellationToken,
-        context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
+        context: CompletionContext)
+        : ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 
-        return new Promise((resolve, reject) => {
-            if (token.isCancellationRequested) {
-                reject();
-            } else {
-                const range = new Range(this.start, position);
-                const text = document.getText(range);
-                const canComplete = this.canComplete.exec(text);
-                const selector = this.selectors.get(document.uri.toString());
+        const range = new Range(this.start, position);
+        const text = document.getText(range);
+        const canComplete = this.canComplete.exec(text);
+        const selector = this.selectors.get(document.uri.toString());
 
-                if (canComplete && selector) {
-                    resolve([...(canComplete[1] === "id"
-                        ? selector.ids
-                        : selector.classes).values()]);
-                } else {
-                    reject();
-                }
-            }
-        });
+        return canComplete && selector
+            ? [...(canComplete[1] === "id" ? selector.ids : selector.classes).values()]
+            : [];
     }
 }
