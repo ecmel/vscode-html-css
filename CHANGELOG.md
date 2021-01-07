@@ -2,7 +2,7 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [1.6.3] - 2021-01-06
+## [1.6.3] - 2021-01-07
 
 - Added Handlebars inheritance (https://jknack.github.io/handlebars.java/reuse.html).
 - Update documentation.
