@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { nextTick } from "process";
 import { parse, walk } from "css-tree";
 import { basename, dirname, extname, isAbsolute, join } from "path";
 import {
@@ -25,11 +26,11 @@ export type Validation = {
     class: boolean
 };
 
-export type Selectors = {
+export type Selector = {
     ids: Map<string, CompletionItem>,
-    idRanges: Range[],
     classes: Map<string, CompletionItem>,
-    classRanges: Range[]
+    rangesId: Range[],
+    rangesClass: Range[]
 };
 
 export class SelectorCompletionItemProvider implements CompletionItemProvider, Disposable {
@@ -37,8 +38,8 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     readonly start = new Position(0, 0);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly watchers = new Map<string, Disposable>();
-    readonly selectors = new Map<string, Selectors>();
-    readonly collection = languages.createDiagnosticCollection();
+    readonly selectors = new Map<string, Selector>();
+    readonly warnings = languages.createDiagnosticCollection();
     readonly isRemote = /^https?:\/\//i;
     readonly findLinkRel = /rel\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*("|')((?:(?!\1).)+)\1/si;
@@ -49,7 +50,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         this.cache.clear();
         this.watchers.clear();
         this.selectors.clear();
-        this.collection.dispose();
+        this.warnings.dispose();
     }
 
     watchFile(uri: Uri, listener: (e: Uri) => any) {
@@ -225,8 +226,8 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
         const ids = new Map<string, CompletionItem>();
         const classes = new Map<string, CompletionItem>();
-        const idRanges: Range[] = [];
-        const classRanges: Range[] = [];
+        const rangesId: Range[] = [];
+        const rangesClass: Range[] = [];
 
         keys.forEach(key => this.cache.get(key)?.forEach((v, k) =>
             (v.kind === CompletionItemKind.Value ? ids : classes).set(k, v)));
@@ -242,7 +243,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                 - attribute[3].length
                 + attribute[3].indexOf(attribute[2]);
 
-            (attribute[1] === "id" ? idRanges : classRanges).push(new Range(
+            (attribute[1] === "id" ? rangesId : rangesClass).push(new Range(
                 document.positionAt(offset),
                 document.positionAt(findAttribute.lastIndex - 1)));
 
@@ -271,8 +272,8 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             }
         }
 
-        this.collection.set(uri, diagnostics);
-        this.selectors.set(uri.toString(), { ids, idRanges, classes, classRanges });
+        this.warnings.set(uri, diagnostics);
+        this.selectors.set(uri.toString(), { ids, classes, rangesId, rangesClass });
     }
 
     provideCompletionItems(
@@ -282,7 +283,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         context: CompletionContext)
         : ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => nextTick(() => {
             if (token.isCancellationRequested) {
                 reject();
                 return;
@@ -291,14 +292,14 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             const selector = this.selectors.get(document.uri.toString());
 
             if (selector) {
-                for (const range of selector.classRanges) {
+                for (const range of selector.rangesClass) {
                     if (range.contains(position)) {
                         resolve([...selector.classes.values()]);
                         return;
                     }
                 }
 
-                for (const range of selector.idRanges) {
+                for (const range of selector.rangesId) {
                     if (range.contains(position)) {
                         resolve([...selector.ids.values()]);
                         return;
@@ -307,6 +308,6 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             }
 
             reject();
-        });
+        }));
     }
 }

@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.6.4] - 
+
+- Use nextTick()
+
 ## [1.6.3] - 2021-01-07
 
 - Added Handlebars inheritance (https://jknack.github.io/handlebars.java/reuse.html).
