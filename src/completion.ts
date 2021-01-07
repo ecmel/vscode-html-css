@@ -282,20 +282,31 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         context: CompletionContext)
         : ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 
-        const selector = this.selectors.get(document.uri.toString());
+        return new Promise((resolve, reject) => {
+            if (token.isCancellationRequested) {
+                reject();
+                return;
+            }
 
-        if (selector) {
-            for (const range of selector.classRanges) {
-                if (range.contains(position)) {
-                    return [...selector.classes.values()];
+            const selector = this.selectors.get(document.uri.toString());
+
+            if (selector) {
+                for (const range of selector.classRanges) {
+                    if (range.contains(position)) {
+                        resolve([...selector.classes.values()]);
+                        return;
+                    }
+                }
+
+                for (const range of selector.idRanges) {
+                    if (range.contains(position)) {
+                        resolve([...selector.ids.values()]);
+                        return;
+                    }
                 }
             }
 
-            for (const range of selector.idRanges) {
-                if (range.contains(position)) {
-                    return [...selector.ids.values()];
-                }
-            }
-        }
+            reject();
+        });
     }
 }

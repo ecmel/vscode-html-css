@@ -27,7 +27,7 @@ export function activate(context: ExtensionContext) {
             timeouts.set(uri, setTimeout(() => {
                 timeouts.delete(uri);
                 provider.validate(document);
-            }, 500));
+            }, 300));
         }
     };
 
