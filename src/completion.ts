@@ -247,7 +247,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                 document.positionAt(offset),
                 document.positionAt(findAttribute.lastIndex - 1)));
 
-            const findSelector = /([a-zA-Z0-9_\-]+)(?![^(\[{]*[}\])])/gi;
+            const findSelector = /([^(\[{}\])\s]+)(?![^(\[{]*[}\])])/gi;
 
             let value;
 
