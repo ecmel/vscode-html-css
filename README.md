@@ -12,8 +12,8 @@ HTML `id` and `class` attribute completion for Visual Studio Code.
 
 ## Usage
 
-You can view a list of `id` and `class` attribute suggestions via `ctrl + space`. Invalid `class` selectors will be shown as warnings, `id` selectors will be shown as information.
-
+You can view a list of `id` and `class` attribute suggestions via `ctrl + space`.
+ 
 ## Linked and Embedded Style Sheets
 
 Linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets are used in completion for `id` and `class` attributes. Links support local and remote files. Absolute local file paths are relative to the workspace folder while others are relative to HTML file:
