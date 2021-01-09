@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.7.1] - 2021-01-09
+
+- Update documentation.
+
 ## [1.7.0] - 2021-01-09
 
 - Removed validation.

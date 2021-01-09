@@ -187,7 +187,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         }
     }
 
-    async findAll(document: TextDocument, kind: CompletionItemKind): Promise<Map<string, CompletionItem>> {
+    async findAll(document: TextDocument, tag: string): Promise<CompletionItem[]> {
         const keys = new Set<string>();
         const uri = document.uri;
         const text = document.getText();
@@ -199,6 +199,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         await this.findExtendedStyles(uri, keys, text);
 
         const items = new Map<string, CompletionItem>();
+        const kind = tag === "id" ? CompletionItemKind.Value : CompletionItemKind.Enum;
 
         keys.forEach(key => this.cache.get(key)?.forEach((v, k) => {
             if (v.kind === kind) {
@@ -206,7 +207,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             }
         }));
 
-        return items;
+        return [...items.values()];
     }
 
     provideCompletionItems(
@@ -224,11 +225,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                 const canComplete = this.canComplete.exec(text);
 
                 if (canComplete) {
-                    const kind = canComplete[1] === "id"
-                        ? CompletionItemKind.Value
-                        : CompletionItemKind.Enum;
-
-                    this.findAll(document, kind).then((items => resolve([...items.values()])));
+                    this.findAll(document, canComplete[1]).then(resolve);
                 } else {
                     reject();
                 }
