@@ -2,9 +2,9 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [1.6.4] - 
+## [1.7.0] - 2021-01-09
 
-- Use nextTick()
+- Removed validation.
 
 ## [1.6.3] - 2021-01-07
 

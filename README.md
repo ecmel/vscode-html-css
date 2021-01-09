@@ -1,10 +1,10 @@
 # Visual Studio Code CSS Intellisense for HTML
 
-HTML `id` and `class` attribute completion and validation for Visual Studio Code.
+HTML `id` and `class` attribute completion for Visual Studio Code.
 
 ## Features
 
-- HTML `id` and `class` attribute completion and validation.
+- HTML `id` and `class` attribute completion.
 - Supports linked and embedded style sheets.
 - Supports template inheritance.
 - Supports additional style sheets.
@@ -144,19 +144,6 @@ If it is not possible to specify local or remote styles in HTML or via template 
 ```
 
 This configuration is same as the [first](#linked-and-embedded-style-sheets) example. All relative paths will be evaluated relative to the HTML file being edited.
-
-## Selector Validation
-
-Validated selectors can be configured with the `css.validation` setting. By default `class` selectors are validated:
-
-```json
-{
-    "css.validation": {
-        "id": false,
-        "class": true
-    }
-}
-```
 
 ## Supported Languages
 

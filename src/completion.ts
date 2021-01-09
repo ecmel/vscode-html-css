@@ -9,10 +9,7 @@ import {
     CompletionItemKind,
     CompletionItemProvider,
     CompletionList,
-    Diagnostic,
-    DiagnosticSeverity,
     Disposable,
-    languages,
     Position,
     ProviderResult,
     Range,
@@ -20,11 +17,6 @@ import {
     Uri,
     workspace
 } from "vscode";
-
-export type Validation = {
-    id: boolean,
-    class: boolean
-};
 
 export type Selector = {
     ids: Map<string, CompletionItem>,
@@ -38,19 +30,16 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     readonly start = new Position(0, 0);
     readonly cache = new Map<string, Map<string, CompletionItem>>();
     readonly watchers = new Map<string, Disposable>();
-    readonly selectors = new Map<string, Selector>();
-    readonly warnings = languages.createDiagnosticCollection();
     readonly isRemote = /^https?:\/\//i;
+    readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findExtended = /(?:{{<|{{>|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
 
     dispose() {
         this.watchers.forEach(v => v.dispose());
-        this.cache.clear();
         this.watchers.clear();
-        this.selectors.clear();
-        this.warnings.dispose();
+        this.cache.clear();
     }
 
     watchFile(uri: Uri, listener: (e: Uri) => any) {
@@ -69,15 +58,6 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
     getStyleSheets(uri: Uri): string[] {
         return workspace.getConfiguration("css", uri).get<string[]>("styleSheets", []);
-    }
-
-    getValidation(uri: Uri): Validation {
-        const config = workspace.getConfiguration("css", uri);
-
-        return {
-            id: config.get<boolean>("validation.id", false),
-            class: config.get<boolean>("validation.class", true)
-        };
     }
 
     getRelativePath(uri: Uri, spec: string, ext?: string): string {
@@ -214,100 +194,52 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         }
     }
 
-    async validate(document: TextDocument): Promise<void> {
+    async findAll(document: TextDocument, kind: CompletionItemKind): Promise<Map<string, CompletionItem>> {
         const keys = new Set<string>();
         const uri = document.uri;
         const text = document.getText();
 
         this.findDocumentStyles(uri, keys, text);
+
         await this.findStyleSheets(uri, keys);
         await this.findDocumentLinks(uri, keys, text);
         await this.findExtendedStyles(uri, keys, text);
 
-        const ids = new Map<string, CompletionItem>();
-        const classes = new Map<string, CompletionItem>();
-        const rangesId: Range[] = [];
-        const rangesClass: Range[] = [];
+        const items = new Map<string, CompletionItem>();
 
-        keys.forEach(key => this.cache.get(key)?.forEach((v, k) =>
-            (v.kind === CompletionItemKind.Value ? ids : classes).set(k, v)));
-
-        const validation = this.getValidation(uri);
-        const diagnostics: Diagnostic[] = [];
-        const findAttribute = /(id|class|className)\s*=\s*("|')(.*?)\2/gsi;
-
-        let attribute;
-
-        while ((attribute = findAttribute.exec(text)) !== null) {
-            const offset = findAttribute.lastIndex
-                - attribute[3].length
-                + attribute[3].indexOf(attribute[2]);
-
-            (attribute[1] === "id" ? rangesId : rangesClass).push(new Range(
-                document.positionAt(offset),
-                document.positionAt(findAttribute.lastIndex - 1)));
-
-            const findSelector = /([^(\[{}\])\s]+)(?![^(\[{]*[}\])])/gi;
-
-            let value;
-
-            while ((value = findSelector.exec(attribute[3])) !== null) {
-                const anchor = findSelector.lastIndex + offset;
-                const end = document.positionAt(anchor);
-                const start = document.positionAt(anchor - value[1].length);
-
-                if (attribute[1] === "id") {
-                    if (validation.id && !ids.has(value[1])) {
-                        diagnostics.push(new Diagnostic(new Range(start, end),
-                            `CSS id selector '${value[1]}' not found.`,
-                            DiagnosticSeverity.Information));
-                    }
-                } else {
-                    if (validation.class && !classes.has(value[1])) {
-                        diagnostics.push(new Diagnostic(new Range(start, end),
-                            `CSS class selector '${value[1]}' not found.`,
-                            DiagnosticSeverity.Warning));
-                    }
-                }
+        keys.forEach(key => this.cache.get(key)?.forEach((v, k) => {
+            if (v.kind === kind) {
+                items.set(k, v);
             }
-        }
+        }));
 
-        this.warnings.set(uri, diagnostics);
-        this.selectors.set(uri.toString(), { ids, classes, rangesId, rangesClass });
+        return items;
     }
 
     provideCompletionItems(
         document: TextDocument,
         position: Position,
         token: CancellationToken,
-        context: CompletionContext)
-        : ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
+        context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 
         return new Promise((resolve, reject) => nextTick(() => {
             if (token.isCancellationRequested) {
                 reject();
-                return;
-            }
+            } else {
+                const range = new Range(this.start, position);
+                const text = document.getText(range);
+                const canComplete = this.canComplete.exec(text);
 
-            const selector = this.selectors.get(document.uri.toString());
+                if (canComplete) {
+                    const kind = canComplete[1] === "id"
+                        ? CompletionItemKind.Value
+                        : CompletionItemKind.Enum;
 
-            if (selector) {
-                for (const range of selector.rangesClass) {
-                    if (range.contains(position)) {
-                        resolve([...selector.classes.values()]);
-                        return;
-                    }
-                }
-
-                for (const range of selector.rangesId) {
-                    if (range.contains(position)) {
-                        resolve([...selector.ids.values()]);
-                        return;
-                    }
+                    this.findAll(document, kind).then((items => resolve([...items.values()])));
+                } else {
+                    reject();
                 }
             }
-
-            reject();
         }));
     }
 }

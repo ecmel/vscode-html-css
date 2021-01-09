@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS Intellisense for HTML",
-	"version": "1.6.4",
+	"version": "1.7.0",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -42,28 +42,10 @@
 				"css.enabledLanguages": {
 					"type": "array",
 					"scope": "application",
-					"description": "List of languages where suggestions are desired.",
+					"description": "List of languages which suggestions are desired.",
 					"default": [
 						"html"
 					]
-				},
-				"css.validation": {
-					"type": "object",
-					"scope": "resource",
-					"description": "Map of selectors to validate.",
-					"default": {},
-					"properties": {
-						"id": {
-							"type": "boolean",
-							"description": "Whether to validate 'id' selectors.",
-							"default": false
-						},
-						"class": {
-							"type": "boolean",
-							"description": "Whether to validate 'class' selectors.",
-							"default": true
-						}
-					}
 				},
 				"css.styleSheets": {
 					"type": "array",
