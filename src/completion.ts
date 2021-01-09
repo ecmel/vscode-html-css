@@ -18,13 +18,6 @@ import {
     workspace
 } from "vscode";
 
-export type Selector = {
-    ids: Map<string, CompletionItem>,
-    classes: Map<string, CompletionItem>,
-    rangesId: Range[],
-    rangesClass: Range[]
-};
-
 export class SelectorCompletionItemProvider implements CompletionItemProvider, Disposable {
 
     readonly start = new Position(0, 0);
