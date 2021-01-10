@@ -17,6 +17,11 @@ import {
     workspace
 } from "vscode";
 
+export type Completion = {
+    ids: Map<string, CompletionItem>,
+    classes: Map<string, CompletionItem>
+};
+
 export class SelectorCompletionItemProvider implements CompletionItemProvider, Disposable {
 
     readonly start = new Position(0, 0);
@@ -186,7 +191,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         }
     }
 
-    async findAll(document: TextDocument, tag: string): Promise<CompletionItem[]> {
+    async findAll(document: TextDocument): Promise<Completion> {
         const keys = new Set<string>();
         const uri = document.uri;
         const text = document.getText();
@@ -197,16 +202,13 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         await this.findDocumentLinks(uri, keys, text);
         await this.findExtendedStyles(uri, keys, text);
 
-        const items = new Map<string, CompletionItem>();
-        const kind = tag === "id" ? CompletionItemKind.Value : CompletionItemKind.Enum;
+        const ids = new Map<string, CompletionItem>();
+        const classes = new Map<string, CompletionItem>();
 
-        keys.forEach(key => this.cache.get(key)?.forEach(v => {
-            if (v.kind === kind) {
-                items.set(v.label, v);
-            }
-        }));
+        keys.forEach(key => this.cache.get(key)?.forEach(item =>
+            (item.kind === CompletionItemKind.Value ? ids : classes).set(item.label, item)));
 
-        return [...items.values()];
+        return { ids, classes };
     }
 
     provideCompletionItems(
@@ -221,7 +223,10 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             const canComplete = this.canComplete.exec(text);
 
             if (canComplete) {
-                this.findAll(document, canComplete[1]).then(resolve);
+                this.findAll(document).then(completion => resolve([
+                    ...(canComplete[1] === "id"
+                        ? completion.ids
+                        : completion.classes).values()]));
             } else {
                 reject();
             }
