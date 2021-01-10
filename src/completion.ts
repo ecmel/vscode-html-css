@@ -1,5 +1,4 @@
 import fetch from "node-fetch";
-import { nextTick } from "process";
 import { parse, walk } from "css-tree";
 import { basename, dirname, extname, isAbsolute, join } from "path";
 import {
@@ -21,7 +20,7 @@ import {
 export class SelectorCompletionItemProvider implements CompletionItemProvider, Disposable {
 
     readonly start = new Position(0, 0);
-    readonly cache = new Map<string, Map<string, CompletionItem>>();
+    readonly cache = new Map<string, CompletionItem[]>();
     readonly watchers = new Map<string, Disposable>();
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
@@ -64,7 +63,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             : join(dirname(uri.fsPath), name);
     }
 
-    parseTextToItems(text: string, items: Map<string, CompletionItem>) {
+    parseTextToItems(text: string, items: CompletionItem[]) {
         walk(parse(text), node => {
 
             let kind: CompletionItemKind;
@@ -80,13 +79,13 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                     return;
             }
 
-            items.set(node.name, new CompletionItem(node.name, kind));
+            items.push(new CompletionItem(node.name, kind));
         });
     }
 
     async fetchLocal(key: string, uri: Uri): Promise<void> {
-        const items = new Map<string, CompletionItem>();
         const file = Uri.file(this.getRelativePath(uri, key));
+        const items: CompletionItem[] = [];
 
         try {
             const content = await workspace.fs.readFile(file);
@@ -99,7 +98,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     }
 
     async fetchRemote(key: string): Promise<void> {
-        const items = new Map<string, CompletionItem>();
+        const items: CompletionItem[] = [];
 
         try {
             const res = await fetch(key);
@@ -126,7 +125,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
     findDocumentStyles(uri: Uri, keys: Set<string>, text: string) {
         const key = uri.toString();
-        const items = new Map<string, CompletionItem>();
+        const items: CompletionItem[] = [];
         const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
 
         let style;
@@ -201,9 +200,9 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         const items = new Map<string, CompletionItem>();
         const kind = tag === "id" ? CompletionItemKind.Value : CompletionItemKind.Enum;
 
-        keys.forEach(key => this.cache.get(key)?.forEach((v, k) => {
+        keys.forEach(key => this.cache.get(key)?.forEach(v => {
             if (v.kind === kind) {
-                items.set(k, v);
+                items.set(v.label, v);
             }
         }));
 
@@ -216,20 +215,16 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         token: CancellationToken,
         context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 
-        return new Promise((resolve, reject) => nextTick(() => {
-            if (token.isCancellationRequested) {
-                reject();
-            } else {
-                const range = new Range(this.start, position);
-                const text = document.getText(range);
-                const canComplete = this.canComplete.exec(text);
+        return new Promise((resolve, reject) => {
+            const range = new Range(this.start, position);
+            const text = document.getText(range);
+            const canComplete = this.canComplete.exec(text);
 
-                if (canComplete) {
-                    this.findAll(document, canComplete[1]).then(resolve);
-                } else {
-                    reject();
-                }
+            if (canComplete) {
+                this.findAll(document, canComplete[1]).then(resolve);
+            } else {
+                reject();
             }
-        }));
+        });
     }
 }
