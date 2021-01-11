@@ -109,7 +109,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
             token,
             context) as Thenable<CompletionItem[]>;
 
-        result.then(items => done(new Error("Should reject!")), () => done());
+        result.then(() => done(new Error("Should reject!")), () => done());
     });
 
     test("Completes from style tag", async () => {

@@ -2,9 +2,9 @@ import { SelectorCompletionItemProvider } from "./completion";
 import { ExtensionContext, commands, languages, window, workspace } from "vscode";
 
 export function activate(context: ExtensionContext) {
-    const validations = languages.createDiagnosticCollection();
     const config = workspace.getConfiguration("css");
     const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
+    const validations = languages.createDiagnosticCollection();
     const provider = new SelectorCompletionItemProvider();
 
     context.subscriptions.push(
