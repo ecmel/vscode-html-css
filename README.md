@@ -83,7 +83,7 @@ Template inheritance is supported for the following tags:
 {{> base }}
 ```
 
-Only one level of inheritance is supported:
+Styles defined in `base.html` will also be available for completion in `home.html`:
 
 **`base.html`**
 ```html
@@ -113,8 +113,6 @@ Only one level of inheritance is supported:
 
 </html>
 ```
-
-Styles defined in `base.html` will also be available for completion in `home.html`:
 
 **`home.html`**
 ```html
@@ -160,6 +158,12 @@ Supported languages can be configured with the `css.enabledLanguages` setting. B
 Extension can be configured to support any language where it makes sense such as `nunjucks`, `twig`, `mustache`, etc. You should also install corresponding language extension which registers the language id in VS Code.
 
 This setting is application scoped and changing the setting requires restarting VS Code.
+
+## Commands
+
+### Validate Attributes
+
+Validates all `id` and `class` attributes in the active editor.
 
 ## Installation
 

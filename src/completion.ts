@@ -8,6 +8,8 @@ import {
     CompletionItemKind,
     CompletionItemProvider,
     CompletionList,
+    Diagnostic,
+    DiagnosticSeverity,
     Disposable,
     Position,
     ProviderResult,
@@ -171,10 +173,12 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         }
     }
 
-    async findExtendedStyles(uri: Uri, keys: Set<string>, text: string): Promise<void> {
+    async findExtendedStyles(uri: Uri, keys: Set<string>, text: string, level: number = 0): Promise<void> {
         const extended = this.findExtended.exec(text);
 
-        if (extended) {
+        if (extended && level < 3) {
+            level++;
+
             const name = extended[2];
             const ext = extname(name) || extname(uri.fsPath);
             const key = this.getRelativePath(uri, name, ext);
@@ -185,7 +189,9 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                 const text = content.toString();
 
                 this.findDocumentStyles(file, keys, text);
+
                 await this.findDocumentLinks(file, keys, text);
+                await this.findExtendedStyles(file, keys, text, level);
             } catch (error) {
             }
         }
@@ -209,6 +215,47 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             (item.kind === CompletionItemKind.Value ? ids : classes).set(item.label, item)));
 
         return { ids, classes };
+    }
+
+    async validate(document: TextDocument): Promise<Diagnostic[]> {
+        const completion = await this.findAll(document);
+        const text = document.getText();
+        const diagnostics: Diagnostic[] = [];
+        const findAttribute = /(id|class|className)\s*=\s*("|')(.*?)\2/gsi;
+
+        let attribute;
+
+        while ((attribute = findAttribute.exec(text)) !== null) {
+            const offset = findAttribute.lastIndex
+                - attribute[3].length
+                + attribute[3].indexOf(attribute[2]);
+
+            const findSelector = /([^(\[{}\])\s]+)(?![^(\[{]*[}\])])/gi;
+
+            let value;
+
+            while ((value = findSelector.exec(attribute[3])) !== null) {
+                const anchor = findSelector.lastIndex + offset;
+                const end = document.positionAt(anchor);
+                const start = document.positionAt(anchor - value[1].length);
+
+                if (attribute[1] === "id") {
+                    if (!completion.ids.has(value[1])) {
+                        diagnostics.push(new Diagnostic(new Range(start, end),
+                            `CSS id selector '${value[1]}' not found.`,
+                            DiagnosticSeverity.Information));
+                    }
+                } else {
+                    if (!completion.classes.has(value[1])) {
+                        diagnostics.push(new Diagnostic(new Range(start, end),
+                            `CSS class selector '${value[1]}' not found.`,
+                            DiagnosticSeverity.Information));
+                    }
+                }
+            }
+        }
+
+        return diagnostics;
     }
 
     provideCompletionItems(

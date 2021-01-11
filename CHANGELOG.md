@@ -2,6 +2,11 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.8.0] - 2021-01-11
+
+- Added validate command.
+- Allow multi level inheritance.
+
 ## [1.7.2] - 2021-01-10
 
 - Update internals.
