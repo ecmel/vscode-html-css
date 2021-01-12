@@ -2,10 +2,6 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [1.8.1] - 
-
-- Minor internal refactoring.
-
 ## [1.8.0] - 2021-01-11
 
 - Added validate command.

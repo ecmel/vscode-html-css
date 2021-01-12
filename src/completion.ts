@@ -41,31 +41,33 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         this.cache.clear();
     }
 
-    watchFile(path: string, listener: (e: Uri) => any) {
-        if (!this.watchers.has(path)) {
-            const watcher = workspace.createFileSystemWatcher(path);
+    watchFile(uri: Uri, listener: (e: Uri) => any) {
+        const key = uri.toString();
+
+        if (!this.watchers.has(key)) {
+            const watcher = workspace.createFileSystemWatcher(uri.fsPath);
 
             watcher.onDidCreate(listener);
             watcher.onDidChange(listener);
             watcher.onDidDelete(listener);
 
-            this.watchers.set(path, watcher);
+            this.watchers.set(key, watcher);
         }
-    }
-
-    getRelativePath(uri: Uri, path: string, ext?: string): string {
-        const folder = workspace.getWorkspaceFolder(uri);
-        const name = ext ? join(dirname(path), basename(path, ext) + ext) : path;
-
-        return folder
-            ? join(isAbsolute(path)
-                ? folder.uri.fsPath
-                : dirname(uri.fsPath), name)
-            : join(dirname(uri.fsPath), name);
     }
 
     getStyleSheets(uri: Uri): string[] {
         return workspace.getConfiguration("css", uri).get<string[]>("styleSheets", []);
+    }
+
+    getRelativePath(uri: Uri, spec: string, ext?: string): string {
+        const folder = workspace.getWorkspaceFolder(uri);
+        const name = ext ? join(dirname(spec), basename(spec, ext) + ext) : spec;
+
+        return folder
+            ? join(isAbsolute(spec)
+                ? folder.uri.fsPath
+                : dirname(uri.fsPath), name)
+            : join(dirname(uri.fsPath), name);
     }
 
     parseTextToItems(text: string, items: CompletionItem[]) {
@@ -88,38 +90,47 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         });
     }
 
-    async fetchStyleSheet(key: string, uri: Uri): Promise<void> {
-        if (this.cache.has(key)) {
-            return;
-        }
-
+    async fetchLocal(key: string, uri: Uri): Promise<void> {
+        const file = Uri.file(this.getRelativePath(uri, key));
         const items: CompletionItem[] = [];
 
-        if (this.isRemote.test(key)) {
-            try {
-                const res = await fetch(key);
+        try {
+            const content = await workspace.fs.readFile(file);
+            this.parseTextToItems(content.toString(), items);
+        } catch (error) {
+        }
 
-                if (res.ok) {
-                    this.parseTextToItems(await res.text(), items);
-                }
-            } catch (error) {
+        this.cache.set(key, items);
+        this.watchFile(file, e => this.cache.delete(key));
+    }
+
+    async fetchRemote(key: string): Promise<void> {
+        const items: CompletionItem[] = [];
+
+        try {
+            const res = await fetch(key);
+
+            if (res.ok) {
+                const text = await res.text();
+                this.parseTextToItems(text, items);
             }
-        } else {
-            const path = this.getRelativePath(uri, key);
-
-            try {
-                const content = await workspace.fs.readFile(Uri.file(path));
-                this.parseTextToItems(content.toString(), items);
-            } catch (error) {
-            }
-
-            this.watchFile(path, e => this.cache.delete(key));
+        } catch (error) {
         }
 
         this.cache.set(key, items);
     }
 
-    findEmbedded(uri: Uri, keys: Set<string>, text: string) {
+    async fetchStyleSheet(key: string, uri: Uri): Promise<void> {
+        if (!this.cache.has(key)) {
+            if (this.isRemote.test(key)) {
+                await this.fetchRemote(key);
+            } else {
+                await this.fetchLocal(key, uri);
+            }
+        }
+    }
+
+    findDocumentStyles(uri: Uri, keys: Set<string>, text: string) {
         const key = uri.toString();
         const items: CompletionItem[] = [];
         const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
@@ -134,14 +145,14 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         keys.add(key);
     }
 
-    async findFixed(uri: Uri, keys: Set<string>): Promise<void> {
+    async findStyleSheets(uri: Uri, keys: Set<string>): Promise<void> {
         for (const key of this.getStyleSheets(uri)) {
             await this.fetchStyleSheet(key, uri);
             keys.add(key);
         }
     }
 
-    async findLinked(uri: Uri, keys: Set<string>, text: string): Promise<void> {
+    async findDocumentLinks(uri: Uri, keys: Set<string>, text: string): Promise<void> {
         const findLinks = /<link([^>]+)>/gi;
 
         let link;
@@ -162,7 +173,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         }
     }
 
-    async findInherited(uri: Uri, keys: Set<string>, text: string, level: number = 0): Promise<void> {
+    async findExtendedStyles(uri: Uri, keys: Set<string>, text: string, level: number = 0): Promise<void> {
         const extended = this.findExtended.exec(text);
 
         if (extended && level < 3) {
@@ -177,10 +188,10 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                 const content = await workspace.fs.readFile(file);
                 const text = content.toString();
 
-                this.findEmbedded(file, keys, text);
+                this.findDocumentStyles(file, keys, text);
 
-                await this.findLinked(file, keys, text);
-                await this.findInherited(file, keys, text, level);
+                await this.findDocumentLinks(file, keys, text);
+                await this.findExtendedStyles(file, keys, text, level);
             } catch (error) {
             }
         }
@@ -191,11 +202,11 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         const uri = document.uri;
         const text = document.getText();
 
-        this.findEmbedded(uri, keys, text);
+        this.findDocumentStyles(uri, keys, text);
 
-        await this.findFixed(uri, keys);
-        await this.findLinked(uri, keys, text);
-        await this.findInherited(uri, keys, text);
+        await this.findStyleSheets(uri, keys);
+        await this.findDocumentLinks(uri, keys, text);
+        await this.findExtendedStyles(uri, keys, text);
 
         const ids = new Map<string, CompletionItem>();
         const classes = new Map<string, CompletionItem>();
