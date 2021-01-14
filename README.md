@@ -136,12 +136,13 @@ If it is not possible to specify local or remote styles in HTML or via template 
         "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css",
         "/style.css",
         "style.css",
-        "./style.css"
+        "./style.css",
+        "./${fileBasenameNoExtension}.css"
     ]
 }
 ```
 
-This configuration is same as the [first](#linked-and-embedded-style-sheets) example. All relative paths will be evaluated relative to the HTML file being edited.
+All relative paths will be evaluated relative to the HTML file being edited. `${fileBasenameNoExtension}` will be replaced with the base name of the file being edited.
 
 ## Supported Languages
 
