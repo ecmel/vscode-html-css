@@ -59,12 +59,12 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         return workspace.getConfiguration("css", uri).get<string[]>("styleSheets", []);
     }
 
-    getPath(uri: Uri, spec: string, ext?: string): string {
+    getPath(uri: Uri, path: string, ext?: string): string {
         const folder = workspace.getWorkspaceFolder(uri);
-        const name = ext ? join(dirname(spec), basename(spec, ext) + ext) : spec;
+        const name = ext ? join(dirname(path), basename(path, ext) + ext) : path;
 
         return folder
-            ? join(isAbsolute(spec)
+            ? join(isAbsolute(path)
                 ? folder.uri.fsPath
                 : dirname(uri.fsPath), name)
             : join(dirname(uri.fsPath), name);
