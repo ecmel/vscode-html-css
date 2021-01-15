@@ -19,11 +19,12 @@ export function activate(context: ExtensionContext) {
                 }
             }
         }),
+        commands.registerCommand("vscode-html-css.dispose", () => provider.dispose()),
         workspace.onDidChangeTextDocument(e => validations.delete(e.document.uri)),
         workspace.onDidCloseTextDocument(document => validations.delete(document.uri)),
         languages.registerCompletionItemProvider(enabledLanguages, provider),
-        provider,
-        validations
+        validations,
+        provider
     );
 }
 

@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.8.2] - 
+
+- Added Clear Cache command.
+
 ## [1.8.1] - 2021-01-15
 
 - Added ${fileBasenameNoExtension} setting variable.
