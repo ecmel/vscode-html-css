@@ -1,10 +1,6 @@
 import * as assert from "assert";
 import { CompletionList, Position, commands, workspace } from "vscode";
 
-function sleep(duration: number): Thenable<void> {
-	return new Promise(resolve => setTimeout(resolve, duration));
-}
-
 suite("Extension Test Suite", () => {
 
 	test("Completes for html", async () => {
@@ -19,6 +15,6 @@ suite("Extension Test Suite", () => {
 			new Position(1, 14)
 		);
 
-		//assert.strictEqual(list?.items[0].label, "some");
+		assert.strictEqual(list?.items[0].label, "some");
 	});
 });
