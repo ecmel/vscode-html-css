@@ -36,7 +36,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     readonly findExtended = /(?:{{<|{{>|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
 
     dispose() {
-        this.watchers.forEach(v => v.dispose());
+        this.watchers.forEach(e => e.dispose());
         this.watchers.clear();
         this.cache.clear();
     }
@@ -156,8 +156,8 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     }
 
     async findFixed(uri: Uri, keys: Set<string>): Promise<void> {
-        for (const sheet of this.getStyleSheets(uri)) {
-            keys.add(await this.fetch(uri, sheet));
+        for (const key of this.getStyleSheets(uri)) {
+            keys.add(await this.fetch(uri, key));
         }
     }
 
@@ -187,8 +187,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
             const name = extended[2];
             const ext = extname(name) || extname(uri.fsPath);
-            const key = this.getPath(uri, name, ext);
-            const file = Uri.file(key);
+            const file = Uri.file(this.getPath(uri, name, ext));
 
             try {
                 const content = await workspace.fs.readFile(file);
@@ -217,8 +216,8 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         const ids = new Map<string, CompletionItem>();
         const classes = new Map<string, CompletionItem>();
 
-        keys.forEach(key => this.cache.get(key)?.forEach(item =>
-            (item.kind === CompletionItemKind.Value ? ids : classes).set(item.label, item)));
+        keys.forEach(key => this.cache.get(key)?.forEach(e =>
+            (e.kind === CompletionItemKind.Value ? ids : classes).set(e.label, e)));
 
         return { ids, classes };
     }

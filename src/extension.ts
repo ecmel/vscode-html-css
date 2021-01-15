@@ -15,8 +15,7 @@ export function activate(context: ExtensionContext) {
                 const document = editor.document;
 
                 if (enabledLanguages.includes(document.languageId)) {
-                    const diagnostics = await provider.validate(document);
-                    validations.set(document.uri, diagnostics);
+                    validations.set(document.uri, await provider.validate(document));
                 }
             }
         }),
