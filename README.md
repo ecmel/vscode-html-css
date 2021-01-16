@@ -24,20 +24,21 @@ Linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets
 <html>
 
 <head>
-    <!-- (1) Remote style sheet -->
+    <!-- Remote style sheet -->
+
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+    
+    <!-- Local style sheet relative to workspace folder -->
 
-    <!-- (2) Local style sheet relative to workspace folder -->
     <link rel="stylesheet" href="/style.css">
 
-    <!-- (3) Local style sheet relative to this file -->
-    <link rel="stylesheet" href="style.css">
+    <!-- Local style sheet relative to this file -->
 
-    <!-- (4) Local style sheet relative to this file -->
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="style.css">
     
-    <!-- (5) Embedded style sheet -->
+    <!-- Embedded style sheet -->
+
     <style>
         #content {
             display: block;
@@ -127,7 +128,9 @@ Styles defined in `base.html` will also be available for completion in `home.htm
 
 ## Additional Style Sheets
 
-If it is not possible to specify local or remote styles in HTML or via template inheritance, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder:
+If it is not possible to specify local or remote styles in HTML or via template inheritance, they can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all HTML files within that workspace folder.
+
+### Example 
 
 **`.vscode/settings.json`**
 ```json
@@ -136,13 +139,12 @@ If it is not possible to specify local or remote styles in HTML or via template 
         "https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css",
         "/style.css",
         "style.css",
-        "./style.css",
-        "./${fileBasenameNoExtension}.css"
+        "${fileBasenameNoExtension}.css"
     ]
 }
 ```
 
-All relative paths will be evaluated relative to the HTML file being edited. `${fileBasenameNoExtension}` will be replaced with the base name of the file being edited.
+All relative paths will be evaluated relative to the file being edited. `${fileBasenameNoExtension}` will be replaced with the file name of the file being edited without extension.
 
 ## Supported Languages
 
@@ -165,6 +167,10 @@ This setting is application scoped and changing the setting requires restarting 
 ### Validate Attributes
 
 Validates all `id` and `class` attributes in the active editor.
+
+### Clear Cache
+
+Clears file cache.
 
 ## Installation
 
