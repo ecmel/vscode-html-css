@@ -5,6 +5,7 @@ All notable changes to the extension will be documented in this file.
 ## [1.9.0] - 2021-01-16
 
 - Added Clear Cache command.
+- Added file cache.
 - Update documentation.
 
 ## [1.8.1] - 2021-01-15

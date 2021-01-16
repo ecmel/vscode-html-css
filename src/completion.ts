@@ -28,6 +28,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
     readonly start = new Position(0, 0);
     readonly cache = new Map<string, CompletionItem[]>();
+    readonly files = new Map<string, string>();
     readonly watchers = new Map<string, Disposable>();
     readonly isRemote = /^https?:\/\//i;
     readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
@@ -39,6 +40,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         this.watchers.forEach(e => e.dispose());
         this.watchers.clear();
         this.cache.clear();
+        this.files.clear();
     }
 
     watchFile(path: string, listener: (e: Uri) => any) {
@@ -187,11 +189,17 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
             const name = extended[2];
             const ext = extname(name) || extname(uri.fsPath);
-            const file = Uri.file(this.getPath(uri, name, ext));
+            const path = this.getPath(uri, name, ext);
+            const file = Uri.file(path);
+
+            let text = this.files.get(path);
 
             try {
-                const content = await workspace.fs.readFile(file);
-                const text = content.toString();
+                if (!text) {
+                    text = (await workspace.fs.readFile(file)).toString();
+                    this.files.set(path, text);
+                    this.watchFile(path, () => this.files.delete(path));
+                }
 
                 this.findEmbedded(file, keys, text);
 
