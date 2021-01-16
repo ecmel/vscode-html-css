@@ -198,7 +198,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                 try {
                     text = (await workspace.fs.readFile(file)).toString();
                 } catch (error) {
-                    text = "";
+                    text = "n/a";
                 }
 
                 this.files.set(path, text);
