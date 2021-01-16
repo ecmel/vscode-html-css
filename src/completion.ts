@@ -19,7 +19,7 @@ import {
     workspace
 } from "vscode";
 
-export type Selector = {
+export type Context = {
     ids: Map<string, CompletionItem>,
     classes: Map<string, CompletionItem>
 };
@@ -212,7 +212,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         }
     }
 
-    async findAll(document: TextDocument): Promise<Selector> {
+    async findAll(document: TextDocument): Promise<Context> {
         const keys = new Set<string>();
         const uri = document.uri;
         const text = document.getText();
@@ -233,7 +233,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     }
 
     async validate(document: TextDocument): Promise<Diagnostic[]> {
-        const selector = await this.findAll(document);
+        const context = await this.findAll(document);
         const text = document.getText();
         const diagnostics: Diagnostic[] = [];
         const findAttribute = /(id|class|className)\s*=\s*("|')(.*?)\2/gsi;
@@ -255,13 +255,13 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                 const start = document.positionAt(anchor - value[1].length);
 
                 if (attribute[1] === "id") {
-                    if (!selector.ids.has(value[1])) {
+                    if (!context.ids.has(value[1])) {
                         diagnostics.push(new Diagnostic(new Range(start, end),
                             `CSS id selector '${value[1]}' not found.`,
                             DiagnosticSeverity.Information));
                     }
                 } else {
-                    if (!selector.classes.has(value[1])) {
+                    if (!context.classes.has(value[1])) {
                         diagnostics.push(new Diagnostic(new Range(start, end),
                             `CSS class selector '${value[1]}' not found.`,
                             DiagnosticSeverity.Information));
@@ -285,10 +285,10 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             const canComplete = this.canComplete.exec(text);
 
             if (canComplete) {
-                this.findAll(document).then(selector => resolve(
+                this.findAll(document).then(context => resolve(
                     [...(canComplete[1] === "id"
-                        ? selector.ids
-                        : selector.classes).values()]));
+                        ? context.ids
+                        : context.classes).values()]));
             } else {
                 reject();
             }
