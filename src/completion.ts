@@ -43,7 +43,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         this.files.clear();
     }
 
-    watchFile(path: string, listener: (e: Uri) => any) {
+    watchFile(path: string, listener: () => any) {
         if (this.watchers.has(path)) {
             return;
         }
@@ -194,19 +194,21 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
             let text = this.files.get(path);
 
-            try {
-                if (!text) {
+            if (!text) {
+                try {
                     text = (await workspace.fs.readFile(file)).toString();
-                    this.files.set(path, text);
-                    this.watchFile(path, () => this.files.delete(path));
+                } catch (error) {
+                    text = "";
                 }
 
-                this.findEmbedded(file, keys, text);
-
-                await this.findLinks(file, keys, text);
-                await this.findInherited(file, keys, text, level);
-            } catch (error) {
+                this.files.set(path, text);
+                this.watchFile(path, () => this.files.delete(path));
             }
+
+            this.findEmbedded(file, keys, text);
+
+            await this.findLinks(file, keys, text);
+            await this.findInherited(file, keys, text, level);
         }
     }
 
