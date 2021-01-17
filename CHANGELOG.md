@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.9.1] - 2021-01-17
+
+- Update documentation.
+
 ## [1.9.0] - 2021-01-16
 
 - Added Clear Cache command.

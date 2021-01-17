@@ -9,6 +9,7 @@ HTML `id` and `class` attribute completion for Visual Studio Code.
 - Supports template inheritance.
 - Supports additional style sheets.
 - Supports other HTML like languages.
+- Validates CSS selectors on demand.
 
 ## Usage
 
@@ -26,28 +27,28 @@ Linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets
 <head>
     <!-- Remote style sheet -->
 
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
     
     <!-- Local style sheet relative to workspace folder -->
 
-    <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="/style.css">
 
     <!-- Local style sheet relative to this file -->
 
-    <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="style.css">
     
     <!-- Embedded style sheet -->
 
-    <style>
-        #content {
-            display: block;
-        }
+        <style>
+            #content {
+                display: block;
+            }
 
-        .internal {
-            display: block;
-        }
-    </style>
+            .internal {
+                display: block;
+            }
+        </style>
 </head>
 
 <body>
@@ -61,6 +62,7 @@ Linked `[<link rel="stylesheet">]` and embedded `[<style></style>]` style sheets
 
 </html>
 ```
+
 All local links point to the same file which is in the root of workspace folder:
 
 **`style.css`**
