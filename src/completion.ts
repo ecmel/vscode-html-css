@@ -166,13 +166,13 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     async findLinks(uri: Uri, keys: Set<string>, text: string): Promise<void> {
         const findLinks = /<link([^>]+)>/gi;
 
-        let link;
+        let link, rel, href;
 
         while ((link = findLinks.exec(text)) !== null) {
-            const rel = this.findLinkRel.exec(link[1]);
+            rel = this.findLinkRel.exec(link[1]);
 
             if (rel && rel[2] === "stylesheet") {
-                const href = this.findLinkHref.exec(link[1]);
+                href = this.findLinkHref.exec(link[1]);
 
                 if (href) {
                     keys.add(await this.fetch(uri, href[2]));
@@ -238,22 +238,20 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         const diagnostics: Diagnostic[] = [];
         const findAttribute = /(id|class|className)\s*=\s*("|')(.*?)\2/gsi;
 
-        let attribute;
+        let attribute, offset, findSelector, value, anchor, end, start;
 
         while ((attribute = findAttribute.exec(text)) !== null) {
-            const offset = findAttribute.lastIndex
+            offset = findAttribute.lastIndex
                 - attribute[3].length
                 + attribute[3].indexOf(attribute[2]);
 
-            const findSelector = /([^(\[{}\])\s]+)(?![^(\[{]*[}\])])/gi;
-
-            let value;
+            findSelector = /([^(\[{}\])\s]+)(?![^(\[{]*[}\])])/gi;
 
             while ((value = findSelector.exec(attribute[3])) !== null) {
                 if (!(attribute[1] === "id" ? context.ids : context.classes).has(value[1])) {
-                    const anchor = findSelector.lastIndex + offset;
-                    const end = document.positionAt(anchor);
-                    const start = document.positionAt(anchor - value[1].length);
+                    anchor = findSelector.lastIndex + offset;
+                    end = document.positionAt(anchor);
+                    start = document.positionAt(anchor - value[1].length);
 
                     diagnostics.push(new Diagnostic(new Range(start, end),
                         `CSS selector '${value[1]}' not found.`,
