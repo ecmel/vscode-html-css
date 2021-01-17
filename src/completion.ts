@@ -250,11 +250,11 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             let value;
 
             while ((value = findSelector.exec(attribute[3])) !== null) {
-                const anchor = findSelector.lastIndex + offset;
-                const end = document.positionAt(anchor);
-                const start = document.positionAt(anchor - value[1].length);
-
                 if (!(attribute[1] === "id" ? context.ids : context.classes).has(value[1])) {
+                    const anchor = findSelector.lastIndex + offset;
+                    const end = document.positionAt(anchor);
+                    const start = document.positionAt(anchor - value[1].length);
+
                     diagnostics.push(new Diagnostic(new Range(start, end),
                         `CSS selector '${value[1]}' not found.`,
                         DiagnosticSeverity.Information));
