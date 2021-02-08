@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.10.0] - 2021-02-08
+
+- Update dependencies for VS Code 1.53
+
 ## [1.9.1] - 2021-01-17
 
 - Update documentation.
