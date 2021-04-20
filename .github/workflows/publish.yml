@@ -15,8 +15,13 @@ jobs:
           node-version: 12.x
       - run: npm install
       - run: xvfb-run -a npm test
-      - name: Publish
+      - name: Publish (vsce)
         if: success()
         run: npm run deploy
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Publish (ovsx)
+        if: success()
+        run: npx ovsx publish
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
