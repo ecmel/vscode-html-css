@@ -13,7 +13,7 @@
 		"url": "https://github.com/ecmel/vscode-html-css.git"
 	},
 	"engines": {
-		"vscode": "^1.53.0"
+		"vscode": "^1.58.0"
 	},
 	"categories": [
 		"Programming Languages",
@@ -81,7 +81,6 @@
 		"deploy": "vsce publish"
 	},
 	"devDependencies": {
-		"@types/css-tree": "^1.0.5",
 		"@types/glob": "^7.1.3",
 		"@types/mocha": "^8.0.4",
 		"@types/node": "^12.11.7",

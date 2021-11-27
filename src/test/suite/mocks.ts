@@ -22,7 +22,7 @@ export class MockCancellationToken implements CancellationToken {
 
 export class MockCompletionContext implements CompletionContext {
     triggerKind = CompletionTriggerKind.Invoke;
-    triggerCharacter?: string | undefined;
+    triggerCharacter: string | undefined;
 }
 
 export class MockDocument implements TextDocument {

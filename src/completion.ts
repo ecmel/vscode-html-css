@@ -5,6 +5,7 @@ import {
     CancellationToken,
     CompletionContext,
     CompletionItem,
+    CompletionItemLabel,
     CompletionItemKind,
     CompletionItemProvider,
     CompletionList,
@@ -72,7 +73,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
             : join(dirname(uri.fsPath), name);
     }
 
-    parseTextToItems(text: string, items: CompletionItem[]) {
+    parseTextToItems(path: string, text: string, items: CompletionItem[]) {
         walk(parse(text), node => {
 
             let kind: CompletionItemKind;
@@ -88,7 +89,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
                     return;
             }
 
-            items.push(new CompletionItem(node.name, kind));
+            items.push(new CompletionItem({ label: node.name, description: path }, kind));
         });
     }
 
@@ -101,7 +102,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
         try {
             const content = await workspace.fs.readFile(Uri.file(path));
-            this.parseTextToItems(content.toString(), items);
+            this.parseTextToItems(basename(path), content.toString(), items);
         } catch (error) {
         }
 
@@ -121,7 +122,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
 
             if (res.ok) {
                 const text = await res.text();
-                this.parseTextToItems(text, items);
+                this.parseTextToItems(basename(path), text, items);
             }
         } catch (error) {
         }
@@ -150,7 +151,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         let style;
 
         while ((style = findStyles.exec(text)) !== null) {
-            this.parseTextToItems(style[1], items);
+            this.parseTextToItems(basename(uri.fsPath), style[1], items);
         }
 
         this.cache.set(key, items);
@@ -227,7 +228,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
         const classes = new Map<string, CompletionItem>();
 
         keys.forEach(key => this.cache.get(key)?.forEach(e =>
-            (e.kind === CompletionItemKind.Value ? ids : classes).set(e.label, e)));
+            (e.kind === CompletionItemKind.Value ? ids : classes).set((<CompletionItemLabel>e.label).label, e)));
 
         return { ids, classes };
     }
