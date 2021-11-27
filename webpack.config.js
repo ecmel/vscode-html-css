@@ -3,18 +3,12 @@
 "use strict";
 
 const path = require("path");
+const webpack = require("webpack");
 
 /**@type {import('webpack').Configuration}*/
-const config = {
-    target: "node",
+const baseConfig = {
     mode: "none",
-
     entry: "./src/extension.ts",
-    output: {
-        path: path.resolve(__dirname, "dist"),
-        filename: "extension.js",
-        libraryTarget: "commonjs2"
-    },
     devtool: "nosources-source-map",
     externals: {
         vscode: "commonjs vscode"
@@ -36,4 +30,35 @@ const config = {
         ]
     }
 };
-module.exports = config;
+
+const nodeConfig = {
+    ...baseConfig,
+    target: "node",
+    output: {
+        path: path.resolve(__dirname, "dist"),
+        filename: "extension.js",
+        libraryTarget: "commonjs2"
+    }
+};
+
+const webConfig = {
+    ...baseConfig,
+    target: "webworker",
+    output: {
+        path: path.resolve(__dirname, "dist"),
+        filename: "extension-web.js",
+        libraryTarget: "commonjs2"
+    },
+    resolve: {
+        fallback: {
+            "path": require.resolve("path-browserify")
+        }
+    },
+    plugins: [
+		new webpack.ProvidePlugin({
+			process: "process/browser",
+		})
+	]
+};
+
+module.exports = [ nodeConfig, webConfig ];
