@@ -40,7 +40,7 @@ const nodeConfig = {
         libraryTarget: "commonjs2"
     }
 };
-
+/*
 const webConfig = {
     ...baseConfig,
     target: "webworker",
@@ -60,5 +60,5 @@ const webConfig = {
 		})
 	]
 };
-
-module.exports = [ nodeConfig, webConfig ];
+*/
+module.exports = [ nodeConfig/*, webConfig*/ ];
