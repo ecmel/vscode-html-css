@@ -6,25 +6,16 @@ const path = require("path");
 const webpack = require("webpack");
 
 /**@type {import('webpack').Configuration}*/
-module.exports = {
+const baseConfig = {
     mode: "none",
-    target: "webworker",
     entry: "./src/extension.ts",
     devtool: "nosources-source-map",
     externals: {
         vscode: "commonjs vscode"
     },
     resolve: {
-        extensions: [".ts", ".js"],
-        fallback: {
-            "path": require.resolve("path-browserify")
-        }
+        extensions: [".ts", ".js"]
     },
-    plugins: [
-		new webpack.ProvidePlugin({
-			process: "process/browser",
-		})
-	],
     module: {
         rules: [
             {
@@ -37,10 +28,37 @@ module.exports = {
                 ]
             }
         ]
-    },
+    }
+};
+
+const nodeConfig = {
+    ...baseConfig,
+    target: "node",
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "extension.js",
         libraryTarget: "commonjs2"
     }
 };
+/*
+const webConfig = {
+    ...baseConfig,
+    target: "webworker",
+    output: {
+        path: path.resolve(__dirname, "dist"),
+        filename: "extension-web.js",
+        libraryTarget: "commonjs2"
+    },
+    resolve: {
+        fallback: {
+            "path": require.resolve("path-browserify")
+        }
+    },
+    plugins: [
+		new webpack.ProvidePlugin({
+			process: "process/browser",
+		})
+	]
+};
+*/
+module.exports = [ nodeConfig/*, webConfig*/ ];
