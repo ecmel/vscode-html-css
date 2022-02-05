@@ -10,6 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        node-version: [14]
         os: [ubuntu-20.04, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -18,7 +19,7 @@ jobs:
       - name: Install node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: xvfb-run -a npm test
         if: runner.os == 'Linux'

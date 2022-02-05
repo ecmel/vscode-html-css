@@ -4,12 +4,13 @@ All notable changes to the extension will be documented in this file.
 
 ## [1.11.0] - 2022-02-05
 
-- Update dependencies
-- Added source file name to completion list
+- Update dependencies.
+- Fixed extension test.
+- Added source file name to completion list.
 
 ## [1.10.2] - 2021-02-10
 
-- Update dependencies for VS Code 1.53
+- Update dependencies.
 
 ## [1.9.1] - 2021-01-17
 
