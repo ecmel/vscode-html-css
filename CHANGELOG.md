@@ -2,7 +2,7 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [1.11.0] - 2022-02-05
+## [1.11.0] - 2022-02-06
 
 - Update dependencies.
 - Fixed extension test.
