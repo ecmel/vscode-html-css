@@ -5,7 +5,6 @@ All notable changes to the extension will be documented in this file.
 ## [1.11.0] - 2022-02-06
 
 - Update dependencies.
-- Fixed extension test.
 - Added source file name to completion list.
 
 ## [1.10.2] - 2021-02-10
