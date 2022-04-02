@@ -174,6 +174,6 @@ Clears file cache.
 
 Extension can be installed from [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css).
 
-## Buy me a coffee
+## Sponsor
 
 https://www.buymeacoffee.com/ecmel
