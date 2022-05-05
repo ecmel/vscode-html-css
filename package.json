@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS Intellisense for HTML",
-	"version": "1.12.0",
+	"version": "1.12.1",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -76,7 +76,8 @@
 		"watch-tests": "tsc -p . -w --outDir out",
 		"pretest": "npm run compile-tests && npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
+		"test": "node ./out/test/runTest.js",
+		"deploy": "vsce publish"
 	},
 	"devDependencies": {
 		"@types/css-tree": "^1.0.7",
