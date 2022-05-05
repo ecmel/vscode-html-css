@@ -2,7 +2,7 @@
 	"name": "vscode-html-css",
 	"displayName": "HTML CSS Support",
 	"description": "CSS Intellisense for HTML",
-	"version": "1.12.1",
+	"version": "1.12.2",
 	"publisher": "ecmel",
 	"license": "MIT",
 	"homepage": "https://github.com/ecmel/vscode-html-css",
@@ -83,8 +83,8 @@
 		"@types/css-tree": "^1.0.7",
 		"@types/glob": "^7.2.0",
 		"@types/mocha": "^9.1.1",
-		"@types/node-fetch": "^2.5.8",
 		"@types/node": "14.x",
+		"@types/node-fetch": "^2.5.8",
 		"@types/vscode": "^1.66.0",
 		"@typescript-eslint/eslint-plugin": "^5.21.0",
 		"@typescript-eslint/parser": "^5.21.0",
@@ -96,7 +96,8 @@
 		"node-fetch": "^2.6.1",
 		"ts-loader": "^9.2.8",
 		"typescript": "^4.6.4",
-		"webpack-cli": "^4.9.2",
-		"webpack": "^5.70.0"
+		"vsce": "^2.7.0",
+		"webpack": "^5.70.0",
+		"webpack-cli": "^4.9.2"
 	}
 }
