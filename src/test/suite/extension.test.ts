@@ -16,6 +16,6 @@ suite("Extension Test Suite", () => {
 		);
 
 		// TODO
-		// assert.strictEqual(list?.items[0].insertText, "some");
+		assert.strictEqual(list?.items[0].insertText, "some");
 	});
 });
