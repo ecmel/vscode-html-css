@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.13.0] - 2022-06-13
+
+- Added sponsor field.
+
 ## [1.12.2] - 2022-05-05
 
 - Update dependencies.
