@@ -8,6 +8,9 @@
 	"homepage": "https://github.com/ecmel/vscode-html-css",
 	"bugs": "https://github.com/ecmel/vscode-html-css/issues",
 	"icon": "icon.png",
+	"sponsor": {
+		"url": "https://www.buymeacoffee.com/ecmel"
+	}
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ecmel/vscode-html-css.git"
