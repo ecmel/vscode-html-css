@@ -32,7 +32,7 @@ export class SelectorCompletionItemProvider implements CompletionItemProvider, D
     readonly files = new Map<string, string>();
     readonly watchers = new Map<string, Disposable>();
     readonly isRemote = /^https?:\/\//i;
-    readonly canComplete = /(id|class|className)\s*=\s*("|')(?:(?!\2).)*$/si;
+    readonly canComplete = /(id|class|className)\s*[=:]\s*("|')(?:(?!\2).)*$/si;
     readonly findLinkRel = /rel\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findLinkHref = /href\s*=\s*("|')((?:(?!\1).)+)\1/si;
     readonly findExtended = /(?:{{<|{{>|{%\s*extends|@extends\s*\()\s*("|')?([./A-Za-z_0-9\\\-]+)\1\s*(?:\)|%}|}})/i;
