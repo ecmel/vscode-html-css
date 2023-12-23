@@ -1,106 +1,103 @@
 {
-	"name": "vscode-html-css",
-	"displayName": "HTML CSS Support",
-	"description": "CSS Intellisense for HTML",
-	"version": "1.13.1",
-	"publisher": "ecmel",
-	"license": "MIT",
-	"homepage": "https://github.com/ecmel/vscode-html-css",
-	"bugs": "https://github.com/ecmel/vscode-html-css/issues",
-	"icon": "icon.png",
-	"sponsor": {
-		"url": "https://github.com/sponsors/ecmel"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/ecmel/vscode-html-css.git"
-	},
-	"engines": {
-		"vscode": "^1.66.0"
-	},
-	"categories": [
-		"Programming Languages",
-		"Other"
-	],
-	"keywords": [
-		"css",
-		"html",
-		"twig",
-		"blade",
-		"django",
-		"nunjucks",
-		"mustache",
-		"angular",
-		"react",
-		"vue",
-		"multi-root ready"
-	],
-	"activationEvents": [
-		"*"
-	],
-	"contributes": {
-		"configuration": {
-			"title": "CSS Settings",
-			"properties": {
-				"css.enabledLanguages": {
-					"type": "array",
-					"scope": "application",
-					"description": "List of languages which suggestions are desired.",
-					"default": [
-						"html"
-					]
-				},
-				"css.styleSheets": {
-					"type": "array",
-					"scope": "resource",
-					"description": "List of local or remote style sheets for suggestions.",
-					"default": []
-				}
-			}
-		},
-		"commands": [
-			{
-				"command": "vscode-html-css.validate",
-				"title": "CSS: Validate Attributes"
-			},
-			{
-				"command": "vscode-html-css.dispose",
-				"title": "CSS: Clear Cache"
-			}
-		]
-	},
-	"main": "./dist/extension.js",
-	"scripts": {
-		"vscode:prepublish": "npm run package",
-		"compile": "webpack",
-		"watch": "webpack --watch",
-		"package": "webpack --mode production --devtool hidden-source-map",
-		"compile-tests": "tsc -p . --outDir out",
-		"watch-tests": "tsc -p . -w --outDir out",
-		"pretest": "npm run compile-tests && npm run compile && npm run lint",
-		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js",
-		"deploy": "vsce publish"
-	},
-	"devDependencies": {
-		"@types/css-tree": "^1.0.7",
-		"@types/glob": "^7.2.0",
-		"@types/mocha": "^9.1.1",
-		"@types/node": "14.x",
-		"@types/node-fetch": "^2.5.8",
-		"@types/vscode": "^1.66.0",
-		"@typescript-eslint/eslint-plugin": "^5.21.0",
-		"@typescript-eslint/parser": "^5.21.0",
-		"@vscode/test-electron": "^2.1.3",
-		"css-tree": "^2.0.4",
-		"eslint": "^8.14.0",
-		"glob": "^8.0.1",
-		"mocha": "^9.2.2",
-		"node-fetch": "^2.6.1",
-		"ts-loader": "^9.2.8",
-		"typescript": "^4.6.4",
-		"vsce": "^2.9.1",
-		"webpack": "^5.76.0",
-		"webpack-cli": "^4.9.2"
-	}
+  "name": "vscode-html-css",
+  "displayName": "HTML CSS Support",
+  "description": "CSS Intellisense for HTML",
+  "version": "1.14.0",
+  "publisher": "ecmel",
+  "license": "MIT",
+  "homepage": "https://github.com/ecmel/vscode-html-css",
+  "bugs": "https://github.com/ecmel/vscode-html-css/issues",
+  "icon": "icon.png",
+  "sponsor": {
+    "url": "https://github.com/sponsors/ecmel"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecmel/vscode-html-css.git"
+  },
+  "engines": {
+    "vscode": "^1.66.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "css",
+    "html",
+    "twig",
+    "blade",
+    "django",
+    "nunjucks",
+    "mustache",
+    "angular",
+    "react",
+    "vue",
+    "multi-root ready"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "CSS Settings",
+      "properties": {
+        "css.enabledLanguages": {
+          "type": "array",
+          "scope": "application",
+          "description": "List of languages which suggestions are desired.",
+          "default": [
+            "html"
+          ]
+        },
+        "css.styleSheets": {
+          "type": "array",
+          "scope": "resource",
+          "description": "List of local or remote style sheets for suggestions.",
+          "default": []
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "vscode-html-css.validate",
+        "title": "CSS: Validate Attributes"
+      },
+      {
+        "command": "vscode-html-css.dispose",
+        "title": "CSS: Clear Cache"
+      }
+    ]
+  },
+  "main": "./dist/extension.js",
+  "scripts": {
+    "clean": "git clean -Xdf",
+    "format": "prettier -w --list-different .",
+    "prereset": "npm run clean",
+    "reset": "npm install",
+    "build": "rollup -c",
+    "pretest": "tsc -p ./test --outDir out --sourceMap true",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/css-tree": "^2.3.4",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.5",
+    "@types/vscode": "^1.66.0",
+    "@vscode/test-electron": "^2.3.8",
+    "css-tree": "^2.3.1",
+    "glob": "^10.3.10",
+    "mocha": "^10.2.0",
+    "prettier": "^3.1.1",
+    "rollup": "^4.9.1",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3",
+    "vsce": "^2.15.0"
+  }
 }

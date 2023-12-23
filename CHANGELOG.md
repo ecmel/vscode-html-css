@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.14.0] - 2023-12-
+
+- Ported to rollup config.
+
 ## [1.13.1] - 2022-07-31
 
 - Updated sponsor field.
@@ -77,7 +81,7 @@ All notable changes to the extension will be documented in this file.
 ## [1.5.0] - 2020-12-28
 
 - Added `css.validation` setting.
- 
+
 ## [1.4.5] - 2020-12-28
 
 - Update documentation.
