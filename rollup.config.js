@@ -1,6 +1,7 @@
-const typescript = require("@rollup/plugin-typescript");
-const commonjs = require("@rollup/plugin-commonjs");
 const nodeResolve = require("@rollup/plugin-node-resolve");
+const commonjs = require("@rollup/plugin-commonjs");
+const typescript = require("@rollup/plugin-typescript");
+const terser = require("@rollup/plugin-terser");
 
 /**
  * @type {import('rollup').RollupOptions}
@@ -12,5 +13,10 @@ module.exports = {
     format: "commonjs",
   },
   external: (module) => module === "vscode" || module === "css-tree",
-  plugins: [nodeResolve({ preferBuiltins: true }), commonjs(), typescript()],
+  plugins: [
+    nodeResolve({ preferBuiltins: true }),
+    commonjs(),
+    typescript(),
+    terser(),
+  ],
 };
