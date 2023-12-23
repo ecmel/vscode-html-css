@@ -12,9 +12,9 @@ module.exports = {
     dir: "dist",
     format: "commonjs",
   },
-  external: (module) => module === "vscode" || module === "css-tree",
+  external: (module) => module === "vscode",
   plugins: [
-    nodeResolve({ preferBuiltins: true }),
+    nodeResolve({ preferBuiltins: true, browser: true }),
     commonjs(),
     typescript(),
     terser(),

@@ -78,6 +78,7 @@
     "build": "rollup -c",
     "pretest": "npm run build && tsc -p ./test --outDir out --sourceMap true",
     "test": "node ./out/test/runTest.js",
+    "vscode:prepublish": "npm run build",
     "package": "vsce package",
     "publish": "vsce publish"
   },
