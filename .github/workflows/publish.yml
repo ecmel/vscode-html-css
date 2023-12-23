@@ -19,6 +19,6 @@ jobs:
       - run: xvfb-run -a npm test
       - name: Publish
         if: success()
-        run: npm run deploy
+        run: npm run publish
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}

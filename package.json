@@ -76,7 +76,7 @@
     "prereset": "npm run clean",
     "reset": "npm install",
     "build": "rollup -c",
-    "pretest": "tsc -p ./test --outDir out --sourceMap true",
+    "pretest": "npm run build && tsc -p ./test --outDir out --sourceMap true",
     "test": "node ./out/test/runTest.js",
     "package": "vsce package",
     "publish": "vsce publish"
