@@ -6,6 +6,8 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": false
+    "strict": false,
+    "sourceMap": true,
+    "outDir": "../out"
   }
 }

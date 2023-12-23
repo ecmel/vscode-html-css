@@ -17,11 +17,11 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
 
     assert.strictEqual(
       provider.isRemote.test("http://example.com/example.css"),
-      true
+      true,
     );
     assert.strictEqual(
       provider.isRemote.test("https://example.com/example.css"),
-      true
+      true,
     );
   });
 
@@ -38,7 +38,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       provider.canComplete.test(`
 			class = "someClass
 		`),
-      true
+      true,
     );
 
     assert.strictEqual(
@@ -46,7 +46,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
 			class 
 			= "someClass
 		`),
-      true
+      true,
     );
     assert.strictEqual(
       provider.canComplete.test(`
@@ -54,7 +54,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
 					"someClass
 
 		`),
-      true
+      true,
     );
     assert.strictEqual(
       provider.canComplete.test(`
@@ -62,7 +62,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
 					"someClass
 					
 		"`),
-      false
+      false,
     );
     assert.strictEqual(
       provider.canComplete.test(`
@@ -71,7 +71,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
 					"someClass
 					
 		"`),
-      false
+      false,
     );
   });
 
@@ -82,7 +82,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       provider.findLinkRel.exec(`
 			<link rel="stylesheet" href="http://example.com/example.css">
 		"`)?.[2],
-      "stylesheet"
+      "stylesheet",
     );
   });
 
@@ -93,7 +93,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       provider.findLinkHref.exec(`
 			<link rel="stylesheet" href="http://example.com/example.css">
 		"`)?.[2],
-      "http://example.com/example.css"
+      "http://example.com/example.css",
     );
   });
 
@@ -104,7 +104,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       provider.findExtended.exec(`
             {% extends "base" %}
         `)?.[2],
-      "base"
+      "base",
     );
   });
 
@@ -115,7 +115,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       provider.findExtended.exec(`
             {{< base }}
         `)?.[2],
-      "base"
+      "base",
     );
   });
 
@@ -126,7 +126,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       provider.findExtended.exec(`
             {{> base }}
         `)?.[2],
-      "base"
+      "base",
     );
   });
 
@@ -137,7 +137,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       provider.findExtended.exec(`
             @extends('base')
         `)?.[2],
-      "base"
+      "base",
     );
   });
 
@@ -149,12 +149,12 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       document,
       position,
       token,
-      context
+      context,
     ) as Thenable<CompletionItem[]>;
 
     result.then(
       () => done(new Error("Should reject!")),
-      () => done()
+      () => done(),
     );
   });
 
@@ -166,7 +166,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       document,
       position,
       token,
-      context
+      context,
     ) as Thenable<CompletionItem[]>);
 
     assert.strictEqual(items.length, 1);
@@ -185,7 +185,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       document,
       position,
       token,
-      context
+      context,
     ) as Thenable<CompletionItem[]>);
 
     assert.notStrictEqual(items.length, 0);
@@ -206,7 +206,7 @@ suite("SelectorCompletionItemProvider Test Suite", () => {
       document,
       position,
       token,
-      context
+      context,
     ) as Thenable<CompletionItem[]>);
 
     assert.notStrictEqual(items.length, 0);

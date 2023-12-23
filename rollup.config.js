@@ -3,6 +3,9 @@ const commonjs = require("@rollup/plugin-commonjs");
 const typescript = require("@rollup/plugin-typescript");
 const terser = require("@rollup/plugin-terser");
 
+const debug = process.env.ROLLUP_WATCH === "true";
+process.env.NODE_ENV = debug ? "development" : "production";
+
 /**
  * @type {import('rollup').RollupOptions}
  */
@@ -11,6 +14,7 @@ module.exports = {
   output: {
     dir: "dist",
     format: "commonjs",
+    sourcemap: debug,
   },
   external: (module) => module === "vscode",
   plugins: [

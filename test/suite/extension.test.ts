@@ -11,7 +11,7 @@ suite("Extension Test Suite", () => {
     const list = await commands.executeCommand<CompletionList>(
       "vscode.executeCompletionItemProvider",
       document.uri,
-      new Position(1, 14)
+      new Position(1, 14),
     );
 
     assert.strictEqual(list?.items[0].insertText, "some");

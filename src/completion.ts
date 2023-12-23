@@ -90,7 +90,7 @@ export class SelectorCompletionItemProvider
       }
 
       items.push(
-        new CompletionItem({ label: node.name, description: path }, kind)
+        new CompletionItem({ label: node.name, description: path }, kind),
       );
     });
   }
@@ -138,7 +138,7 @@ export class SelectorCompletionItemProvider
 
       path = this.getPath(
         uri,
-        path.replace(/\${\s*fileBasenameNoExtension\s*}/, base)
+        path.replace(/\${\s*fileBasenameNoExtension\s*}/, base),
       );
       await this.fetchLocal(path);
     }
@@ -189,7 +189,7 @@ export class SelectorCompletionItemProvider
     uri: Uri,
     keys: Set<string>,
     text: string,
-    level: number = 0
+    level: number = 0,
   ): Promise<void> {
     const extended = this.findExtended.exec(text);
 
@@ -242,9 +242,9 @@ export class SelectorCompletionItemProvider
           ?.forEach((e) =>
             (e.kind === CompletionItemKind.Value ? ids : classes).set(
               (<CompletionItemLabel>e.label).label,
-              e
-            )
-          )
+              e,
+            ),
+          ),
     );
 
     return { ids, classes };
@@ -278,8 +278,8 @@ export class SelectorCompletionItemProvider
             new Diagnostic(
               new Range(start, end),
               `CSS selector '${value[1]}' not found.`,
-              DiagnosticSeverity.Information
-            )
+              DiagnosticSeverity.Information,
+            ),
           );
         }
       }
@@ -292,7 +292,7 @@ export class SelectorCompletionItemProvider
     document: TextDocument,
     position: Position,
     token: CancellationToken,
-    context: CompletionContext
+    context: CompletionContext,
   ): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
     return new Promise((resolve, reject) => {
       const range = new Range(this.start, position);
@@ -306,7 +306,7 @@ export class SelectorCompletionItemProvider
               ? context.ids
               : context.classes
             ).values(),
-          ])
+          ]),
         );
       } else {
         reject();
