@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1986-2023 Ecmel Ercan <ecmel.ercan@gmail.com>
- * Subject to MIT License
+ * Licensed under the MIT License
  */
 
 import { parse, walk } from "css-tree";
