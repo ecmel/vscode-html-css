@@ -1,6 +1,7 @@
-out
-dist
-node_modules
+.DS_Store
 .vscode-test/
+node_modules/
+coverage/
+out/
+dist/
 *.vsix
-nbproject
