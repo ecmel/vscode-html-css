@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 1986-2023 Ecmel Ercan <ecmel.ercan@gmail.com>
+ * Subject to MIT License
+ */
+
 import { parse, walk } from "css-tree";
 import { basename, dirname, extname, isAbsolute, join } from "path";
 import {

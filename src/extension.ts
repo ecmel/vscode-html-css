@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 1986-2023 Ecmel Ercan <ecmel.ercan@gmail.com>
+ * Subject to MIT License
+ */
+
 import { SelectorCompletionItemProvider } from "./completion";
 import {
   ExtensionContext,

@@ -1,12 +1,32 @@
-// See https://go.microsoft.com/fwlink/?LinkId=733558
-// for the documentation about the tasks.json format
 {
   "version": "2.0.0",
   "tasks": [
     {
       "type": "npm",
       "script": "debug",
-      "problemMatcher": "$rollup-ts-watch",
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": ["relative", "${cwd}"],
+        "pattern": {
+          "regexp": "^\\(!\\) Plugin typescript: @rollup\\/plugin-typescript TS(?<errorCode>\\d+): (?<message>.+)\\r?\\n(?<file>.*?):\\s*\\((?<line>\\d+):(?<column>\\d+)\\)$",
+          "file": 3,
+          "line": 4,
+          "column": 5,
+          "code": 1,
+          "message": 2
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "^rollup v\\d+\\.\\d+\\.\\d+$"
+          },
+          "endsPattern": {
+            "regexp": "^\\[[:-\\s\\d]+\\] waiting for changes\\.\\.\\.$"
+          }
+        }
+      },
       "isBackground": true,
       "presentation": {
         "reveal": "always",
