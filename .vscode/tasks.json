@@ -16,11 +16,6 @@
         "kind": "build",
         "isDefault": true
       }
-    },
-    {
-      "label": "tasks: watch-tests",
-      "dependsOn": ["npm: build", "npm: compile"],
-      "problemMatcher": []
     }
   ]
 }
