@@ -1,5 +1,7 @@
 # Visual Studio Code CSS Intellisense for HTML
 
+![commit workflow](https://github.com/ecmel/vscode-html-css/actions/workflows/commit.yml/badge.svg)
+
 HTML `id` and `class` attribute completion for Visual Studio Code.
 
 ## Features
