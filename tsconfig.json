@@ -9,6 +9,6 @@
     "strict": true,
     "noEmit": true
   },
-  "include": ["src"],
-  "exclude": ["test", "dist", "out", "node_modules", "coverage"]
+  "include": ["src", "test"],
+  "exclude": ["node_modules"]
 }
