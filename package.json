@@ -8,6 +8,10 @@
   "homepage": "https://github.com/ecmel/vscode-html-css",
   "bugs": "https://github.com/ecmel/vscode-html-css/issues",
   "icon": "icon.png",
+  "author": {
+    "name": "Ecmel Ercan",
+    "url": "https://github.com/ecmel"
+  },
   "sponsor": {
     "url": "https://github.com/sponsors/ecmel"
   },
