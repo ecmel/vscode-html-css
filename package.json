@@ -95,13 +95,13 @@
     "@types/node": "^20.10.5",
     "@types/vscode": "^1.66.0",
     "@vscode/test-electron": "^2.3.8",
+    "@vscode/vsce": "^2.22.0",
     "css-tree": "^2.3.1",
     "glob": "^10.3.10",
     "mocha": "^10.2.0",
     "prettier": "^3.1.1",
     "rollup": "^4.9.1",
     "tslib": "^2.6.2",
-    "typescript": "^5.3.3",
-    "vsce": "^2.15.0"
+    "typescript": "^5.3.3"
   }
 }
