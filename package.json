@@ -76,9 +76,9 @@
   "main": "./dist/extension.js",
   "scripts": {
     "clean": "git clean -Xdf",
-    "format": "prettier -w --list-different .",
     "prereset": "npm run clean",
     "reset": "npm install",
+    "format": "prettier -w --list-different .",
     "debug": "rollup -c -w",
     "build": "rollup -c",
     "compile": "tsc -p ./ --outDir out --sourceMap true --module commonjs --moduleResolution node --noEmit false",
