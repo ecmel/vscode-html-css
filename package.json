@@ -84,6 +84,7 @@
     "compile": "tsc -p ./ --outDir out --sourceMap true --module commonjs --moduleResolution node --noEmit false",
     "pretest": "npm run build && npm run compile",
     "test": "node ./out/test/runTest.js",
+    "coverage": "c8 --all --src out npm run test",
     "vscode:prepublish": "npm run build",
     "package": "vsce package",
     "publish": "vsce publish"
@@ -100,6 +101,7 @@
     "@types/vscode": "^1.66.0",
     "@vscode/test-electron": "^2.3.8",
     "@vscode/vsce": "^2.22.0",
+    "c8": "^8.0.1",
     "css-tree": "^2.3.1",
     "glob": "^10.3.10",
     "mocha": "^10.2.0",
