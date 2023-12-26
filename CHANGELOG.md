@@ -4,8 +4,8 @@ All notable changes to the extension will be documented in this file.
 
 ## [1.14.0] - 2023-12-
 
-- Match on patterns with a colon in addition to equals
-- Ported to rollup config.
+- Match on patterns with a colon in addition to equals.
+- Ported to rollup.
 - Updated dependencies.
 
 ## [1.13.1] - 2022-07-31

@@ -26,6 +26,6 @@ module.exports = {
     nodeResolve({ preferBuiltins: true, browser: true }),
     commonjs(),
     typescript(),
-    terser(),
+    !debug && terser(),
   ],
 };
