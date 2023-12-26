@@ -3,11 +3,8 @@
   "displayName": "HTML CSS Support",
   "description": "CSS Intellisense for HTML",
   "version": "1.14.0",
-  "publisher": "ecmel",
   "license": "MIT",
-  "homepage": "https://github.com/ecmel/vscode-html-css",
-  "bugs": "https://github.com/ecmel/vscode-html-css/issues",
-  "icon": "icon.png",
+  "publisher": "ecmel",
   "author": {
     "name": "Ecmel Ercan",
     "url": "https://github.com/ecmel"
@@ -19,6 +16,8 @@
     "type": "git",
     "url": "https://github.com/ecmel/vscode-html-css.git"
   },
+  "bugs": "https://github.com/ecmel/vscode-html-css/issues",
+  "homepage": "https://github.com/ecmel/vscode-html-css",
   "engines": {
     "vscode": "^1.66.0"
   },
@@ -74,6 +73,7 @@
     ]
   },
   "main": "./dist/extension.js",
+  "icon": "icon.png",
   "scripts": {
     "clean": "git clean -Xdf",
     "prereset": "npm run clean",
