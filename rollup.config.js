@@ -25,7 +25,7 @@ module.exports = {
   plugins: [
     nodeResolve({ preferBuiltins: true, browser: true }),
     commonjs(),
-    typescript(),
+    typescript({ noEmit: true }),
     !debug && terser(),
   ],
 };

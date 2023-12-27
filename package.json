@@ -81,7 +81,7 @@
     "format": "prettier -w --list-different .",
     "debug": "rollup -c -w",
     "build": "rollup -c --forceExit",
-    "compile": "tsc -p ./ --outDir out --sourceMap true --module commonjs --moduleResolution node --noEmit false",
+    "compile": "tsc -p ./ --outDir out --sourceMap true --module commonjs --moduleResolution node",
     "pretest": "npm run build && npm run compile",
     "test": "node ./out/test/runTest.js",
     "coverage": "c8 --all --src out npm run test",

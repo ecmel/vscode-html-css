@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
-    "noEmit": true
+    "noUnusedLocals": true
   },
   "include": ["src", "test"],
   "exclude": ["node_modules"]
