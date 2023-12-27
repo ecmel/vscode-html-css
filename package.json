@@ -80,7 +80,7 @@
     "reset": "npm install",
     "format": "prettier -w --list-different .",
     "debug": "rollup -c -w",
-    "build": "rollup -c",
+    "build": "rollup -c --forceExit",
     "compile": "tsc -p ./ --outDir out --sourceMap true --module commonjs --moduleResolution node --noEmit false",
     "pretest": "npm run build && npm run compile",
     "test": "node ./out/test/runTest.js",
