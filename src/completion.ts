@@ -3,7 +3,6 @@
  * Licensed under the MIT License
  */
 
-import { parse, walk } from "css-tree";
 import { glob } from "fast-glob";
 import { basename, dirname, extname, isAbsolute, join } from "path";
 import {
@@ -80,24 +79,18 @@ export class SelectorCompletionItemProvider
   }
 
   parseTextToItems(path: string, text: string, items: CompletionItem[]) {
-    walk(parse(text), (node) => {
-      let kind: CompletionItemKind;
+    const regex = /([.#])(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)\s*{([^}]*)}/g;
 
-      switch (node.type) {
-        case "ClassSelector":
-          kind = CompletionItemKind.Enum;
-          break;
-        case "IdSelector":
-          kind = CompletionItemKind.Value;
-          break;
-        default:
-          return;
-      }
+    let match;
 
+    while ((match = regex.exec(text))) {
       items.push(
-        new CompletionItem({ label: node.name, description: path }, kind),
+        new CompletionItem(
+          { label: match[2], description: path },
+          match[1] === "." ? CompletionItemKind.Enum : CompletionItemKind.Value,
+        ),
       );
-    });
+    }
   }
 
   async fetchLocal(path: string): Promise<void> {
