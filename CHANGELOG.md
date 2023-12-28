@@ -2,7 +2,7 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [1.14.0] - 2023-12-28
+## [1.14.1] - 2023-12-28
 
 - Added glob support for local files.
 - Initial support for lit css.

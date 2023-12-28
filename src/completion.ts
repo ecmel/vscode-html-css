@@ -249,7 +249,7 @@ export class SelectorCompletionItemProvider
     for (const value of this.cache.values()) {
       for (const item of value) {
         const target = item.kind === CompletionItemKind.Value ? ids : classes;
-        target.set(item.label.toString(), item);
+        target.set(item.label as string, item);
       }
     }
 
