@@ -154,12 +154,12 @@ export class SelectorCompletionItemProvider
   findEmbedded(uri: Uri, keys: Set<string>, text: string) {
     const key = uri.toString();
     const items: CompletionItem[] = [];
-    const findStyles = /<style[^>]*>([^<]+)<\/style>/gi;
+    const findStyles = /(?:<style[^>]*>([^<]+)<\/style>|css\s*`([^`]+)`)/gi;
 
     let style;
 
     while ((style = findStyles.exec(text)) !== null) {
-      this.parseTextToItems(basename(uri.fsPath), style[1], items);
+      this.parseTextToItems(basename(uri.fsPath), style[1] || style[2], items);
     }
 
     this.cache.set(key, items);

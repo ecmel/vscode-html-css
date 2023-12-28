@@ -4,6 +4,7 @@ All notable changes to the extension will be documented in this file.
 
 ## [1.14.0] - 2023-12-
 
+- Initial support for lit css
 - Match on patterns with a colon in addition to equals.
 - Ported to rollup.
 - Updated dependencies.

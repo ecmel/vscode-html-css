@@ -36,6 +36,7 @@
     "angular",
     "react",
     "vue",
+    "lit",
     "multi-root ready"
   ],
   "activationEvents": [
