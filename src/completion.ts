@@ -4,12 +4,12 @@
  */
 
 import { parse, walk } from "css-tree";
+import { glob } from "fast-glob";
 import { basename, dirname, extname, isAbsolute, join } from "path";
 import {
   CancellationToken,
   CompletionContext,
   CompletionItem,
-  CompletionItemLabel,
   CompletionItemKind,
   CompletionItemProvider,
   CompletionList,
@@ -109,7 +109,8 @@ export class SelectorCompletionItemProvider
 
     try {
       const content = await workspace.fs.readFile(Uri.file(path));
-      this.parseTextToItems(basename(path), content.toString(), items);
+      const text = content.toString();
+      this.parseTextToItems(basename(path), text, items);
     } catch (error) {}
 
     this.cache.set(path, items);
@@ -145,7 +146,12 @@ export class SelectorCompletionItemProvider
         uri,
         path.replace(/\${\s*fileBasenameNoExtension\s*}/, base),
       );
-      await this.fetchLocal(path);
+
+      let paths = isAbsolute(path) ? glob.sync(path) : [path];
+
+      for (const path of paths) {
+        await this.fetchLocal(path);
+      }
     }
 
     return path;
@@ -240,17 +246,12 @@ export class SelectorCompletionItemProvider
     const ids = new Map<string, CompletionItem>();
     const classes = new Map<string, CompletionItem>();
 
-    keys.forEach(
-      (key) =>
-        this.cache
-          .get(key)
-          ?.forEach((e) =>
-            (e.kind === CompletionItemKind.Value ? ids : classes).set(
-              (<CompletionItemLabel>e.label).label,
-              e,
-            ),
-          ),
-    );
+    for (const value of this.cache.values()) {
+      for (const item of value) {
+        const target = item.kind === CompletionItemKind.Value ? ids : classes;
+        target.set(item.label.toString(), item);
+      }
+    }
 
     return { ids, classes };
   }

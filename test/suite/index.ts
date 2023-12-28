@@ -5,7 +5,7 @@
 
 import path from "path";
 import Mocha from "mocha";
-import { glob } from "glob";
+import { glob } from "fast-glob";
 
 export function run(): Promise<void> {
   const mocha = new Mocha({
@@ -15,24 +15,23 @@ export function run(): Promise<void> {
 
   const testsRoot = path.resolve(__dirname, "..");
 
-  return new Promise((c, e) => {
+  return new Promise((resolve, reject) => {
     glob("**/**.test.js", { cwd: testsRoot })
       .then((files) => {
         files.forEach((f) => mocha.addFile(path.resolve(testsRoot, f)));
-
         try {
           mocha.run((failures) => {
             if (failures > 0) {
-              e(new Error(`${failures} tests failed.`));
+              reject(new Error(`${failures} tests failed.`));
             } else {
-              c();
+              resolve();
             }
           });
         } catch (err) {
           console.error(err);
-          e(err);
+          reject(err);
         }
       })
-      .catch((err) => e(err));
+      .catch((err) => reject(err));
   });
 }

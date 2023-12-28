@@ -2,11 +2,12 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [1.14.0] - 2023-12-
+## [1.14.0] - 2023-12-28
 
-- Initial support for lit css
+- Added glob support for local files.
+- Initial support for lit css.
 - Match on patterns with a colon in addition to equals.
-- Ported to rollup.
+- Ported to rollup & fast-glob.
 - Updated dependencies.
 
 ## [1.13.1] - 2022-07-31

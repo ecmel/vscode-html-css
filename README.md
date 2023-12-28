@@ -149,6 +149,16 @@ If it is not possible to specify local or remote styles in HTML or via template 
 
 All relative paths will be evaluated relative to the file being edited. `${fileBasenameNoExtension}` will be replaced with the file name of the file being edited without extension.
 
+Absolute paths can include glob patterns:
+
+```json
+{
+  "css.styleSheets": ["/dist/*.css"]
+}
+```
+
+Note that absolute paths are still relative to the workspace folder.
+
 ## Supported Languages
 
 Supported languages can be configured with the `css.enabledLanguages` setting. By default `html` is enabled:
