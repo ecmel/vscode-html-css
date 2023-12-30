@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [2.0.0] - 2024-01-
+
+- Ported to custom parser.
+
 ## [1.14.1] - 2023-12-28
 
 - Added glob support for local files.

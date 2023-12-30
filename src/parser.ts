@@ -3,7 +3,7 @@
  * Licensed under the MIT License
  */
 
-const regex = /([.#])(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)\s*{([^}]*)}/g;
+const regex = /([.#])(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?=.*?{([^}]*)})/gs;
 
 export const enum StyleType {
   ID = "#",
@@ -11,9 +11,10 @@ export const enum StyleType {
 }
 
 export interface Style {
+  index: number;
   type: StyleType;
-  label: string;
-  definition: string;
+  selector: string;
+  block: string;
 }
 
 export function parse(text: string) {
@@ -21,9 +22,10 @@ export function parse(text: string) {
   let match;
   while ((match = regex.exec(text))) {
     styles.push({
+      index: match.index,
       type: match[1] as StyleType,
-      label: match[2],
-      definition: match[3].replace(/\s+/g, " ").trim(),
+      selector: match[2],
+      block: match[3].replace(/\s+/g, " ").trim(),
     });
   }
   return styles;

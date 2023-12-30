@@ -65,7 +65,8 @@
     "commands": [
       {
         "command": "vscode-html-css.validate",
-        "title": "CSS: Validate attributes"
+        "title": "CSS: Validate attributes",
+        "when": "editorTextFocus"
       },
       {
         "command": "vscode-html-css.clear",
@@ -86,6 +87,7 @@
     "pretest": "npm run build && npm run compile",
     "test": "node ./out/test/runTest.js",
     "coverage": "c8 --all --src out npm run test",
+    "update": "ncu -x @types/vscode -x prettier",
     "vscode:prepublish": "npm run build",
     "package": "vsce package",
     "publish": "vsce publish"
@@ -95,8 +97,6 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
-    "@types/css-tree": "^2.3.4",
-    "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.6",
     "@types/vscode": "^1.66.0",

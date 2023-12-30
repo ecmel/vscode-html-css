@@ -28,6 +28,7 @@ Stylesheets can be specified in VS Code settings per workspace folder in `.vscod
   "css.styleSheets": [
     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
     "src/**/*.scss",
+    "src/view/style.ts",
     "dist/style.css"
   ]
 }
