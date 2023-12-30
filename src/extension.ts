@@ -3,45 +3,21 @@
  * Licensed under the MIT License
  */
 
-import { SelectorCompletionItemProvider } from "./completion";
-import {
-  ExtensionContext,
-  commands,
-  languages,
-  window,
-  workspace,
-} from "vscode";
+import { ExtensionContext, commands, languages, workspace } from "vscode";
+import { getEnabledLanguages } from "./settings";
+import { Completer, clear, invalidate } from "./completer";
 
 export function activate(context: ExtensionContext) {
-  const config = workspace.getConfiguration("css");
-  const enabledLanguages = config.get<string[]>("enabledLanguages", ["html"]);
-  const validations = languages.createDiagnosticCollection();
-  const provider = new SelectorCompletionItemProvider();
+  const enabledLanguages = getEnabledLanguages();
+  const completer = new Completer();
 
   context.subscriptions.push(
-    commands.registerCommand("vscode-html-css.validate", async () => {
-      const editor = window.activeTextEditor;
-
-      if (editor) {
-        const document = editor.document;
-
-        if (enabledLanguages.includes(document.languageId)) {
-          validations.set(document.uri, await provider.validate(document));
-        }
-      }
-    }),
-    commands.registerCommand("vscode-html-css.dispose", () =>
-      provider.dispose(),
+    languages.registerCompletionItemProvider(enabledLanguages, completer),
+    workspace.onDidChangeTextDocument((event) =>
+      invalidate(event.document.uri.toString())
     ),
-    workspace.onDidChangeTextDocument((e) =>
-      validations.delete(e.document.uri),
-    ),
-    workspace.onDidCloseTextDocument((document) =>
-      validations.delete(document.uri),
-    ),
-    languages.registerCompletionItemProvider(enabledLanguages, provider),
-    validations,
-    provider,
+    commands.registerCommand("vscode-html-css.clear", () => clear()),
+    commands.registerCommand("vscode-html-css.validate", async () => {})
   );
 }
 

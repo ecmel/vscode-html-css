@@ -7,18 +7,19 @@ import * as assert from "assert";
 import { CompletionList, Position, commands, workspace } from "vscode";
 
 suite("Extension Test Suite", () => {
-  test("Completes for html", async () => {
+  test("should complete for html", async () => {
     const document = await workspace.openTextDocument({
       language: "html",
-      content: "<style>.some{}</style>\n<a class='some'></a>",
+      content: "<style>.some{}</style>\n<a class='som'></a>",
     });
 
     const list = await commands.executeCommand<CompletionList>(
       "vscode.executeCompletionItemProvider",
       document.uri,
-      new Position(1, 14),
+      new Position(1, 13)
     );
 
-    assert.strictEqual(list?.items[0].insertText, "some");
+    assert.ok(list.items.length > 0);
+    assert.strictEqual(list.items[0].insertText, "some");
   });
 });
