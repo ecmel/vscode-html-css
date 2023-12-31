@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS Intellisense for HTML",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "license": "MIT",
   "publisher": "ecmel",
   "author": {
@@ -91,8 +91,8 @@
     "compile": "tsc -p ./ --outDir out --sourceMap true --module commonjs --moduleResolution node",
     "pretest": "npm run build && npm run compile",
     "test": "node ./out/test/runTest.js",
-    "coverage": "c8 --all --src out npm run test",
-    "update": "ncu -x @types/vscode -x prettier",
+    "coverage": "c8 --src out npm run test",
+    "update": "ncu -u -x prettier -x @types/vscode",
     "vscode:prepublish": "npm run build",
     "package": "vsce package",
     "publish": "vsce publish"
