@@ -73,6 +73,12 @@
       }
     ]
   },
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false
+    },
+    "virtualWorkspaces": true
+  },
   "main": "./dist/extension.js",
   "icon": "icon.png",
   "scripts": {

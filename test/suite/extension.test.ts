@@ -10,13 +10,13 @@ suite("Extension Test Suite", () => {
   test("should complete for html", async () => {
     const document = await workspace.openTextDocument({
       language: "html",
-      content: "<style>.some{}</style>\n<a class='som'></a>",
+      content: "<style>.selector{}</style>\n<a class='selecto'></a>",
     });
     const list = await commands.executeCommand<CompletionList>(
       "vscode.executeCompletionItemProvider",
       document.uri,
-      new Position(1, 13)
+      new Position(1, 17)
     );
-    assert.ok(list.items.includes, "some");
+    assert.ok(list.items.find((item) => item.label === "selector"));
   });
 });

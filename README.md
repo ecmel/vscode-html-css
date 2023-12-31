@@ -85,6 +85,20 @@ Configuration depends on your layout of the project but some samples are below:
 }
 ```
 
+### EJS
+
+```json
+{
+  "css.enabledLanguages": ["ejs"]
+}
+```
+
+```json
+{
+  "css.styleSheets": ["src/**/*.ejs"]
+}
+```
+
 ## Commands
 
 ### Validate selectors
