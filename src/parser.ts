@@ -23,7 +23,7 @@ export interface Style {
 
 export function parse(text: string) {
   const styles: Style[] = [];
-  const lc = lineColumn(text);
+  const lc = lineColumn(text, { origin: 0 });
   let match, lci, index;
   let line = 0;
   let col = 0;
@@ -31,8 +31,8 @@ export function parse(text: string) {
     index = match.index;
     lci = lc.fromIndex(index);
     if (lci) {
-      line = lci.line - 1;
-      col = lci.col;
+      line = lci.line;
+      col = lci.col + 1;
     }
     styles.push({
       index,

@@ -4,8 +4,8 @@
  */
 
 import {
-  ExtensionContext,
   commands,
+  ExtensionContext,
   languages,
   window,
   workspace,

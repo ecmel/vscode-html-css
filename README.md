@@ -57,7 +57,7 @@ Validates all `class` attributes in the active editor.
 
 ### Clear style cache
 
-Clears stylesheet cache.
+Clears style cache.
 
 ## Installation
 
