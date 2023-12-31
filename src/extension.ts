@@ -11,15 +11,16 @@ import {
   workspace,
 } from "vscode";
 import { getEnabledLanguages } from "./settings";
-import { Completer, clear, invalidate } from "./providers";
+import { Provider, clear, invalidate } from "./provider";
 
 export function activate(context: ExtensionContext) {
   const enabledLanguages = getEnabledLanguages();
   const validations = languages.createDiagnosticCollection();
-  const completer = new Completer();
+  const provider = new Provider();
 
   context.subscriptions.push(
-    languages.registerCompletionItemProvider(enabledLanguages, completer),
+    languages.registerCompletionItemProvider(enabledLanguages, provider),
+    languages.registerDefinitionProvider(enabledLanguages, provider),
     workspace.onDidChangeTextDocument((event) => {
       const uri = event.document.uri;
       invalidate(uri.toString());
@@ -33,7 +34,7 @@ export function activate(context: ExtensionContext) {
       if (editor) {
         const document = editor.document;
         if (enabledLanguages.includes(document.languageId)) {
-          validations.set(document.uri, await completer.validate(document));
+          validations.set(document.uri, await provider.validate(document));
         }
       }
     }),

@@ -3,6 +3,8 @@
  * Licensed under the MIT License
  */
 
+import lineColumn from "line-column";
+
 const regex = /([.#])(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?=.*?{([^}]*)})/gs;
 
 export const enum StyleType {
@@ -12,20 +14,33 @@ export const enum StyleType {
 
 export interface Style {
   index: number;
+  line: number;
+  col: number;
   type: StyleType;
   selector: string;
-  block: string;
+  definition: string;
 }
 
 export function parse(text: string) {
   const styles: Style[] = [];
-  let match;
+  const lc = lineColumn(text);
+  let match, lci, index;
+  let line = 0;
+  let col = 0;
   while ((match = regex.exec(text))) {
+    index = match.index;
+    lci = lc.fromIndex(index);
+    if (lci) {
+      line = lci.line - 1;
+      col = lci.col;
+    }
     styles.push({
-      index: match.index,
+      index,
+      line,
+      col,
       type: match[1] as StyleType,
       selector: match[2],
-      block: match[3].replace(/\s+/g, " ").trim(),
+      definition: match[3].replace(/\s+/g, " ").trim(),
     });
   }
   return styles;

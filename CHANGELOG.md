@@ -2,8 +2,9 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [2.0.0] - 2024-01-
+## [2.0.0] - 2024-01-01
 
+- Go to definition support.
 - Ported to custom parser.
 
 ## [1.14.1] - 2023-12-28

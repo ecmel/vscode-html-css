@@ -65,12 +65,11 @@
     "commands": [
       {
         "command": "vscode-html-css.validate",
-        "title": "CSS: Validate attributes",
-        "when": "editorTextFocus"
+        "title": "CSS: Validate selectors"
       },
       {
         "command": "vscode-html-css.clear",
-        "title": "CSS: Clear cache"
+        "title": "CSS: Clear style cache"
       }
     ]
   },
@@ -97,6 +96,7 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
+    "@types/line-column": "^1.0.2",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.6",
     "@types/vscode": "^1.66.0",
@@ -104,6 +104,7 @@
     "@vscode/vsce": "^2.22.0",
     "c8": "^8.0.1",
     "fast-glob": "^3.3.2",
+    "line-column": "^1.0.2",
     "mocha": "^10.2.0",
     "prettier": "^2.8.8",
     "rollup": "^4.9.2",

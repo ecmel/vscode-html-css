@@ -10,8 +10,12 @@ import {
   CompletionItemKind,
   CompletionItemProvider,
   CompletionList,
+  Definition,
+  DefinitionProvider,
   Diagnostic,
   DiagnosticSeverity,
+  Location,
+  LocationLink,
   Position,
   ProviderResult,
   Range,
@@ -27,11 +31,12 @@ import { Style, StyleType, parse } from "./parser";
 const start = new Position(0, 0);
 const cache = new Map<string, Style[]>();
 const isRemote = /^https?:\/\//i;
+const wordRange = /-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
 const findSelector = /([^(\[{}\])\s]+)(?![^(\[{]*[}\])])/gi;
 const findAttribute = /(class|className)\s*[=:]\s*(["'])(.*?)\2/gis;
 const canComplete = /(id|class|className)\s*[=:]\s*(["'])(?:.(?!\2))*$/is;
 
-export class Completer implements CompletionItemProvider {
+export class Provider implements CompletionItemProvider, DefinitionProvider {
   private async fetch(url: string) {
     try {
       const res = await fetch(url);
@@ -132,6 +137,48 @@ export class Completer implements CompletionItemProvider {
             match[1] === "id" ? StyleType.ID : StyleType.CLASS
           )
         );
+      } else {
+        reject();
+      }
+    });
+  }
+
+  private async getDefinitions(document: TextDocument, position: Position) {
+    const styles = await this.getStyles(document);
+    const range = document.getWordRangeAtPosition(position, wordRange);
+    const selector = document.getText(range);
+    const locations: Location[] = [];
+
+    for (const entry of styles) {
+      if (!isRemote.test(entry[0])) {
+        entry[1]
+          .filter((style) => style.selector === selector)
+          .forEach((style) =>
+            locations.push(
+              new Location(
+                Uri.parse(entry[0]),
+                new Position(style.line, style.col)
+              )
+            )
+          );
+      }
+    }
+
+    return locations;
+  }
+
+  provideDefinition(
+    document: TextDocument,
+    position: Position,
+    token: CancellationToken
+  ): ProviderResult<Definition | LocationLink[]> {
+    const range = new Range(start, position);
+    const text = document.getText(range);
+    const match = canComplete.exec(text);
+
+    return new Promise((resolve, reject) => {
+      if (match && !token.isCancellationRequested) {
+        resolve(this.getDefinitions(document, position));
       } else {
         reject();
       }

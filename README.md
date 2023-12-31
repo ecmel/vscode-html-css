@@ -9,6 +9,7 @@ HTML `id` and `class` attribute completion for Visual Studio Code.
 - HTML `id` and `class` attribute completion.
 - Supports specifying remote and local style sheets for completion.
 - Supports any language for completion.
+- Supports go to definition for selectors.
 - Validates CSS selectors on demand.
 
 ## Usage
@@ -50,11 +51,11 @@ This setting is application scoped and changing the setting requires restarting 
 
 ## Commands
 
-### Validate Attributes
+### Validate selectors
 
-Validates all `id` and `class` attributes in the active editor.
+Validates all `class` attributes in the active editor.
 
-### Clear Cache
+### Clear style cache
 
 Clears stylesheet cache.
 
