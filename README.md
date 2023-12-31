@@ -18,7 +18,7 @@ You can view a list of `id` and `class` attribute suggestions in configured lang
 
 ## Specifying Style Sheets
 
-Stylesheets can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all configured languages within that workspace folder.
+Style sheets can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all configured languages within that workspace folder.
 
 ### Example
 
@@ -28,6 +28,7 @@ Stylesheets can be specified in VS Code settings per workspace folder in `.vscod
 {
   "css.styleSheets": [
     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
+    "node_modules/bootstrap/dist/css/bootstrap.css",
     "src/**/*.scss",
     "src/view/style.ts",
     "dist/style.css"
@@ -53,7 +54,7 @@ This setting is application scoped and changing the setting requires restarting 
 
 ### Validate selectors
 
-Validates all `class` attributes in the active editor.
+Validates all `class` selectors in the active editor.
 
 ### Clear style cache
 
