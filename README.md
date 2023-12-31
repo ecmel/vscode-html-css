@@ -50,6 +50,41 @@ Extension can be configured to support any language where it makes sense such as
 
 This setting is application scoped and changing the setting requires restarting VS Code.
 
+## Examples
+
+Configuration depends on your layout of the project but some samples are below:
+
+### Bootstrap
+
+```json
+{
+  "css.enabledLanguages": ["html"]
+}
+```
+
+```json
+{
+  "css.styleSheets": [
+    "node_modules/bootstrap/dist/css/bootstrap.css",
+    "src/**/*.css"
+  ]
+}
+```
+
+### Lit
+
+```json
+{
+  "css.enabledLanguages": ["typescript"]
+}
+```
+
+```json
+{
+  "css.styleSheets": ["src/style.ts", "src/style.css"]
+}
+```
+
 ## Commands
 
 ### Validate selectors
