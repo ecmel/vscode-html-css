@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS Intellisense for HTML",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "license": "MIT",
   "publisher": "ecmel",
   "author": {
@@ -105,6 +105,7 @@
     "@types/line-column": "^1.0.2",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.6",
+    "@types/sinon": "^17.0.2",
     "@types/vscode": "^1.66.0",
     "@vscode/test-electron": "^2.3.8",
     "@vscode/vsce": "^2.22.0",
@@ -114,6 +115,7 @@
     "mocha": "^10.2.0",
     "prettier": "^2.8.8",
     "rollup": "^4.9.2",
+    "sinon": "^17.0.1",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3"
   }

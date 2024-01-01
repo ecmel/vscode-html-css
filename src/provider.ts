@@ -74,30 +74,28 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   private async getStyles(document: TextDocument) {
     const styles = new Map<string, Style[]>();
     const folder = workspace.getWorkspaceFolder(document.uri);
+    const sheets = getStyleSheets(document.uri);
 
-    if (folder) {
-      const sheets = getStyleSheets(document.uri);
-      for (const sheet of sheets) {
-        if (isRemote.test(sheet)) {
-          styles.set(sheet, await this.getRemote(sheet));
-        } else {
-          const files = await workspace.findFiles(
-            new RelativePattern(folder, sheet).pattern
-          );
-          for (const file of files) {
-            styles.set(file.toString(), await this.getLocal(file));
-          }
+    for (const sheet of sheets) {
+      if (isRemote.test(sheet)) {
+        styles.set(sheet, await this.getRemote(sheet));
+      } else if (folder) {
+        const files = await workspace.findFiles(
+          new RelativePattern(folder, sheet).pattern
+        );
+        for (const file of files) {
+          styles.set(file.toString(), await this.getLocal(file));
         }
       }
     }
     styles.set(document.uri.toString(), parse(document.getText()));
-
     return styles;
   }
 
   private async getCompletionMap(document: TextDocument, type: StyleType) {
     const map = new Map<string, CompletionItem>();
     const styles = await this.getStyles(document);
+
     for (const value of styles.values()) {
       for (const style of value) {
         if (style.type === type) {
@@ -122,6 +120,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     const map = await this.getCompletionMap(document, type);
     const range = document.getWordRangeAtPosition(position, wordRange);
     const items = [];
+
     for (const item of map.values()) {
       item.range = range;
       items.push(item);
