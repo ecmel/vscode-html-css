@@ -21,13 +21,14 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     languages.registerCompletionItemProvider(enabledLanguages, provider),
     languages.registerDefinitionProvider(enabledLanguages, provider),
-    workspace.onDidChangeTextDocument((event) => {
-      const uri = event.document.uri;
-      invalidate(uri.toString());
-      validations.delete(uri);
-    }),
+    workspace.onDidSaveTextDocument((document) =>
+      invalidate(document.uri.toString())
+    ),
     workspace.onDidCloseTextDocument((document) =>
       validations.delete(document.uri)
+    ),
+    workspace.onDidChangeTextDocument((event) =>
+      validations.delete(event.document.uri)
     ),
     commands.registerCommand("vscode-html-css.validate", async () => {
       const editor = window.activeTextEditor;

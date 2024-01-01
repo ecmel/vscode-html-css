@@ -31,7 +31,7 @@ import { Style, StyleType, parse } from "./parser";
 const start = new Position(0, 0);
 const cache = new Map<string, Style[]>();
 const isRemote = /^https?:\/\//i;
-const wordRange = /-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
+const wordRange = /[_a-zA-Z0-9-]+/;
 const findSelector = /([^(\[{}\])\s]+)(?![^(\[{]*[}\])])/gi;
 const findAttribute = /(class|className)\s*[=:]\s*(["'])(.*?)\2/gis;
 const canComplete = /(id|class|className)\s*[=:]\s*(["'])(?:.(?!\2))*$/is;
@@ -96,7 +96,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   }
 
   private async getCompletionMap(document: TextDocument, type: StyleType) {
-    const items = new Map<string, CompletionItem>();
+    const map = new Map<string, CompletionItem>();
     const styles = await this.getStyles(document);
     for (const value of styles.values()) {
       for (const style of value) {
@@ -107,16 +107,26 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
               ? CompletionItemKind.Value
               : CompletionItemKind.Enum
           );
-          items.set(style.selector, item);
+          map.set(style.selector, item);
         }
       }
     }
-    return items;
+    return map;
   }
 
-  private async getCompletionItems(document: TextDocument, type: StyleType) {
-    const items = await this.getCompletionMap(document, type);
-    return [...items.values()];
+  private async getCompletionItems(
+    document: TextDocument,
+    position: Position,
+    type: StyleType
+  ) {
+    const map = await this.getCompletionMap(document, type);
+    const range = document.getWordRangeAtPosition(position, wordRange);
+    const items = [];
+    for (const item of map.values()) {
+      item.range = range;
+      items.push(item);
+    }
+    return items;
   }
 
   provideCompletionItems(
@@ -134,6 +144,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
         resolve(
           this.getCompletionItems(
             document,
+            position,
             match[1] === "id" ? StyleType.ID : StyleType.CLASS
           )
         );
@@ -186,9 +197,9 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   }
 
   async validate(document: TextDocument) {
-    const text = document.getText();
     const diagnostics: Diagnostic[] = [];
-    const styles = await this.getCompletionMap(document, StyleType.CLASS);
+    const map = await this.getCompletionMap(document, StyleType.CLASS);
+    const text = document.getText();
 
     let attribute, offset, value, anchor, end, start;
 
@@ -199,7 +210,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
         attribute[3].indexOf(attribute[2]);
 
       while ((value = findSelector.exec(attribute[3]))) {
-        if (styles.has(value[1])) {
+        if (map.has(value[1])) {
           continue;
         }
 
