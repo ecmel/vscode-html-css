@@ -6,7 +6,7 @@
 import lineColumn from "line-column";
 
 const regex =
-  /([.#])(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?=[\s:,.#_a-zA-Z0-9-]*{[^}]*})/g;
+  /([.#])(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?=[#.,\s\[\]\^:*"'=_a-zA-Z0-9-]*{[^}]*})/g;
 
 export const enum StyleType {
   ID = "#",
