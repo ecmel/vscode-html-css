@@ -8,33 +8,26 @@ import { describe, it } from "mocha";
 import { CompletionList, Position, commands, workspace } from "vscode";
 
 describe("extension", () => {
-  it("should suggest completion for html class attributes", async () => {
+  it("should complete id and class attributes", async () => {
     const document = await workspace.openTextDocument({
       language: "html",
-      content: "<style>.selector{}</style>\n<a class='selecto'></a>",
+      content: "<style>#main,.red{}</style>\n<a id='mai' class='re'></a>",
     });
 
-    const list = await commands.executeCommand<CompletionList>(
+    let list = await commands.executeCommand<CompletionList>(
       "vscode.executeCompletionItemProvider",
       document.uri,
-      new Position(1, 17)
+      new Position(1, 10)
     );
 
-    assert.ok(list.items.find((item) => item.label === "selector"));
-  });
+    assert.ok(list.items.find((item) => item.label === "main"));
 
-  it("should suggest completion for html id attributes", async () => {
-    const document = await workspace.openTextDocument({
-      language: "html",
-      content: "<style>#selector{}</style>\n<a id='selecto'></a>",
-    });
-
-    const list = await commands.executeCommand<CompletionList>(
+    list = await commands.executeCommand<CompletionList>(
       "vscode.executeCompletionItemProvider",
       document.uri,
-      new Position(1, 14)
+      new Position(1, 21)
     );
 
-    assert.ok(list.items.find((item) => item.label === "selector"));
+    assert.ok(list.items.find((item) => item.label === "red"));
   });
 });
