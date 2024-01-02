@@ -91,7 +91,7 @@
     "compile": "tsc -p ./ --outDir out --sourceMap true --module commonjs --moduleResolution node",
     "pretest": "npm run build && npm run compile",
     "test": "node ./out/test/runTest.js",
-    "coverage": "c8 --all -n out/src npm run test",
+    "coverage": "c8 -n out/src npm run test",
     "update": "ncu -u -x prettier -x @types/vscode",
     "vscode:prepublish": "npm run build",
     "package": "vsce package",

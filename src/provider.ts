@@ -24,6 +24,7 @@ import {
   Uri,
   window,
   workspace,
+  WorkspaceFolder,
 } from "vscode";
 import { getStyleSheets } from "./settings";
 import { Style, StyleType, parse } from "./parser";
@@ -71,17 +72,21 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     return styles;
   }
 
+  private getRelativePattern(folder: WorkspaceFolder, glob: string) {
+    return new RelativePattern(folder, glob).pattern;
+  }
+
   private async getStyles(document: TextDocument) {
     const styles = new Map<string, Style[]>();
     const folder = workspace.getWorkspaceFolder(document.uri);
-    const sheets = getStyleSheets(document.uri);
+    const globs = getStyleSheets(document.uri);
 
-    for (const sheet of sheets) {
-      if (isRemote.test(sheet)) {
-        styles.set(sheet, await this.getRemote(sheet));
+    for (const glob of globs) {
+      if (isRemote.test(glob)) {
+        styles.set(glob, await this.getRemote(glob));
       } else if (folder) {
         const files = await workspace.findFiles(
-          new RelativePattern(folder, sheet).pattern
+          this.getRelativePattern(folder, glob)
         );
         for (const file of files) {
           styles.set(file.toString(), await this.getLocal(file));

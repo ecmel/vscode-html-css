@@ -12,7 +12,7 @@ import {
   Position,
   workspace,
 } from "vscode";
-import { Provider } from "../../src/provider";
+import { Provider, clear, invalidate } from "../../src/provider";
 import * as settings from "../../src/settings";
 
 describe("provider", () => {
@@ -31,6 +31,30 @@ describe("provider", () => {
 
   afterEach(() => {
     sinon.restore();
+  });
+
+  it("should complete from local style sheets", async () => {
+    sinon.stub(workspace, "getWorkspaceFolder").value(() => ({}));
+    sinon.stub(workspace, "findFiles").value(() => [""]);
+    sinon.stub(workspace, "fs").value({ readFile: async () => ".container{}" });
+    sinon.stub(settings, "getStyleSheets").value(() => ["style"]);
+    sinon.stub(provider, <any>"getRelativePattern").value(() => "");
+
+    const document = await workspace.openTextDocument({
+      language: "html",
+      content: "<a class='containe'></a>",
+    });
+
+    const items = await provider.provideCompletionItems(
+      document,
+      new Position(0, 18),
+      token,
+      context
+    );
+
+    assert.ok(items);
+    assert.ok("find" in items);
+    assert.ok(items.find((item) => item.label === "container"));
   });
 
   it("should complete from remote style sheets", async () => {
@@ -79,5 +103,36 @@ describe("provider", () => {
     });
     const diagnostics = await provider.validate(document);
     assert.strictEqual(diagnostics.length, 2);
+  });
+
+  it("should cache style sheets", async () => {
+    let read = false;
+
+    sinon.stub(workspace, "fs").value({
+      readFile: async () => {
+        read = true;
+        return ".container{}";
+      },
+    });
+
+    const document = await workspace.openTextDocument({
+      language: "html",
+      content: "<a class='containe'></a>",
+    });
+
+    await provider["getLocal"](document.uri);
+    assert.strictEqual(read, true);
+    read = false;
+    await provider["getLocal"](document.uri);
+    assert.strictEqual(read, false);
+    clear();
+    await provider["getLocal"](document.uri);
+    assert.strictEqual(read, true);
+    read = false;
+    await provider["getLocal"](document.uri);
+    assert.strictEqual(read, false);
+    invalidate(document.uri.toString());
+    await provider["getLocal"](document.uri);
+    assert.strictEqual(read, true);
   });
 });
