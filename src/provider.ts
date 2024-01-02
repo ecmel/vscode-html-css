@@ -138,19 +138,17 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     const text = document.getText(range);
     const match = canComplete.exec(text);
 
-    return new Promise((resolve, reject) => {
-      if (match && !token.isCancellationRequested) {
-        resolve(
-          this.getCompletionItems(
-            document,
-            position,
-            match[1] === "id" ? StyleType.ID : StyleType.CLASS
+    return new Promise((resolve, reject) =>
+      match && !token.isCancellationRequested
+        ? resolve(
+            this.getCompletionItems(
+              document,
+              position,
+              match[1] === "id" ? StyleType.ID : StyleType.CLASS
+            )
           )
-        );
-      } else {
-        reject();
-      }
-    });
+        : reject()
+    );
   }
 
   private async getDefinitions(document: TextDocument, position: Position) {
@@ -173,7 +171,6 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
           );
       }
     }
-
     return locations;
   }
 
@@ -186,13 +183,11 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     const text = document.getText(range);
     const match = canComplete.exec(text);
 
-    return new Promise((resolve, reject) => {
-      if (match && !token.isCancellationRequested) {
-        resolve(this.getDefinitions(document, position));
-      } else {
-        reject();
-      }
-    });
+    return new Promise((resolve, reject) =>
+      match && !token.isCancellationRequested
+        ? resolve(this.getDefinitions(document, position))
+        : reject()
+    );
   }
 
   async validate(document: TextDocument) {
@@ -209,24 +204,21 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
         attribute[3].indexOf(attribute[2]);
 
       while ((value = findSelector.exec(attribute[3]))) {
-        if (map.has(value[1])) {
-          continue;
+        if (!map.has(value[1])) {
+          anchor = findSelector.lastIndex + offset;
+          end = document.positionAt(anchor);
+          start = document.positionAt(anchor - value[1].length);
+
+          diagnostics.push(
+            new Diagnostic(
+              new Range(start, end),
+              `CSS selector '${value[1]}' not found.`,
+              DiagnosticSeverity.Warning
+            )
+          );
         }
-
-        anchor = findSelector.lastIndex + offset;
-        end = document.positionAt(anchor);
-        start = document.positionAt(anchor - value[1].length);
-
-        diagnostics.push(
-          new Diagnostic(
-            new Range(start, end),
-            `CSS selector '${value[1]}' not found.`,
-            DiagnosticSeverity.Warning
-          )
-        );
       }
     }
-
     return diagnostics;
   }
 }
