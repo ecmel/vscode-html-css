@@ -10,6 +10,7 @@ import {
   CancellationToken,
   CompletionContext,
   Position,
+  window,
   workspace,
 } from "vscode";
 import { Provider, clear, invalidate } from "../../src/provider";
@@ -134,5 +135,15 @@ describe("provider", () => {
     invalidate(document.uri.toString());
     await provider["getLocal"](document.uri);
     assert.strictEqual(read, true);
+  });
+
+  it("should show error message for remote failures", async () => {
+    const url =
+      "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css2";
+
+    let shown = false;
+    sinon.stub(window, "showErrorMessage").value(() => (shown = true));
+    await provider["fetch"](url);
+    assert.strictEqual(shown, true);
   });
 });
