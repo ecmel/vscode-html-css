@@ -1,16 +1,17 @@
 # Visual Studio Code CSS Intellisense for HTML
 
-![commit workflow](https://github.com/ecmel/vscode-html-css/actions/workflows/commit.yml/badge.svg)
+[![commit](https://github.com/ecmel/vscode-html-css/actions/workflows/commit.yml/badge.svg)](https://github.com/ecmel/vscode-html-css/actions/workflows/commit.yml)
 
 HTML `id` and `class` attribute completion for Visual Studio Code.
 
 ## Features
 
 - HTML `id` and `class` attribute completion.
-- Supports specifying remote and local style sheets for completion.
+- Supports completion from in file styles.
+- Supports specifying remote and local style sheets.
 - Supports any language for completion.
 - Supports go to definition for selectors.
-- Validates CSS selectors on demand.
+- Validates class attributes on demand.
 
 ## Usage
 
@@ -81,7 +82,7 @@ Configuration depends on your layout of the project but some samples are below:
 
 ```json
 {
-  "css.styleSheets": ["src/style.ts", "src/style.css"]
+  "css.styleSheets": ["src/view/style.ts"]
 }
 ```
 
