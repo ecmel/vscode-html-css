@@ -93,7 +93,7 @@
     "test": "node ./out/test/runTest.js",
     "coverage": "c8 -n out/src npm run test",
     "update": "ncu -u -x prettier -x @types/vscode",
-    "vscode:prepublish": "npm run reset && npm run build",
+    "vscode:prepublish": "npm run build",
     "package": "vsce package",
     "publish": "vsce publish"
   },

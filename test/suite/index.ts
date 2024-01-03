@@ -19,7 +19,7 @@ export function run(): Promise<void> {
           failures > 0
             ? reject(new Error(`${failures} test(s) failed.`))
             : resolve(),
-        250
+        500
       )
     );
   });

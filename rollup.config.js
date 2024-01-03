@@ -23,7 +23,7 @@ module.exports = {
   },
   external: (module) => module === "vscode",
   plugins: [
-    nodeResolve({ preferBuiltins: true, browser: true }),
+    nodeResolve({ preferBuiltins: true }),
     commonjs(),
     typescript({ noEmit: true }),
     !debug && terser(),
