@@ -6,12 +6,12 @@ HTML `id` and `class` attribute completion for Visual Studio Code.
 
 ## Features
 
-- HTML `id` and `class` attribute completion.
-- Supports completion from in file styles.
-- Supports specifying remote and local style sheets.
-- Supports any language for completion.
-- Supports go to definition for selectors.
-- Validates class attributes on demand.
+- HTML `id` and `class` attribute completion
+- Supports completion from in file styles
+- Supports specifying remote and local style sheets
+- Supports any language for completion
+- Supports go to definition for selectors
+- Validates class attributes on demand
 
 ## Usage
 

@@ -42,7 +42,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     try {
       const res = await fetch(url);
       if (res.ok) {
-        return await res.text();
+        return res.text();
       }
       throw new Error(res.statusText);
     } catch (error) {

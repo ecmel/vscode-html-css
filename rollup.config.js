@@ -7,6 +7,7 @@ const nodeResolve = require("@rollup/plugin-node-resolve");
 const commonjs = require("@rollup/plugin-commonjs");
 const typescript = require("@rollup/plugin-typescript");
 const terser = require("@rollup/plugin-terser");
+const { cleandir } = require("rollup-plugin-cleandir");
 
 const debug = process.env.ROLLUP_WATCH === "true";
 process.env.NODE_ENV = debug ? "development" : "production";
@@ -23,6 +24,7 @@ module.exports = {
   },
   external: (module) => module === "vscode",
   plugins: [
+    cleandir(),
     nodeResolve({ preferBuiltins: true }),
     commonjs(),
     typescript({ noEmit: true }),

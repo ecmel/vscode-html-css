@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [2.0.7] - 2024-02-
+
+- Build fixes
+
 ## [2.0.6] - 2024-01-01
 
 - Go to definition support
