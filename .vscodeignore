@@ -9,3 +9,4 @@ test/**
 .gitignore
 tsconfig.json
 rollup.config.js
+*.zip
