@@ -31,13 +31,20 @@ import { Style, StyleType, parse } from "./parser";
 
 const start = new Position(0, 0);
 const cache = new Map<string, Style[]>();
-const isRemote = /^https?:\/\//i;
-const wordRange = /[_a-zA-Z0-9-]+/;
-const findSelector = /([^(\[{}\])\s]+)(?![^(\[{]*[}\])])/gi;
-const findAttribute = /(class|className)\s*[=:]\s*(["'])(.*?)\2/gis;
-const canComplete = /(id|class|className)\s*[=:]\s*(["'])(?:.(?!\2))*$/is;
 
 export class Provider implements CompletionItemProvider, DefinitionProvider {
+  private get isRemote() {
+    return /^https?:\/\//i;
+  }
+
+  private get wordRange() {
+    return /[_a-zA-Z0-9-]+/;
+  }
+
+  private get canComplete() {
+    return /(id|class|className)\s*[=:]\s*(["'])(?:.(?!\2))*$/is;
+  }
+
   private async fetch(url: string) {
     try {
       const res = await fetch(url);
@@ -82,7 +89,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     const globs = getStyleSheets(document.uri);
 
     for (const glob of globs) {
-      if (isRemote.test(glob)) {
+      if (this.isRemote.test(glob)) {
         styles.set(glob, await this.getRemote(glob));
       } else if (folder) {
         const files = await workspace.findFiles(
@@ -123,7 +130,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     type: StyleType
   ) {
     const map = await this.getCompletionMap(document, type);
-    const range = document.getWordRangeAtPosition(position, wordRange);
+    const range = document.getWordRangeAtPosition(position, this.wordRange);
     const items = [];
 
     for (const item of map.values()) {
@@ -141,7 +148,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   ): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
     const range = new Range(start, position);
     const text = document.getText(range);
-    const match = canComplete.exec(text);
+    const match = this.canComplete.exec(text);
 
     return new Promise((resolve, reject) =>
       match && !token.isCancellationRequested
@@ -158,12 +165,12 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
 
   private async getDefinitions(document: TextDocument, position: Position) {
     const styles = await this.getStyles(document);
-    const range = document.getWordRangeAtPosition(position, wordRange);
+    const range = document.getWordRangeAtPosition(position, this.wordRange);
     const selector = document.getText(range);
     const locations: Location[] = [];
 
     for (const entry of styles) {
-      if (!isRemote.test(entry[0])) {
+      if (!this.isRemote.test(entry[0])) {
         entry[1]
           .filter((style) => style.selector === selector)
           .forEach((style) =>
@@ -186,7 +193,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   ): ProviderResult<Definition | LocationLink[]> {
     const range = new Range(start, position);
     const text = document.getText(range);
-    const match = canComplete.exec(text);
+    const match = this.canComplete.exec(text);
 
     return new Promise((resolve, reject) =>
       match && !token.isCancellationRequested
@@ -196,6 +203,8 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   }
 
   async validate(document: TextDocument) {
+    const findSelector = /([^(\[{}\])\s]+)(?![^(\[{]*[}\])])/gi;
+    const findAttribute = /(class|className)\s*[=:]\s*(["'])(.*?)\2/gis;
     const diagnostics: Diagnostic[] = [];
     const map = await this.getCompletionMap(document, StyleType.CLASS);
     const text = document.getText();

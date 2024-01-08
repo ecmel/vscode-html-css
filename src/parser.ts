@@ -5,9 +5,6 @@
 
 import lineColumn from "line-column";
 
-const regex =
-  /([.#])(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?=[#.,()\s\[\]\^:*"'>=_a-zA-Z0-9-]*{[^}]*})/g;
-
 export const enum StyleType {
   ID = "#",
   CLASS = ".",
@@ -22,6 +19,8 @@ export interface Style {
 }
 
 export function parse(text: string) {
+  const selector =
+    /([.#])(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?=[#.,()\s\[\]\^:*"'>=_a-zA-Z0-9-]*{[^}]*})/g;
   const styles: Style[] = [];
   const lc = lineColumn(text, { origin: 0 });
   let match,
@@ -29,7 +28,7 @@ export function parse(text: string) {
     index,
     line = 0,
     col = 0;
-  while ((match = regex.exec(text))) {
+  while ((match = selector.exec(text))) {
     index = match.index;
     lci = lc.fromIndex(index);
     if (lci) {
