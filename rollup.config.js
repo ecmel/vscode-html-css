@@ -22,7 +22,7 @@ module.exports = {
     format: "commonjs",
     sourcemap: debug,
   },
-  external: (module) => module === "vscode",
+  external: ["vscode"],
   plugins: [
     cleandir(),
     nodeResolve({ preferBuiltins: true }),
