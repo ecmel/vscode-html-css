@@ -19,8 +19,7 @@
   "bugs": "https://github.com/ecmel/vscode-html-css/issues",
   "homepage": "https://github.com/ecmel/vscode-html-css",
   "categories": [
-    "Programming Languages",
-    "Other"
+    "Programming Languages"
   ],
   "keywords": [
     "css",
@@ -33,7 +32,11 @@
     "angular",
     "react",
     "vue",
+    "ejs",
     "lit",
+    "lit-html",
+    "javascript",
+    "typescript",
     "multi-root ready"
   ],
   "activationEvents": [
@@ -104,7 +107,7 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/line-column": "^1.0.2",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.11.0",
+    "@types/node": "^20.11.3",
     "@types/sinon": "^17.0.3",
     "@types/vscode": "^1.75.0",
     "@vscode/test-electron": "^2.3.8",
