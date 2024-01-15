@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1986-2023 Ecmel Ercan (https://ecmel.dev/)
+ * Copyright (c) 1986-2024 Ecmel Ercan (https://ecmel.dev/)
  * Licensed under the MIT License
  */
 
