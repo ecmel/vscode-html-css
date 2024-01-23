@@ -2,7 +2,7 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [2.0.7] - 2024-02-
+## [2.0.7] - 2024-01-23
 
 - Build fixes
 - Updated dependencies
