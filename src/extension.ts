@@ -10,7 +10,7 @@ import {
   window,
   workspace,
 } from "vscode";
-import { getEnabledLanguages } from "./settings";
+import { getEnabledLanguages, getVaildOnSave } from "./settings";
 import { Provider, clear, invalidate } from "./provider";
 
 export function activate(context: ExtensionContext) {
@@ -27,8 +27,13 @@ export function activate(context: ExtensionContext) {
     workspace.onDidCloseTextDocument((document) =>
       validations.delete(document.uri)
     ),
-    workspace.onDidChangeTextDocument((event) =>
-      validations.delete(event.document.uri)
+    workspace.onDidChangeTextDocument(async (event) => {
+      if (getVaildOnSave()) {
+        commands.executeCommand("vscode-html-css.validate")
+      } else {
+        validations.delete(event.document.uri)
+      }
+    }
     ),
     commands.registerCommand("vscode-html-css.validate", async () => {
       const editor = window.activeTextEditor;
@@ -43,4 +48,4 @@ export function activate(context: ExtensionContext) {
   );
 }
 
-export function deactivate() {}
+export function deactivate() { }

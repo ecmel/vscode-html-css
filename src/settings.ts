@@ -16,3 +16,9 @@ export function getStyleSheets(uri: Uri): string[] {
     .getConfiguration("css", uri)
     .get<string[]>("styleSheets", []);
 }
+
+export function getVaildOnSave(): Boolean {
+  return workspace
+    .getConfiguration("vscode-html-css")
+    .get<Boolean>("vaildOnSave", false);
+}
