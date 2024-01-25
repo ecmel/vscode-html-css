@@ -21,9 +21,13 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     languages.registerCompletionItemProvider(enabledLanguages, provider),
     languages.registerDefinitionProvider(enabledLanguages, provider),
-    workspace.onDidSaveTextDocument((document) =>
-      invalidate(document.uri.toString())
-    ),
+    workspace.onDidSaveTextDocument((document) => {
+      if (getVaildOnSave()) {
+        commands.executeCommand("vscode-html-css.validate")
+      } else {
+        invalidate(document.uri.toString())
+      }
+    }),
     workspace.onDidCloseTextDocument((document) =>
       validations.delete(document.uri)
     ),
