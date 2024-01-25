@@ -31,7 +31,7 @@ export function activate(context: ExtensionContext) {
     workspace.onDidCloseTextDocument((document) =>
       validations.delete(document.uri)
     ),
-    workspace.onDidChangeTextDocument(async (event) => {
+    workspace.onDidChangeTextDocument((event) => {
       if (getVaildOnSave()) {
         commands.executeCommand("vscode-html-css.validate")
       } else {
