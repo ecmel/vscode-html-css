@@ -60,11 +60,16 @@
           "description": "List of local or remote style sheets for suggestions.",
           "default": []
         },
-        "css.vaildOnSave": {
-          "type": "boolean",
-          "description": "Verify label class names when saving files.",
+        "css.vaildOnSaveOrChange": {
+          "enum": [
+            "Always",
+            "OnChange",
+            "OnSave",
+            "Never"
+          ],
+          "default": "Never",
           "scope": "resource",
-          "default": false
+          "description": "Verify label class names when saving files."
         }
       }
     },

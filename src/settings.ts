@@ -17,8 +17,15 @@ export function getStyleSheets(uri: Uri): string[] {
     .get<string[]>("styleSheets", []);
 }
 
-export function getVaildOnSave(): Boolean {
+export function getVaildOnSaveOrChange(): VaildOnSaveOrChange {
   return workspace
     .getConfiguration("css")
-    .get<Boolean>("vaildOnSave", false);
+    .get<VaildOnSaveOrChange>("vaildOnSaveOrChange", VaildOnSaveOrChange.Never);
+}
+
+export enum VaildOnSaveOrChange {
+  Always = "Always",
+  OnChange = "OnChange",
+  OnSave = "OnSave",
+  Never = "Never"
 }

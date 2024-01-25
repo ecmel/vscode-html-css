@@ -10,7 +10,7 @@ import {
   window,
   workspace,
 } from "vscode";
-import { getEnabledLanguages, getVaildOnSave } from "./settings";
+import { getEnabledLanguages, getVaildOnSaveOrChange, VaildOnSaveOrChange } from "./settings";
 import { Provider, clear, invalidate } from "./provider";
 
 export function activate(context: ExtensionContext) {
@@ -22,7 +22,8 @@ export function activate(context: ExtensionContext) {
     languages.registerCompletionItemProvider(enabledLanguages, provider),
     languages.registerDefinitionProvider(enabledLanguages, provider),
     workspace.onDidSaveTextDocument((document) => {
-      if (getVaildOnSave()) {
+      const vaildOnSaveOrChange = getVaildOnSaveOrChange();
+      if (vaildOnSaveOrChange == VaildOnSaveOrChange.Always || vaildOnSaveOrChange == VaildOnSaveOrChange.OnSave) {
         commands.executeCommand("vscode-html-css.validate")
       } else {
         invalidate(document.uri.toString())
@@ -32,7 +33,8 @@ export function activate(context: ExtensionContext) {
       validations.delete(document.uri)
     ),
     workspace.onDidChangeTextDocument((event) => {
-      if (getVaildOnSave()) {
+      const vaildOnSaveOrChange = getVaildOnSaveOrChange();
+      if (vaildOnSaveOrChange == VaildOnSaveOrChange.Always || vaildOnSaveOrChange == VaildOnSaveOrChange.OnChange) {
         commands.executeCommand("vscode-html-css.validate")
       } else {
         validations.delete(event.document.uri)
