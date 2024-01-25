@@ -60,10 +60,10 @@
           "description": "List of local or remote style sheets for suggestions.",
           "default": []
         },
-        "vscode-html-css.vaildOnSave": {
+        "css.vaildOnSave": {
           "type": "boolean",
           "description": "Verify label class names when saving files.",
-          "scope": "application",
+          "scope": "resource",
           "default": false
         }
       }
