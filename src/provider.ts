@@ -86,7 +86,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   private async getStyles(document: TextDocument) {
     const styles = new Map<string, Style[]>();
     const folder = workspace.getWorkspaceFolder(document.uri);
-    const globs = getStyleSheets(document.uri);
+    const globs = getStyleSheets(document);
 
     for (const glob of globs) {
       if (this.isRemote.test(glob)) {

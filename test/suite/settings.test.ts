@@ -31,7 +31,7 @@ describe("settings", () => {
       language: "html",
       content: "",
     });
-    const styleSheets = settings.getStyleSheets(document.uri);
+    const styleSheets = settings.getStyleSheets(document);
     assert.strictEqual(styleSheets.length, 1);
     assert.strictEqual(styleSheets[0], "some");
   });
