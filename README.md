@@ -72,12 +72,6 @@ Configuration depends on your layout of the project but some samples are below:
 }
 ```
 
-```json
-{
-  "css.vaildOnSaveOrChange": "Always"
-}
-```
-
 ### Lit
 
 ```json

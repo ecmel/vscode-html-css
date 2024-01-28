@@ -10,7 +10,11 @@ import {
   window,
   workspace,
 } from "vscode";
-import { getEnabledLanguages, getVaildOnSaveOrChange, VaildOnSaveOrChange } from "./settings";
+import {
+  AutoValidation,
+  getAutoValidation,
+  getEnabledLanguages,
+} from "./settings";
 import { Provider, clear, invalidate } from "./provider";
 
 export function activate(context: ExtensionContext) {
@@ -21,26 +25,29 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     languages.registerCompletionItemProvider(enabledLanguages, provider),
     languages.registerDefinitionProvider(enabledLanguages, provider),
-    workspace.onDidSaveTextDocument((document) => {
-      const vaildOnSaveOrChange = getVaildOnSaveOrChange();
-      if (vaildOnSaveOrChange == VaildOnSaveOrChange.Always || vaildOnSaveOrChange == VaildOnSaveOrChange.OnSave) {
-        commands.executeCommand("vscode-html-css.validate")
-      } else {
-        invalidate(document.uri.toString())
+    workspace.onDidSaveTextDocument(async (document) => {
+      invalidate(document.uri.toString());
+      if (enabledLanguages.includes(document.languageId)) {
+        const validation = getAutoValidation(document);
+        if (validation === AutoValidation.SAVE) {
+          validations.set(document.uri, await provider.validate(document));
+        }
       }
     }),
-    workspace.onDidCloseTextDocument((document) =>
-      validations.delete(document.uri)
-    ),
-    workspace.onDidChangeTextDocument((event) => {
-      const vaildOnSaveOrChange = getVaildOnSaveOrChange();
-      if (vaildOnSaveOrChange == VaildOnSaveOrChange.Always || vaildOnSaveOrChange == VaildOnSaveOrChange.OnChange) {
-        commands.executeCommand("vscode-html-css.validate")
-      } else {
-        validations.delete(event.document.uri)
+    workspace.onDidChangeTextDocument(async (event) => {
+      const document = event.document;
+      if (enabledLanguages.includes(document.languageId)) {
+        const validation = getAutoValidation(document);
+        if (validation === AutoValidation.ALWAYS) {
+          validations.set(document.uri, await provider.validate(document));
+        } else {
+          validations.delete(document.uri);
+        }
       }
-    }
-    ),
+    }),
+    workspace.onDidCloseTextDocument((document) => {
+      validations.delete(document.uri);
+    }),
     commands.registerCommand("vscode-html-css.validate", async () => {
       const editor = window.activeTextEditor;
       if (editor) {
@@ -54,4 +61,4 @@ export function activate(context: ExtensionContext) {
   );
 }
 
-export function deactivate() { }
+export function deactivate() {}

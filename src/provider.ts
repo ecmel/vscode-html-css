@@ -28,7 +28,6 @@ import {
 } from "vscode";
 import { getStyleSheets } from "./settings";
 import { Style, StyleType, parse } from "./parser";
-import path from "path";
 
 const start = new Position(0, 0);
 const cache = new Map<string, Style[]>();
@@ -109,14 +108,11 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     const map = new Map<string, CompletionItem>();
     const styles = await this.getStyles(document);
 
-    for (const [key, value] of styles) {
+    for (const value of styles.values()) {
       for (const style of value) {
         if (style.type === type) {
           const item = new CompletionItem(
-            {
-              label: style.selector,
-              description: path.basename(key)
-            },
+            style.selector,
             style.type === StyleType.ID
               ? CompletionItemKind.Value
               : CompletionItemKind.Enum
@@ -157,12 +153,12 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     return new Promise((resolve, reject) =>
       match && !token.isCancellationRequested
         ? resolve(
-          this.getCompletionItems(
-            document,
-            position,
-            match[1] === "id" ? StyleType.ID : StyleType.CLASS
+            this.getCompletionItems(
+              document,
+              position,
+              match[1] === "id" ? StyleType.ID : StyleType.CLASS
+            )
           )
-        )
         : reject()
     );
   }

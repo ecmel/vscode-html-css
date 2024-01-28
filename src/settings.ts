@@ -3,7 +3,7 @@
  * Licensed under the MIT License
  */
 
-import { Uri, workspace } from "vscode";
+import { ConfigurationScope, workspace } from "vscode";
 
 export function getEnabledLanguages(): string[] {
   return workspace
@@ -11,21 +11,20 @@ export function getEnabledLanguages(): string[] {
     .get<string[]>("enabledLanguages", ["html"]);
 }
 
-export function getStyleSheets(uri: Uri): string[] {
+export function getStyleSheets(scope: ConfigurationScope): string[] {
   return workspace
-    .getConfiguration("css", uri)
+    .getConfiguration("css", scope)
     .get<string[]>("styleSheets", []);
 }
 
-export function getVaildOnSaveOrChange(): VaildOnSaveOrChange {
-  return workspace
-    .getConfiguration("css")
-    .get<VaildOnSaveOrChange>("vaildOnSaveOrChange", VaildOnSaveOrChange.Never);
+export const enum AutoValidation {
+  NEVER = "Never",
+  SAVE = "Save",
+  ALWAYS = "Always",
 }
 
-export enum VaildOnSaveOrChange {
-  Always = "Always",
-  OnChange = "OnChange",
-  OnSave = "OnSave",
-  Never = "Never"
+export function getAutoValidation(scope: ConfigurationScope): AutoValidation {
+  return workspace
+    .getConfiguration("css", scope)
+    .get<AutoValidation>("autoValidation", AutoValidation.NEVER);
 }
