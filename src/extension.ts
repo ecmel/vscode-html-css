@@ -34,6 +34,14 @@ export function activate(context: ExtensionContext) {
         }
       }
     }),
+    workspace.onDidOpenTextDocument(async (document) => {
+      if (enabledLanguages.includes(document.languageId)) {
+        const validation = getAutoValidation(document);
+        if (validation === AutoValidation.ALWAYS) {
+          validations.set(document.uri, await provider.validate(document));
+        }
+      }
+    }),
     workspace.onDidChangeTextDocument(async (event) => {
       const document = event.document;
       if (enabledLanguages.includes(document.languageId)) {
