@@ -10,7 +10,7 @@ import {
   window,
   workspace,
 } from "vscode";
-import { getEnabledLanguages } from "./settings";
+import { getEnabledLanguages, getVaildOnSaveOrChange, VaildOnSaveOrChange } from "./settings";
 import { Provider, clear, invalidate } from "./provider";
 
 export function activate(context: ExtensionContext) {
@@ -21,14 +21,25 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     languages.registerCompletionItemProvider(enabledLanguages, provider),
     languages.registerDefinitionProvider(enabledLanguages, provider),
-    workspace.onDidSaveTextDocument((document) =>
-      invalidate(document.uri.toString())
-    ),
+    workspace.onDidSaveTextDocument((document) => {
+      const vaildOnSaveOrChange = getVaildOnSaveOrChange();
+      if (vaildOnSaveOrChange == VaildOnSaveOrChange.Always || vaildOnSaveOrChange == VaildOnSaveOrChange.OnSave) {
+        commands.executeCommand("vscode-html-css.validate")
+      } else {
+        invalidate(document.uri.toString())
+      }
+    }),
     workspace.onDidCloseTextDocument((document) =>
       validations.delete(document.uri)
     ),
-    workspace.onDidChangeTextDocument((event) =>
-      validations.delete(event.document.uri)
+    workspace.onDidChangeTextDocument((event) => {
+      const vaildOnSaveOrChange = getVaildOnSaveOrChange();
+      if (vaildOnSaveOrChange == VaildOnSaveOrChange.Always || vaildOnSaveOrChange == VaildOnSaveOrChange.OnChange) {
+        commands.executeCommand("vscode-html-css.validate")
+      } else {
+        validations.delete(event.document.uri)
+      }
+    }
     ),
     commands.registerCommand("vscode-html-css.validate", async () => {
       const editor = window.activeTextEditor;
@@ -43,4 +54,4 @@ export function activate(context: ExtensionContext) {
   );
 }
 
-export function deactivate() {}
+export function deactivate() { }

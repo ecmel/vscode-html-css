@@ -16,3 +16,16 @@ export function getStyleSheets(uri: Uri): string[] {
     .getConfiguration("css", uri)
     .get<string[]>("styleSheets", []);
 }
+
+export function getVaildOnSaveOrChange(): VaildOnSaveOrChange {
+  return workspace
+    .getConfiguration("css")
+    .get<VaildOnSaveOrChange>("vaildOnSaveOrChange", VaildOnSaveOrChange.Never);
+}
+
+export enum VaildOnSaveOrChange {
+  Always = "Always",
+  OnChange = "OnChange",
+  OnSave = "OnSave",
+  Never = "Never"
+}
