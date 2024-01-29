@@ -238,6 +238,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
 }
 
 export function clear() {
+  window.showInformationMessage(`CSS: Style cache (${cache.size}) cleared.`);
   cache.clear();
 }
 

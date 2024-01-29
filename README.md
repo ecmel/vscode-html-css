@@ -57,17 +57,24 @@ Configuration depends on your layout of the project but some samples are below:
 
 ### Bootstrap
 
-```json
-{
-  "css.enabledLanguages": ["html"]
-}
-```
+If you are using Bootstrap npm module:
 
 ```json
 {
   "css.styleSheets": [
     "node_modules/bootstrap/dist/css/bootstrap.css",
-    "src/**/*.css"
+    "src/**/*.scss"
+  ]
+}
+```
+
+If you are using Bootstrap CDN:
+
+```json
+{
+  "css.styleSheets": [
+    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
+    "src/**/*.scss"
   ]
 }
 ```

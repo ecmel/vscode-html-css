@@ -7,6 +7,7 @@ import {
   commands,
   ExtensionContext,
   languages,
+  TextDocument,
   window,
   workspace,
 } from "vscode";
@@ -17,55 +18,58 @@ import {
 } from "./settings";
 import { Provider, clear, invalidate } from "./provider";
 
-export function activate(context: ExtensionContext) {
-  const enabledLanguages = getEnabledLanguages();
-  const validations = languages.createDiagnosticCollection();
-  const provider = new Provider();
+const enabledLanguages = getEnabledLanguages();
+const validations = languages.createDiagnosticCollection();
+const provider = new Provider();
 
+async function validate(
+  document: TextDocument,
+  type: AutoValidation | undefined
+) {
+  if (enabledLanguages.includes(document.languageId)) {
+    const validation = getAutoValidation(document);
+    if (!type || type === validation) {
+      validations.set(document.uri, await provider.validate(document));
+    } else if (validation !== AutoValidation.ALWAYS) {
+      validations.delete(document.uri);
+    }
+  }
+}
+
+export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     languages.registerCompletionItemProvider(enabledLanguages, provider),
     languages.registerDefinitionProvider(enabledLanguages, provider),
     workspace.onDidSaveTextDocument(async (document) => {
       invalidate(document.uri.toString());
-      if (enabledLanguages.includes(document.languageId)) {
-        const validation = getAutoValidation(document);
-        if (validation === AutoValidation.SAVE) {
-          validations.set(document.uri, await provider.validate(document));
-        }
-      }
+      await validate(document, AutoValidation.SAVE);
     }),
     workspace.onDidOpenTextDocument(async (document) => {
-      if (enabledLanguages.includes(document.languageId)) {
-        const validation = getAutoValidation(document);
-        if (validation === AutoValidation.ALWAYS) {
-          validations.set(document.uri, await provider.validate(document));
-        }
-      }
+      await validate(document, AutoValidation.ALWAYS);
     }),
     workspace.onDidChangeTextDocument(async (event) => {
-      const document = event.document;
-      if (enabledLanguages.includes(document.languageId)) {
-        const validation = getAutoValidation(document);
-        if (validation === AutoValidation.ALWAYS) {
-          validations.set(document.uri, await provider.validate(document));
-        } else {
-          validations.delete(document.uri);
-        }
+      if (event.contentChanges.length > 0) {
+        await validate(event.document, AutoValidation.ALWAYS);
       }
     }),
     workspace.onDidCloseTextDocument((document) => {
       validations.delete(document.uri);
     }),
-    commands.registerCommand("vscode-html-css.validate", async () => {
-      const editor = window.activeTextEditor;
-      if (editor) {
-        const document = editor.document;
-        if (enabledLanguages.includes(document.languageId)) {
-          validations.set(document.uri, await provider.validate(document));
+    commands.registerCommand(
+      "vscode-html-css.validate",
+      async (type: AutoValidation | undefined) => {
+        const editor = window.activeTextEditor;
+        if (editor) {
+          await validate(editor.document, type);
         }
       }
-    }),
+    ),
     commands.registerCommand("vscode-html-css.clear", () => clear())
+  );
+
+  return commands.executeCommand(
+    "vscode-html-css.validate",
+    AutoValidation.ALWAYS
   );
 }
 
