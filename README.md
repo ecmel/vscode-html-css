@@ -103,6 +103,11 @@ Validates all `class` selectors in the active editor.
 
 Clears style cache.
 
+## Sponsor
+
+- [Github Sponsors](https://github.com/sponsors/ecmel)
+- [Buy me a coffee](https://www.buymeacoffee.com/ecmel)
+
 ## Installation
 
 Extension can be installed from [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css).
