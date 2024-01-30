@@ -6,6 +6,7 @@ All notable changes to the extension will be documented in this file.
 
 - Added optional auto validation
 - Added feedback for clear cache
+- Updated documentation
 - Updated dependencies
 
 ## [2.0.7] - 2024-01-23

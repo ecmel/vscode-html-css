@@ -17,26 +17,6 @@ HTML `id` and `class` attribute completion for Visual Studio Code.
 
 You can view a list of `id` and `class` attribute suggestions in configured languages.
 
-## Specifying Style Sheets
-
-Style sheets can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all configured languages within that workspace folder.
-
-### Example
-
-**`.vscode/settings.json`**
-
-```json
-{
-  "css.styleSheets": [
-    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
-    "node_modules/bootstrap/dist/css/bootstrap.css",
-    "src/**/*.scss",
-    "src/view/style.ts",
-    "dist/style.css"
-  ]
-}
-```
-
 ## Supported Languages
 
 Supported languages can be configured with the `css.enabledLanguages` setting. By default `html` is enabled:
@@ -51,13 +31,38 @@ Extension can be configured to support any language where it makes sense such as
 
 This setting is application scoped and changing the setting requires restarting VS Code.
 
+## Specifying Style Sheets
+
+Style sheets can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all configured languages within that workspace folder.
+
+### Glob Patterns
+
+Glob patterns can have the following syntax:
+
+| Pattern | Matches                                     |
+| ------- | ------------------------------------------- |
+| `*`     | zero or more characters in a path segment   |
+| `?`     | one character in a path segment             |
+| `**`    | any number of path segments, including none |
+| `{}`    | group conditions like `**​/*.{ts,js}`       |
+| `[]`    | declare a range of characters like `[0-9]`  |
+| `[!]`   | negate a range of characters like `[!0-9]`  |
+
 ## Examples
 
-Configuration depends on your layout of the project but some samples are below:
+Configuration depends on your layout of the project. The following most basic settings will suggest from all your css files in your project's `src` folder:
+
+**`.vscode/settings.json`**
+
+```json
+{
+  "css.styleSheets": ["src/**/*.css"]
+}
+```
 
 ### Bootstrap
 
-If you are using Bootstrap npm module:
+If you are using Bootstrap `npm` module with additional `scss` this can be a starting point:
 
 ```json
 {
@@ -68,18 +73,20 @@ If you are using Bootstrap npm module:
 }
 ```
 
-If you are using Bootstrap CDN:
+and if you are using Bootstrap CDN with additional plain `css`:
 
 ```json
 {
   "css.styleSheets": [
     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
-    "src/**/*.scss"
+    "src/**/*.css"
   ]
 }
 ```
 
 ### Lit
+
+First `typescript` or `javascript` should be enabled in global settings depending on your needs:
 
 ```json
 {
@@ -87,9 +94,11 @@ If you are using Bootstrap CDN:
 }
 ```
 
+Your in file styles will be available for completion for that file. If you need to use some base styles everywhere you can specify as follows:
+
 ```json
 {
-  "css.styleSheets": ["src/view/style.ts"]
+  "css.styleSheets": ["src/base-styles.ts"]
 }
 ```
 
@@ -97,7 +106,7 @@ If you are using Bootstrap CDN:
 
 ### Validate class selectors
 
-Validates all `class` selectors in the active editor.
+Validates all `class` selectors in the active editor. Auto validation can also be configured in settings.
 
 ### Clear style sheets cache
 
