@@ -33,11 +33,9 @@ This setting is application scoped and changing the setting requires restarting 
 
 ## Specifying Style Sheets
 
-Style sheets can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all configured languages within that workspace folder.
+Remote and local style sheets with optional glob patterns can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all configured languages within that workspace folder.
 
-### Glob Patterns
-
-Glob patterns can have the following syntax:
+Glob patterns for local style sheets can have the following syntax:
 
 | Pattern | Matches                                     |
 | ------- | ------------------------------------------- |
