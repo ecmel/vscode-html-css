@@ -78,11 +78,11 @@
     "commands": [
       {
         "command": "vscode-html-css.validate",
-        "title": "CSS: Validate selectors"
+        "title": "CSS: Validate class selectors"
       },
       {
         "command": "vscode-html-css.clear",
-        "title": "CSS: Clear style cache"
+        "title": "CSS: Clear style sheets cache"
       }
     ]
   },

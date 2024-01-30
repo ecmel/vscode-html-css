@@ -95,13 +95,13 @@ If you are using Bootstrap CDN:
 
 ## Commands
 
-### Validate selectors
+### Validate class selectors
 
 Validates all `class` selectors in the active editor.
 
-### Clear style cache
+### Clear style sheets cache
 
-Clears style cache.
+Clears style sheets cache.
 
 ## Sponsor
 

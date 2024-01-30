@@ -67,7 +67,7 @@ export function activate(context: ExtensionContext) {
     commands.registerCommand("vscode-html-css.clear", () => clear())
   );
 
-  return commands.executeCommand(
+  return commands.executeCommand<void>(
     "vscode-html-css.validate",
     AutoValidation.ALWAYS
   );
