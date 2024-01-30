@@ -2,7 +2,7 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [2.0.8] - 2024-02-
+## [2.0.8] - 2024-02-01
 
 - Added optional auto validation
 - Added feedback for clear cache
