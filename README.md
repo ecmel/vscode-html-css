@@ -100,6 +100,10 @@ Your in file styles will be available for completion for that file. If you need 
 }
 ```
 
+## Go to Definition
+
+Go to definition for `id` and `class` selectors for local style sheets are supported. Selecting `Go to Definition` from context menu, pressing `F12` or `⌘ click` on a selector will open the local style sheet which the selector is defined.
+
 ## Commands
 
 ### Validate class selectors
