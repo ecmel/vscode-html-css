@@ -37,18 +37,17 @@ Remote and local style sheets with optional glob patterns can be specified in VS
 
 Glob patterns for local style sheets can have the following syntax:
 
-| Pattern | Matches                                     |
-| ------- | ------------------------------------------- |
-| `*`     | zero or more characters in a path segment   |
-| `?`     | one character in a path segment             |
-| `**`    | any number of path segments, including none |
-| `{}`    | group conditions like `**​/*.{css,scss}`    |
-| `[]`    | declare a range of characters like `[0-9]`  |
-| `[!]`   | negate a range of characters like `[!0-9]`  |
+| Pattern | Matches                                               |
+| ------- | ----------------------------------------------------- |
+| `*`     | zero or more characters in a path segment             |
+| `?`     | one character in a path segment                       |
+| `**`    | any number of path segments, including none           |
+| `{}`    | group conditions like `**​/*.{css,scss}`              |
+| `[]`    | a range of characters like `[0-9]` or negate `[!0-9]` |
 
 ## Examples
 
-Configuration depends on your layout of the project. The following most basic settings will suggest from all your `css` files in your project's `src` folder:
+Configuration depends on your layout of the project. The following most basic setting will suggest from all your `css` files in your project's `src` folder:
 
 **`.vscode/settings.json`**
 
@@ -58,7 +57,7 @@ Configuration depends on your layout of the project. The following most basic se
 }
 ```
 
-### Bootstrap
+### [Bootstrap](https://getbootstrap.com/)
 
 If you are using Bootstrap `npm` module with additional `scss` this can be a starting point:
 
@@ -82,9 +81,9 @@ and if you are using Bootstrap CDN with additional plain `css`:
 }
 ```
 
-### Lit
+### [Lit](https://lit.dev/)
 
-First `typescript` or `javascript` should be enabled in global settings depending on your usage:
+First `typescript` or `javascript` should be enabled in global settings depending on your usage and VS Code should be restarted:
 
 ```json
 {
@@ -92,7 +91,7 @@ First `typescript` or `javascript` should be enabled in global settings dependin
 }
 ```
 
-Your in file styles will be available for completion for that file. If you need to use some base styles everywhere in your project, you can specify as follows:
+Your in file [static styles](https://lit.dev/docs/components/styles/) will be available for completion for that file. If you need to use some base styles everywhere in your project, you can specify as follows:
 
 ```json
 {
