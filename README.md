@@ -33,7 +33,7 @@ This setting is application scoped and changing the setting requires restarting 
 
 ## Specifying Style Sheets
 
-Remote and local style sheets with optional glob patterns can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest for all configured languages within that workspace folder.
+Remote and local style sheets with optional glob patterns can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest in all configured languages within that workspace folder.
 
 Glob patterns for local style sheets can have the following syntax:
 
@@ -42,13 +42,13 @@ Glob patterns for local style sheets can have the following syntax:
 | `*`     | zero or more characters in a path segment   |
 | `?`     | one character in a path segment             |
 | `**`    | any number of path segments, including none |
-| `{}`    | group conditions like `**​/*.{ts,js}`       |
+| `{}`    | group conditions like `**​/*.{css,scss}`    |
 | `[]`    | declare a range of characters like `[0-9]`  |
 | `[!]`   | negate a range of characters like `[!0-9]`  |
 
 ## Examples
 
-Configuration depends on your layout of the project. The following most basic settings will suggest from all your css files in your project's `src` folder:
+Configuration depends on your layout of the project. The following most basic settings will suggest from all your `css` files in your project's `src` folder:
 
 **`.vscode/settings.json`**
 
@@ -84,15 +84,15 @@ and if you are using Bootstrap CDN with additional plain `css`:
 
 ### Lit
 
-First `typescript` or `javascript` should be enabled in global settings depending on your needs:
+First `typescript` or `javascript` should be enabled in global settings depending on your usage:
 
 ```json
 {
-  "css.enabledLanguages": ["typescript"]
+  "css.enabledLanguages": ["html", "typescript"]
 }
 ```
 
-Your in file styles will be available for completion for that file. If you need to use some base styles everywhere you can specify as follows:
+Your in file styles will be available for completion for that file. If you need to use some base styles everywhere in your project, you can specify as follows:
 
 ```json
 {
@@ -104,7 +104,7 @@ Your in file styles will be available for completion for that file. If you need 
 
 ### Validate class selectors
 
-Validates all `class` selectors in the active editor. Auto validation can also be configured in settings.
+Validates all `class` selectors in the active editor. Auto validation can also be configured in extension settings globally or per workspace.
 
 ### Clear style sheets cache
 
