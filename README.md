@@ -7,7 +7,7 @@ HTML `id` and `class` attribute completion for Visual Studio Code.
 ## Features
 
 - HTML `id` and `class` attribute completion
-- Supports completion from in file styles
+- Supports completion from in file defined styles
 - Supports specifying remote and local style sheets
 - Supports any language for completion
 - Supports go to definition for selectors
@@ -70,7 +70,7 @@ If you are using Bootstrap `npm` module with additional `scss` this can be a sta
 }
 ```
 
-and if you are using Bootstrap CDN with additional plain `css`:
+or if you are using Bootstrap CDN with additional plain `css`:
 
 ```json
 {
@@ -91,7 +91,7 @@ First `typescript` or `javascript` should be enabled in global settings dependin
 }
 ```
 
-Your in file [static styles](https://lit.dev/docs/components/styles/) will be available for completion for that file. If you need to use some base styles everywhere in your project, you can specify as follows:
+Component's [static styles](https://lit.dev/docs/components/styles/) will be available for completion elsewhere in the component. If you need to use some base styles in every component you can specify as follows:
 
 ```json
 {
@@ -107,7 +107,7 @@ Go to definition for `id` and `class` selectors for local style sheets are suppo
 
 ### Validate class selectors
 
-Validates all `class` selectors in the active editor. Auto validation can also be configured in extension settings globally or per workspace.
+Validates all `class` selectors in the active editor. Auto validation can be configured in extension settings globally or per workspace.
 
 ### Clear style sheets cache
 
