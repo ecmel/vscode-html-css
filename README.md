@@ -13,13 +13,9 @@ HTML `id` and `class` attribute completion for Visual Studio Code.
 - Supports go to definition for selectors
 - Validates class attributes on demand
 
-## Usage
-
-You can view a list of `id` and `class` attribute suggestions in configured languages.
-
 ## Supported Languages
 
-Supported languages can be configured with the `css.enabledLanguages` setting. By default `html` is enabled:
+Supported languages can be configured with the `css.enabledLanguages` global setting. By default `html` is enabled:
 
 ```json
 {
@@ -27,7 +23,7 @@ Supported languages can be configured with the `css.enabledLanguages` setting. B
 }
 ```
 
-Extension can be configured to support any language where it makes sense such as `nunjucks`, `twig`, `mustache`, `typescript` etc. You should also install corresponding language extension which registers the language id in VS Code.
+Extension can be configured to support any language where it makes sense such as `nunjucks`, `twig`, `mustache`, `vue`, `typescript` etc. You should also install corresponding language extension which registers the specific language id in VS Code.
 
 This setting is application scoped and changing the setting requires restarting VS Code.
 
@@ -47,7 +43,7 @@ Glob patterns for local style sheets can have the following syntax:
 
 ## Examples
 
-Configuration depends on your layout of the project. The following most basic setting will suggest from all your `css` files in your project's `src` folder:
+Configuration depends on your layout of the project. The following most basic setting will suggest from all `css` files in project's `src` folder:
 
 **`.vscode/settings.json`**
 
@@ -59,7 +55,9 @@ Configuration depends on your layout of the project. The following most basic se
 
 ### [Bootstrap](https://getbootstrap.com/)
 
-If you are using Bootstrap `npm` module with additional `scss` this can be a starting point:
+If Bootstrap `npm` module is used with additional `scss` the following can be a starting point:
+
+**`.vscode/settings.json`**
 
 ```json
 {
@@ -70,7 +68,9 @@ If you are using Bootstrap `npm` module with additional `scss` this can be a sta
 }
 ```
 
-or if you are using Bootstrap CDN with additional plain `css`:
+or in case of Bootstrap CDN with additional plain `css`:
+
+**`.vscode/settings.json`**
 
 ```json
 {
@@ -81,9 +81,11 @@ or if you are using Bootstrap CDN with additional plain `css`:
 }
 ```
 
+All of Bootstrap's class selectors with additional user defined styles in the project will be available for completion in `html` files.
+
 ### [Lit](https://lit.dev/)
 
-First `typescript` or `javascript` should be enabled in global settings depending on your usage and VS Code should be restarted:
+Enable `typescript` or `javascript` in global settings depending on your usage and restart VS Code:
 
 ```json
 {
@@ -93,15 +95,29 @@ First `typescript` or `javascript` should be enabled in global settings dependin
 
 Component's [static styles](https://lit.dev/docs/components/styles/) will be available for completion elsewhere in the component. If you need to use some base styles in every component you can specify as follows:
 
+**`.vscode/settings.json`**
+
 ```json
 {
   "css.styleSheets": ["src/base-styles.ts"]
 }
 ```
 
+### [Vue](https://vuejs.org/)
+
+Install your favorite Vue language extension from [Marketplace](https://marketplace.visualstudio.com/search?term=tag%3Avue&target=VSCode&category=All%20categories&sortBy=Relevance) which registers `vue` language id then enable `vue` in global settings and restart VS Code:
+
+```json
+{
+  "css.enabledLanguages": ["html", "vue"]
+}
+```
+
+Styles defined in component's `<style>` section will be available for completion in component's `<template>` section.
+
 ## Go to Definition
 
-Go to definition for `id` and `class` selectors for local style sheets are supported. Selecting `Go to Definition` from context menu, pressing `F12` or `⌘ click` on a selector will open the local style sheet which the selector is defined.
+Go to definition for `id` and `class` selectors for local style sheets are supported. Selecting `Go to Definition` from context menu (`F12` or `⌘ click`) on a selector will open the local style sheet which the selector is defined.
 
 ## Commands
 

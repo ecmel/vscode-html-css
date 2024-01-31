@@ -120,7 +120,7 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/line-column": "^1.0.2",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.11.11",
+    "@types/node": "^20.11.14",
     "@types/sinon": "^17.0.3",
     "@types/vscode": "^1.75.0",
     "@vscode/test-electron": "^2.3.9",
