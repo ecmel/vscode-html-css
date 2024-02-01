@@ -2,7 +2,7 @@
   "name": "vscode-html-css",
   "displayName": "HTML CSS Support",
   "description": "CSS Intellisense for HTML",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "license": "MIT",
   "publisher": "ecmel",
   "author": {
@@ -120,7 +120,7 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/line-column": "^1.0.2",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.11.14",
+    "@types/node": "^20.11.16",
     "@types/sinon": "^17.0.3",
     "@types/vscode": "^1.75.0",
     "@vscode/test-electron": "^2.3.9",

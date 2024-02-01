@@ -29,7 +29,7 @@ This setting is application scoped and changing the setting requires restarting 
 
 ## Specifying Style Sheets
 
-Remote and local style sheets with optional glob patterns can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest in all configured languages within that workspace folder.
+Remote and local style sheets with optional glob patterns and variable substitutions can be specified in VS Code settings per workspace folder in `.vscode/settings.json` and will suggest in all configured languages within that workspace folder.
 
 Glob patterns for local style sheets can have the following syntax:
 
@@ -41,9 +41,16 @@ Glob patterns for local style sheets can have the following syntax:
 | `{}`    | group conditions like `**​/*.{css,scss}`              |
 | `[]`    | a range of characters like `[0-9]` or negate `[!0-9]` |
 
+The following variable substitutions are supported for local style sheets as well:
+
+| Variable                     | Substitution                              |
+| ---------------------------- | ----------------------------------------- |
+| `${fileBasename}`            | Current file's basename                   |
+| `${fileBasenameNoExtension}` | Current file's basename with no extension |
+
 ## Examples
 
-Configuration depends on your layout of the project. The following most basic setting will suggest from all `css` files in project's `src` folder:
+Configuration depends on your layout of the project. The following most basic setup will suggest from all `css` files in project's `src` folder:
 
 **`.vscode/settings.json`**
 
@@ -103,6 +110,16 @@ Component's [static styles](https://lit.dev/docs/components/styles/) will be ava
 }
 ```
 
+Variable substitution can be used to refer to a related `css` file. If you are working on `my-component.ts` and your `css` is in `my-component-css.ts` then a suitable setup can be:
+
+**`.vscode/settings.json`**
+
+```json
+{
+  "css.styleSheets": ["src/${fileBasenameNoExtension}-css.ts"]
+}
+```
+
 ### [Vue](https://vuejs.org/)
 
 Install your favorite Vue language extension from [Marketplace](https://marketplace.visualstudio.com/search?term=tag%3Avue&target=VSCode&category=All%20categories&sortBy=Relevance) which registers `vue` language id then enable `vue` in global settings and restart VS Code:
@@ -114,6 +131,20 @@ Install your favorite Vue language extension from [Marketplace](https://marketpl
 ```
 
 Styles defined in component's `<style>` section will be available for completion in component's `<template>` section.
+
+### [Angular](https://angular.io/)
+
+Variable substitution can be used for Angular development:
+
+**`.vscode/settings.json`**
+
+```json
+{
+  "css.styleSheets": ["app/${fileBasenameNoExtension}.css"]
+}
+```
+
+With this setup, styles defined in e.g. `app.component.css` will be available in `app.component.html`.
 
 ## Go to Definition
 

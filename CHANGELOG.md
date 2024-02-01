@@ -2,9 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [2.0.8] - 2024-02-01
+## [2.0.9] - 2024-02-01
 
 - Added optional auto validation
+- Added variable substitution for local style sheets
 - Added feedback for clear cache
 - Updated documentation
 - Updated dependencies
