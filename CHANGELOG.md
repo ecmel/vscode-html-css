@@ -2,6 +2,12 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [2.0.10] - 2024-03-01
+
+- Added variable substitution for `${fileExtname}`
+- Updated documentation
+- Ported config to typescript
+
 ## [2.0.9] - 2024-02-01
 
 - Added optional auto validation

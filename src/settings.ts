@@ -4,7 +4,7 @@
  */
 
 import Path from "path";
-import { ConfigurationScope, TextDocument, workspace } from "vscode";
+import { TextDocument, workspace } from "vscode";
 
 export function getEnabledLanguages(): string[] {
   return workspace
@@ -20,9 +20,13 @@ export function getStyleSheets(scope: TextDocument): string[] {
     .get<string[]>("styleSheets", [])
     .map((glob) =>
       glob.replace(
-        /\$\s*{\s*(fileBasenameNoExtension|fileBasename)\s*}/g,
+        /\$\s*{\s*(fileBasenameNoExtension|fileBasename|fileExtname)\s*}/g,
         (match, variable) =>
-          variable === "fileBasename" ? path.base : path.name
+          variable === "fileBasename"
+            ? path.base
+            : variable === "fileExtname"
+            ? path.ext
+            : path.name
       )
     );
 }
@@ -33,7 +37,7 @@ export const enum AutoValidation {
   ALWAYS = "Always",
 }
 
-export function getAutoValidation(scope: ConfigurationScope): AutoValidation {
+export function getAutoValidation(scope: TextDocument): AutoValidation {
   return workspace
     .getConfiguration("css", scope)
     .get<AutoValidation>("autoValidation", AutoValidation.NEVER);

@@ -3,19 +3,17 @@
  * Licensed under the MIT License
  */
 
-const nodeResolve = require("@rollup/plugin-node-resolve");
-const commonjs = require("@rollup/plugin-commonjs");
-const typescript = require("@rollup/plugin-typescript");
-const terser = require("@rollup/plugin-terser");
-const { cleandir } = require("rollup-plugin-cleandir");
+import { defineConfig } from "rollup";
+import { cleandir } from "rollup-plugin-cleandir";
+import resolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import typescript from "@rollup/plugin-typescript";
+import terser from "@rollup/plugin-terser";
 
 const debug = process.env.ROLLUP_WATCH === "true";
 process.env.NODE_ENV = debug ? "development" : "production";
 
-/**
- * @type {import('rollup').RollupOptions}
- */
-module.exports = {
+export default defineConfig({
   input: "src/extension.ts",
   output: {
     dir: "dist",
@@ -25,9 +23,9 @@ module.exports = {
   external: ["vscode"],
   plugins: [
     cleandir(),
-    nodeResolve({ preferBuiltins: true }),
+    resolve({ preferBuiltins: true }),
     commonjs(),
     typescript({ noEmit: true }),
     !debug && terser(),
   ],
-};
+});

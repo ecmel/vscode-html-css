@@ -47,6 +47,7 @@ The following variable substitutions are supported for local style sheets as wel
 | ---------------------------- | ----------------------------------------- |
 | `${fileBasename}`            | Current file's basename                   |
 | `${fileBasenameNoExtension}` | Current file's basename with no extension |
+| `${fileExtname}`             | Current file's extension                  |
 
 ## Examples
 
@@ -116,7 +117,7 @@ Variable substitution can be used to refer to a related `css` file. If you are w
 
 ```json
 {
-  "css.styleSheets": ["src/${fileBasenameNoExtension}-css.ts"]
+  "css.styleSheets": ["**/${fileBasenameNoExtension}-css.ts"]
 }
 ```
 
@@ -140,7 +141,7 @@ Variable substitution can be used for Angular development:
 
 ```json
 {
-  "css.styleSheets": ["app/${fileBasenameNoExtension}.css"]
+  "css.styleSheets": ["**/${fileBasenameNoExtension}.css"]
 }
 ```
 
