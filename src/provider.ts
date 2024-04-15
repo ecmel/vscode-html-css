@@ -80,7 +80,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   }
 
   private getRelativePattern(folder: WorkspaceFolder, glob: string) {
-    return new RelativePattern(folder, glob).pattern;
+    return new RelativePattern(folder, glob);
   }
 
   private async getStyles(document: TextDocument) {
