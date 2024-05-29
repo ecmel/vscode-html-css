@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buenos Días</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #e63946;
+            font-size: 3em;
+            margin: 0;
+        }
+        p {
+            color: #1d3557;
+            font-size: 1.2em;
+        }
+        .heart {
+            color: #e63946;
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>¡Buenos Días!</h1>
+        <p>Que tu día esté lleno de amor y cariño.</p>
+        <p class="heart">❤️</p>
+    </div>
+</body>
+</html>
