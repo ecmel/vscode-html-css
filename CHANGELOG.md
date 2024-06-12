@@ -2,7 +2,7 @@
 
 All notable changes to the extension will be documented in this file.
 
-## [2.0.10] - 2024-03-01
+## [2.0.10] - 2024-06-12
 
 - Added variable substitution for `${fileExtname}`
 - Updated documentation
