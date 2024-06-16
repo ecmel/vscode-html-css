@@ -1,0 +1,42 @@
+.FORM{
+    display:FLEX;
+    flex-direction:column;
+    POSITION:ABSOLUTE;
+    GAP:10PX;
+    padding-left:2eM;
+    padding-right:2eM;
+    padding-bottom:0.4CM;
+    background-color: cyan;
+    border: radius 25px;
+    transition:4S ease-in-out; 
+ }
+ .form.hover{
+    transform: scale(1.05);
+    border: 1px red;
+ }
+ #heading{
+    text-align:center;
+    margin: 2em;
+    color:blanchedalmond;
+    font-size: medium;
+ }
+ .field{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 0.5em;
+    border: radius 25px;
+    padding: 0.6em;
+    border: 0cap;
+    outline:none;
+    color:white;
+    background: color #171714;
+    box-shadow:inset 2px 5px 10px rgb(6,5,6);
+ }
+ .input-field{
+    background:none;
+    border:none;
+    outline:none;
+    width:100%;
+    color:#d3d3d3;
+ }
