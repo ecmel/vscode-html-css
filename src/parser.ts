@@ -20,7 +20,7 @@ export interface Style {
 
 export function parse(text: string) {
   const selector =
-    /([.#])(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?=[#.,()\s\[\]\^:*"'>=_a-zA-Z0-9-]*{[^}]*})/g;
+    /([.#])(-?[_a-zA-Z]+[\\!+_a-zA-Z0-9-]*)(?=[#.,()\s\[\]\^:*"'>=_a-zA-Z0-9-]*{[^}]*})/g;
   const styles: Style[] = [];
   const lc = lineColumn(text, { origin: 0 });
   let match,
@@ -40,7 +40,7 @@ export function parse(text: string) {
       line,
       col,
       type: match[1] as StyleType,
-      selector: match[2],
+      selector: match[2].replaceAll("\\", ''),
     });
   }
   return styles;
