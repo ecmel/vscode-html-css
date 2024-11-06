@@ -130,7 +130,7 @@
     "line-column": "^1.0.2",
     "mocha": "^10.3.0",
     "prettier": "^2.8.8",
-    "rollup": "^4.10.0",
+    "rollup": "^4.22.4",
     "rollup-plugin-cleandir": "^2.0.0",
     "sinon": "^17.0.1",
     "tslib": "^2.6.2",
