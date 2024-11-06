@@ -42,7 +42,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   }
 
   private get canComplete() {
-    return /(id|class|className)\s*[=:]\s*(["'])(?:.(?!\2))*$/is;
+    return /(id|class|className|[.#])\s*[=:]?\s*(["'])(?:.(?!\2))*$/is;
   }
 
   private async fetch(url: string) {

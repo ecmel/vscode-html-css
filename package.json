@@ -39,6 +39,8 @@
     "template",
     "javascript",
     "typescript",
+    "maud",
+    "rust",
     "multi-root ready"
   ],
   "activationEvents": [
@@ -111,7 +113,7 @@
     "publish": "vsce publish"
   },
   "engines": {
-    "vscode": "^1.75.0"
+    "vscode": "^1.86.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -122,9 +124,9 @@
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.17",
     "@types/sinon": "^17.0.3",
-    "@types/vscode": "^1.75.0",
-    "@vscode/test-electron": "^2.3.9",
-    "@vscode/vsce": "^2.23.0",
+    "@types/vscode": "^1.86.0",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^2.32.0",
     "c8": "^9.1.0",
     "fast-glob": "^3.3.2",
     "line-column": "^1.0.2",
