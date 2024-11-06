@@ -38,7 +38,7 @@ async function validate(
 
 export function activate(context: ExtensionContext) {
   context.subscriptions.push(
-    languages.registerCompletionItemProvider(enabledLanguages, provider),
+    languages.registerCompletionItemProvider(enabledLanguages, provider, " "),
     languages.registerDefinitionProvider(enabledLanguages, provider),
     workspace.onDidSaveTextDocument(async (document) => {
       invalidate(document.uri.toString());
