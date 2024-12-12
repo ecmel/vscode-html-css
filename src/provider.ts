@@ -129,8 +129,8 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     position: Position,
     type: StyleType
   ) {
-    const map = await this.getCompletionMap(document, type);
     const range = document.getWordRangeAtPosition(position, this.wordRange);
+    const map = await this.getCompletionMap(document, type);
     const items = [];
 
     for (const item of map.values()) {
@@ -164,8 +164,8 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   }
 
   private async getDefinitions(document: TextDocument, position: Position) {
-    const styles = await this.getStyles(document);
     const range = document.getWordRangeAtPosition(position, this.wordRange);
+    const styles = await this.getStyles(document);
     const selector = document.getText(range);
     const locations: Location[] = [];
 
