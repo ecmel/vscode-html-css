@@ -2,6 +2,10 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [2.0.12] - 2025-01-01
+
+- Fixed escape character breaking css intellisense
+
 ## [2.0.11] - 2024-11-06
 
 - Added maud support (."container")
