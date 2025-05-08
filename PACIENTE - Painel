@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel do Paciente</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f9fc;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #002244;
+    }
+    .paciente-info {
+      background: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .card {
+      background: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      border-left: 4px solid gold;
+      border-image: linear-gradient(to bottom, gold, transparent) 1;
+      border-image-slice: 1;
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #002244;
+      border-bottom: 1px solid gold;
+      padding-bottom: 4px;
+    }
+    .linha {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px dotted gold;
+    }
+    .linha:last-child {
+      border-bottom: none;
+    }
+    .obs-area {
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 10px;
+      background-color: #002244;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    input[type="checkbox"] {
+      transform: scale(1.3);
+    }
+    .contato {
+      margin-top: 5px;
+    }
+    .doc-link {
+      display: block;
+      margin: 6px 0;
+      color: #0044cc;
+    }
+  </style>
+</head>
+<body>
+
+<h1>👤 Painel do Paciente</h1>
+<div id="infoPaciente" class="paciente-info"></div>
+<div id="cardsChecklists"></div>
+
+<button onclick="baixarPDF()">📄 Baixar PDF</button>
+
+<form id="uploadForm" enctype="multipart/form-data" method="post" target="hidden_iframe" action="https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_WEBAPP_URL_HERE/exec">
+  <input type="file" name="file" accept="application/pdf" required>
+  <input type="hidden" name="telefone" id="inputTelefone">
+  <button type="submit">📤 Enviar novo PDF (JotForm)</button>
+</form>
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const busca = urlParams.get("telefone") || urlParams.get("id") || urlParams.get("nome");
+let dadosGlobais = {};
+
+if (busca) {
+  google.script.run.withSuccessHandler(renderizarChecklists).getChecklistPaciente(busca);
+  document.getElementById("inputTelefone").value = busca;
+}
+
+function renderizarChecklists(dados) {
+  dadosGlobais = dados;
+  const cards = document.getElementById("cardsChecklists");
+  const info = document.getElementById("infoPaciente");
+
+  const exemplo = dados.orcamento[0] || dados.financeiro[0] || dados.documentos[0];
+  if (!exemplo) {
+    info.innerHTML = "<p>Paciente não encontrado.</p>";
+    return;
+  }
+
+  info.innerHTML = `
+    <strong>Nome:</strong> ${exemplo.nome}<br>
+    <strong>Telefone:</strong> <a href="https://wa.me/${exemplo.telefone}" target="_blank">${exemplo.telefone}</a><br>
+    <strong>ID:</strong> ${exemplo.id}
+    <div class="contato">
+      <strong>Email:</strong> <input type="text" placeholder="ex: paciente@email.com" style="width:60%; padding:4px;"> 
+    </div>
+  `;
+
+  montarCard("🧾 Checklist Orçamento", dados.orcamento, cards);
+  montarCard("💰 Checklist Financeiro", dados.financeiro, cards);
+  montarCard("📎 Checklist Documentos", dados.documentos, cards);
+
+  montarDocumentosCard(cards, exemplo);
+}
+
+function montarCard(titulo, lista, container) {
+  const div = document.createElement("div");
+  div.className = "card";
+  div.innerHTML = `<h2>${titulo}</h2>`;
+
+  lista.forEach((item, index) => {
+    const linha = document.createElement("div");
+    linha.className = "linha";
+    linha.innerHTML = `
+      <span>${item.checklist}</span>
+      <input type="checkbox" ${item.status === "✅" ? "checked" : ""} onchange="atualizarStatus('${item.aba}', ${index}, this.checked)">
+    `;
+    div.appendChild(linha);
+  });
+
+  const obs = document.createElement("textarea");
+  obs.className = "obs-area";
+  obs.placeholder = "Observações internas...";
+  obs.id = `obs-${titulo}`;
+  div.appendChild(obs);
+
+  const salvar = document.createElement("button");
+  salvar.innerText = "Salvar Observações";
+  salvar.onclick = () => {
+    const observacao = obs.value;
+    const aba = lista[0]?.aba;
+    const id = lista[0]?.id;
+    if (aba && id) {
+      google.script.run
+        .withSuccessHandler(() => alert("💾 Observação salva!"))
+        .withFailureHandler(e => alert("Erro: " + e.message))
+        .salvarObservacaoChecklist(id, aba, observacao);
+    }
+  };
+  div.appendChild(salvar);
+
+  container.appendChild(div);
+}
+
+function montarDocumentosCard(container, paciente) {
+  const div = document.createElement("div");
+  div.className = "card";
+  div.innerHTML = `<h2>📂 Documentos do Paciente</h2>`;
+
+  const links = ["Link_PDF", "LinkAceite", "LinkComprovante", "LInkSimulador"];
+  links.forEach(campo => {
+    const url = paciente[campo?.toLowerCase()] || paciente[campo];
+    if (url) {
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.className = "doc-link";
+      a.innerText = campo.replace("Link", "");
+      div.appendChild(a);
+    }
+  });
+
+  container.appendChild(div);
+}
+
+function atualizarStatus(aba, index, marcado) {
+  const linha = dadosGlobais[aba.toLowerCase()].filter((x, i) => i === index)[0];
+  const novoStatus = marcado ? "✅" : "❌";
+
+  google.script.run
+    .withSuccessHandler(() => console.log("✔️ Atualizado: " + linha.checklist))
+    .withFailureHandler(e => alert("Erro ao atualizar: " + e.message))
+    .atualizarChecklistStatus(linha.id, linha.checklist, aba, novoStatus);
+}
+
+function baixarPDF() {
+  window.print();
+}
+</script>
+
+</body>
+</html>
