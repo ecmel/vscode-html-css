@@ -1,0 +1,300 @@
+const SPREADSHEET_ID = '1ib5kX1o1L_f2bt30oj6zvy3ks_dAZTwtFXGWyKoEk';
+// Ajuste de nomes de abas conforme sua planilha
+const ABA_PACIENTE = "Pacientes";
+const ABA_ATENDIMENTO = "Atendimentos";
+const ABA_FICHA = "FichasClinicas";
+const ABA_FICHEIRO = "FicheiroPaciente";
+const ABA_ORCAMENTOS   = 'Orcamentos';
+const ABA_LEADS        = 'LEADS';
+const ABA_CHATLOG      = 'ChatLog';
+const ABA_FOLLOWUP     = 'FollowUp';
+const ABA_NEGOC        = 'Negociacoes'
+
+// onOpen adiciona menu para tarefas administrativas
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('Painel')
+    .addItem('Reiniciar Negociações', 'inicializarNegociacoes')
+    .addToUi();
+}
+
+// Servidor HTTP GET: retorna o painel HTML
+function doGet() {
+  inicializarChatLog();
+  inicializarFollowUp();
+  return HtmlService
+    .createHtmlOutputFromFile('Negociacoes')
+    .setTitle('Leads & Negociações')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+
+/** --- API Principal --- **/
+function doGet(e) {
+  try {
+    if (e.parameter.action == "busca_ficha") {
+      let telefone = normalizePhone(e.parameter.telefone || "");
+      let ficha = gerarFichaDinamica(telefone);
+      return respostaJson(true, ficha);
+    }
+    if (e.parameter.action == "busca_paciente") {
+      let search = normalizePhone(e.parameter.busca || "");
+      let paciente = buscarPaciente(search);
+      return respostaJson(!!paciente, paciente);
+    }
+    return respostaJson(false, null, "Ação não reconhecida");
+  } catch (err) {
+    return respostaJson(false, null, err.message);
+  }
+}
+
+function doPost(e) {
+  try {
+    if (e.parameter.action == "salvar_ficha") {
+      const tel = normalizePhone(e.parameter.telefone);
+      const tipo = e.parameter.tipo_consulta;
+      const obs = e.parameter.obs;
+      const historico = e.parameter.historico;
+
+      salvarOuAtualizarFicha(tel, tipo, obs, historico);
+      return respostaJson(true, {}, "Ficha salva!");
+    }
+    return respostaJson(false, null, "Ação não reconhecida");
+  } catch (err) {
+    return respostaJson(false, null, err.message);
+  }
+}
+
+function normalizePhone(fone) { return fone.replace(/[^\d+]/g,''); }
+
+function buscarPaciente(telefone) {
+  let sh = SpreadsheetApp.getActive().getSheetByName(ABA_PACIENTE);
+  let [cab, ...d] = sh.getDataRange().getValues();
+  let idx = cab.indexOf("Telefone");
+  let out = d.find(l => normalizePhone(l[idx]) == telefone);
+  if (out) return Object.fromEntries(cab.map((k,i)=>[k, out[i]]));
+  return null;
+}
+
+// Retorna ficha consolidada
+function gerarFichaDinamica(telefone) {
+  let paciente = buscarPaciente(telefone);
+  if (!paciente) return null;
+  let atendimentos = buscarPorTelefone(ABA_ATENDIMENTO, telefone);
+  let hoje = Utilities.formatDate(new Date(),'GMT-3','yyyy-MM-dd');
+  let fichaHoje = buscarPorTelefone(ABA_FICHA, telefone).filter(f=>f[2]==hoje);
+  let ficheiro = buscarPorTelefone(ABA_FICHEIRO, telefone);
+
+  let historico = ficheiro && ficheiro[0]?.[2] ? ficheiro[0][2] : "";
+  let tipo = fichaHoje.length ? fichaHoje[0][3] : (atendimentos.length ? atendimentos[0][2] : "Primeira");
+
+  return {
+    paciente: paciente,
+    atendimentos: atendimentos,
+    fichaHoje: fichaHoje,
+    tipo_consulta: tipo,
+    historico: historico
+  };
+}
+
+function buscarPorTelefone(aba, telefone) {
+  let sh = SpreadsheetApp.getActive().getSheetByName(aba);
+  if (!sh) return [];
+  let [cab,...d] = sh.getDataRange().getValues();
+  let idx = cab.indexOf("Telefone");
+  return d.filter(l => normalizePhone(l[idx]) == telefone);
+}
+
+// Salva ou atualiza ficha e histórico
+function salvarOuAtualizarFicha(telefone, tipo, obs, historico) {
+  // Atualiza ficha de hoje
+  let sh = SpreadsheetApp.getActive().getSheetByName(ABA_FICHA);
+  let [cab,...d] = sh.getDataRange().getValues();
+  let idxTel = cab.indexOf("Telefone"), idxData = cab.indexOf("Data");
+  let hoje = Utilities.formatDate(new Date(),'GMT-3','yyyy-MM-dd');
+  let found = false;
+  for(let i=1; i<=d.length; i++) {
+    if(normalizePhone(d[i-1][idxTel])==telefone && d[i-1][idxData]==hoje) {
+      sh.getRange(i+1,cab.indexOf("Tipo_Consulta")+1).setValue(tipo);
+      sh.getRange(i+1,cab.indexOf("Observações")+1).setValue(obs);
+      found=true;
+      break;
+    }
+  }
+  if(!found) sh.appendRow([telefone, buscarPaciente(telefone)?.Nome||'', hoje, tipo, '', obs, '']);
+  
+  // Atualiza histórico no ficheiro
+  let shFich = SpreadsheetApp.getActive().getSheetByName(ABA_FICHEIRO);
+  let [cabF,...dF] = shFich.getDataRange().getValues();
+  let idxTelF = cabF.indexOf("Telefone");
+  let atualizou = false;
+  for(let i=1; i<=dF.length; i++) {
+    if(normalizePhone(dF[i-1][idxTelF])==telefone) {
+      shFich.getRange(i+1,3).setValue(historico);
+      atualizou=true;
+      break;
+    }
+  }
+  if(!atualizou) shFich.appendRow([telefone,buscarPaciente(telefone)?.Nome||'',historico]);
+}
+
+function respostaJson(status, data, msg) {
+  return ContentService.createTextOutput(
+    JSON.stringify({status, data, msg})
+  ).setMimeType(ContentService.MimeType.JSON);
+}
+
+
+// Servidor HTTP POST: API minimalista (por exemplo, busca via webhook)
+function doPost(e) {
+  const params = e.parameter;
+  if (params.action === 'search') {
+    const data = buscarOrcamento(params.termo);
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: !!data, data }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: false, error: 'Ação não suportada' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Lista IDs de orçamentos em negociação
+function getNomesNegociacoes() {
+  return getOrcamentos().map(o => o.ID_Orcamento);
+}
+
+// Retorna orçamentos com status 'Em Negociação'
+function getOrcamentos() {
+  return _lerAba(ABA_ORCAMENTOS)
+    .filter(r => String(r.Status || '').toLowerCase() === 'em negociação');
+}
+
+// Alias para compatibilidade com front-end
+function getNegociacoes() {
+  return getOrcamentos();
+}
+
+// Retorna todos os leads
+function getLeads() {
+  return _lerAba(ABA_LEADS);
+}
+
+// Busca orçamentos e leads por ID, nome ou telefone
+function buscarOrcamento(termo) {
+  termo = String(termo || '').toLowerCase();
+  const all = [...getOrcamentos(), ...getLeads()];
+  return all.find(o =>
+    String(o.ID_Orcamento || '').toLowerCase() === termo ||
+    String(o.Nome || '').toLowerCase().includes(termo) ||
+    (o.Telefone || '').replace(/\D/g, '').includes(termo.replace(/\D/g, ''))
+  ) || null;
+}
+
+// Registra evento de chat em ChatLog
+function registrarChat(event) {
+  const sheet = _sheet(ABA_CHATLOG);
+  sheet.appendRow([
+    new Date(),
+    event.id_orcamento || '',
+    event.visitorId   || '',
+    event.message     || '',
+    event.agent       || '',
+    event.tipoEvento  || ''
+  ]);
+  return true;
+}
+
+// Cria ChatLog se não existir
+function inicializarChatLog() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let sheet = ss.getSheetByName(ABA_CHATLOG);
+    sheet = ss.insertSheet(ABA_CHATLOG);
+    sheet.appendRow(['Timestamp','ID_Orcamento','VisitorID','Message','Agent','TipoEvento']);
+    sheet.setFrozenRows(1);
+  
+}
+
+// Cria FollowUp se não existir
+function inicializarFollowUp() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let sheet = ss.getSheetByName(ABA_FOLLOWUP);
+  if (!sheet) {
+    sheet = ss.insertSheet(ABA_FOLLOWUP);
+    sheet.appendRow(['ID','Nome','DataOrcamento','ValorClinica','ValorTotal','Status']);
+    sheet.setFrozenRows(1);
+  }
+}
+
+// Retorna lista de follow-ups
+function getFollowUps() {
+  return _lerAba(ABA_FOLLOWUP);
+}
+
+// Aceita um follow-up: atualiza status
+function aceitarFollowUp(id) {
+  _atualizarLinha(ABA_FOLLOWUP, 'ID',         id, 'Status', 'Aceito');
+  return true;
+}
+
+// Finaliza um follow-up: atualiza status
+function finalizarFollowUp(id) {
+  _atualizarLinha(ABA_FOLLOWUP, 'ID',         id, 'Status', 'Finalizado');
+  return true;
+}
+
+// Busca follow-up por ID
+function getFollowUpPorId(id) {
+  const lista = getFollowUps();
+  return lista.find(item => item.ID === id) || null;
+}
+
+// Utilitário: lê aba e retorna lista de objetos
+function _lerAba(nomeAba) {
+  const sheet = _sheet(nomeAba);
+  const data  = sheet.getDataRange().getValues();
+  const hdr   = data.shift();
+  return data.map(row => hdr.reduce((o,h,i) => (o[h]=row[i],o), {}));
+}
+
+// Utilitário: retorna Sheet, sensível a case e espaços
+function _sheet(nomeAba) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const target = nomeAba.trim().toLowerCase();
+  const sheet = ss.getSheets().find(s => s.getName().trim().toLowerCase() === target);
+  if (!sheet) throw new Error(`Aba '${nomeAba}' não encontrada.`);
+  return sheet;
+}
+
+// Reinicia aba Negociacoes a partir de LEADS
+function inicializarNegociacoes() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheetLeads = ss.getSheetByName(ABA_LEADS);
+  if (!sheetLeads) throw new Error(`Aba '${ABA_LEADS}' não encontrada.`);
+
+  const dataLeads = sheetLeads.getDataRange().getValues();
+  const header    = dataLeads.shift();
+  const rows      = dataLeads;
+
+  // Remove e recria
+  const old = ss.getSheetByName('Negociacoes');
+  if (old) ss.deleteSheet(old);
+  const sheet = ss.insertSheet('Negociacoes');
+  sheet.appendRow(header);
+  if (rows.length) sheet.getRange(2,1,rows.length,header.length).setValues(rows);
+  sheet.setFrozenRows(1);
+}
+
+// Atualiza célula na linha onde chaveCol === chaveVal
+function _atualizarLinha(nomeAba, chaveCol, chaveVal, alvoCol, novoVal) {
+  const sheet   = _sheet(nomeAba);
+  const data    = sheet.getDataRange().getValues();
+  const headers = data.shift();
+  const idxKey  = headers.indexOf(chaveCol);
+  const idxAlvo = headers.indexOf(alvoCol);
+  data.forEach((row,i) => {
+    if (String(row[idxKey]) === String(chaveVal)) {
+      sheet.getRange(i+2, idxAlvo+1).setValue(novoVal);
+    }
+  });
+}
