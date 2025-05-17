@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduSphère - Plateforme d'apprentissage interactive révolutionnaire</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+<style>
+body {
+font-family: 'Nunito', sans-serif;
+background-color: #f5f7fa;
+color: #2c3e50;
+}
+
+.gradient-bg {
+background: linear-gradient(135deg, #3c57aa, #2ecc71);
+}
+
+.subject-card {
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.subject-card:hover {
+transform: translateY(-5px);
+box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+.screen {
+display: none;
+}
+
+.screen.active {
+display: block;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+animation: fadeIn 0.5s ease forwards;
+}
+
+.progress-bar {
+height: 8px;
+border-radius: 4px;
+background-color: #e2e8f0;
+overflow: hidden;
+}
+
+.progress-bar-fill {
+height: 100%;
+background-color: #3c57aa;
+transition: width 0.3s ease;
+}
+
+.badge {
+width: 60px;
+height: 60px;
+border-radius: 50%;
+display: flex;
+justify-content: center;
+align-items: center;
+background-color: #f1c40f;
+color: white;
+font-weight: bold;
+margin: 8px;
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.badge.locked {
+background-color: #cbd5e0;
+opacity: 0.5;
+}
+
+.modal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+z-index: 50;
+justify-content: center;
+align-items: center;
+}
+
+.modal-content {
+background-color: white;
+padding: 24px;
+border-radius: 8px;
+max-width: 90%;
+max-height: 90%;
+overflow-y: auto;
+}
+</style>
+</head>
+<body class="min-h-screen">
+<div id="game-container" class="max-w-6xl mx-auto bg-white shadow-lg">
+<!-- Header -->
+<header class="gradient-bg text-white p-4 relative">
+<div class="flex justify-between items-center">
+<h1 class="text-3xl font-bold">EduSphère</h1>
+<div class="flex items-center space-x-4">
+<div class="hidden md:block">
+<span class="mr-2">Points:</span>
+<span id="points-counter" class="font-bold">120</span>
+</div>
+<div class="profile-section flex items-center space-x-2">
+<span class="hidden md:inline">Jean Dupont</span>
+<div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-600">
+<i class="fas fa-user"></i>
+</div>
+</div>
+</div>
+</div>
+</header>
+
+<!-- Main content -->
+<main class="p-4 md:p-8">
+<!-- Dashboard Section -->
+<section id="dashboard" class="screen active fade-in mb-12">
+<h2 class="text-2xl font-bold mb-6">Bienvenue dans votre espace d'apprentissage interactif</h2>
+
+<div class="mb-8">
+<h3 class="text-lg font-semibold mb-2">Votre progression</h3>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="bg-blue-50 p-4 rounded-lg">
+<h4 class="font-medium text-blue-700">SVT</h4>
+<div class="progress-bar mt-2">
+<div class="progress-bar-fill" style="width: 65%"></div>
+</div>
+<div class="text-sm text-right mt-1">65%</div>
+</div>
+<div class="bg-green-50 p-4 rounded-lg">
+<h4 class="font-medium text-green-700">Physique-Chimie</h4>
+<div class="progress-bar mt-2">
+<div class="progress-bar-fill bg-green-500" style="width: 42%"></div>
+</div>
+<div class="text-sm text-right mt-1">42%</div>
+</div>
+<div class="bg-yellow-50 p-4 rounded-lg">
+<h4 class="font-medium text-yellow-700">Anglais</h4>
+<div class="progress-bar mt-2">
+<div class="progress-bar-fill bg-yellow-500" style="width: 78%"></div>
+</div>
+<div class="text-sm text-right mt-1">78%</div>
+</div>
+<div class="bg-purple-50 p-4 rounded-lg">
+<h4 class="font-medium text-purple-700">Philosophie</h4>
+<div class="progress-bar mt-2">
+<div class="progress-bar-fill bg-purple-500" style="width: 25%"></div>
+</div>
+<div class="text-sm text-right mt-1">25%</div>
+</div>
+</div>
+</div>
+
+<div class="mb-8">
+<h3 class="text-lg font-semibold mb-2">Mes badges</h3>
+<div class="flex flex-wrap">
+<div class="badge bg-blue-500" title="Expert en Biologie">
+<i class="fas fa-dna"></i>
+</div>
+<div class="badge bg-green-500" title="Novice en Chimie">
+<i class="fas fa-flask"></i>
+</div>
+<div class="badge bg-yellow-500" title="Communicateur Anglais">
+<i class="fas fa-comments"></i>
+</div>
+<div class="badge locked" title="Badge verrouillé">
+<i class="fas fa-lock"></i>
+</div>
+<div class="badge locked" title="Badge verrouillé">
+<i class="fas fa-lock"></i>
+</div>
+</div>
+</div>
+
+<h3 class="text-lg font-semibold mb-4">Choisissez une matière</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="subject-card bg-blue-100 rounded-xl overflow-hidden shadow-md" onclick="showScreen('svt')">
+<div class="p-6">
+<div class="rounded-full bg-blue-500 w-12 h-12 flex items-center justify-center mb-4 text-white">
+<i class="fas fa-leaf text-xl"></i>
+</div>
+<h3 class="font-bold text-lg mb-2">SVT</h3>
+<p class="text-sm text-gray-600">Explorez le monde du vivant et des écosystèmes</p>
+</div>
+<div class="bg-blue-500 text-white py-2 px-4 text-center">
+Accéder
+</div>
+</div>
+
+<div class="subject-card bg-green-100 rounded-xl overflow-hidden shadow-md" onclick="showScreen('physique-chimie')">
+<div class="p-6">
+<div class="rounded-full bg-green-500 w-12 h-12 flex items-center justify-center mb-4 text-white">
+<i class="fas fa-atom text-xl"></i>
+</div>
+<h3 class="font-bold text-lg mb-2">Physique-Chimie</h3>
+<p class="text-sm text-gray-600">Découvrez les lois qui régissent notre univers</p>
+</div>
+<div class="bg-green-500 text-white py-2 px-4 text-center">
+Accéder
+</div>
+</div>
+
+<div class="subject-card bg-yellow-100 rounded-xl overflow-hidden shadow-md" onclick="showScreen('anglais')">
+<div class="p-6">
+<div class="rounded-full bg-yellow-500 w-12 h-12 flex items-center justify-center mb-4 text-white">
+<i class="fas fa-language text-xl"></i>
+</div>
+<h3 class="font-bold text-lg mb-2">Anglais</h3>
+<p class="text-sm text-gray-600">Pratiquez l'anglais de façon interactive</p>
+</div>
+<div class="bg-yellow-500 text-white py-2 px-4 text-center">
+Accéder
+</div>
+</div>
+
+<div class="subject-card bg-purple-100 rounded-xl overflow-hidden shadow-md" onclick="showScreen('philosophie')">
+<div class="p-6">
+<div class="rounded-full bg-purple-500 w-12 h-12 flex items-center justify-center mb-4 text-white">
+<i class="fas fa-brain text-xl"></i>
+</div>
+<h3 class="font-bold text-lg mb-2">Philosophie</h3>
+<p class="text-sm text-gray-600">Explorez les grandes questions philosophiques</p>
+</div>
+<div class="bg-purple-500 text-white py-2 px-4 text-center">
+Accéder
+</div>
+</div>
+</div>
+
+<div class="mt-8 bg-blue-50 p-4 rounded-lg border border-blue-200">
+<h3 class="text-lg font-semibold flex items-center">
+<i class="fas fa-robot mr-2 text-blue-500"></i>
+Assistant IA personnel
+</h3>
+<p class="mt-2">Bonjour Jean ! J'ai analysé votre parcours et je remarque que vous progressez bien en SVT, mais vous pourriez améliorer vos performances en Physique-Chimie. Que diriez-vous de travailler sur les circuits électriques aujourd'hui ?</p>
+<div class="mt-3 flex">
+<button class="bg-blue-500 text-white px-4 py-2 rounded mr-3 hover:bg-blue-600">Accepter la suggestion</button>
+<button class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Autre proposition</button>
+</div>
+</div>
+</section>
+
+<!-- SVT Section -->
+<section id="svt" class="screen fade-in">
+<button class="mb-4 flex items-center text-blue-600" onclick="showScreen('dashboard')">
+<i class="fas fa-arrow-left mr-2"></i> Retour au tableau de bord
+</button>
+
+<h2 class="text-2xl font-bold mb-6 text-blue-700">Sciences de la Vie et de la Terre</h2>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Left column - Modules -->
+<div class="lg:col-span-2">
+<h3 class="text-lg font-semibold mb-4">Modules d'apprentissage</h3>
+
+<div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+<div class="p-4 border-b">
+<div class="flex justify-between items-center">
+<h4 class="font-medium">Module 1: Écosystèmes et biodiversité</h4>
+<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Complété</span>
+</div>
+<div class="progress-bar mt-2">
+<div class="progress-bar-fill bg-green-500" style="width: 100%"></div>
+</div>
+</div>
+<div class="p-4 flex flex-wrap gap-2">
+<span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">Biodiversité</span>
+<span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">Écosystèmes</span>
+<span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">Chaînes alimentaires</span>
+</div>
+</div>
+
+<div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+<div class="p-4 border-b">
+<div class="flex justify-between items-center">
+<h4 class="font-medium">Module 2: Génétique et évolution</h4>
+<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">En cours</span>
+</div>
+<div class="progress-bar mt-2">
+<div class="progress-bar-fill" style="width: 65%"></div>
+</div>
+</div>
+<div class="p-4 flex flex-wrap gap-2">
+<span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">ADN</span>
+<span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">Mutations</span>
+<span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">Sélection naturelle</span>
+</div>
+<div class="p-4 bg-gray-50">
+<button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onclick="showModal('virtual-lab-modal')">
+Accéder au laboratoire virtuel
+</button>
+</div>
+</div>
+
+<div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+<div class="p-4 border-b">
+<div class="flex justify-between items-center">
+<h4 class="font-medium">Module 3: Géologie et tectonique des plaques</h4>
+<span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">À venir</span>
+</div>
+<div class="progress-bar mt-2">
+<div class="progress-bar-fill" style="width: 0%"></div>
+</div>
+</div>
+<div class="p-4 flex flex-wrap gap-2">
+<span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">Séismes</span>
+<span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">Volcans</span>
+<span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">Plaques tectoniques</span>
+</div>
+</div>
+</div>
+
+<!-- Right column - Activities -->
+<div>
+<h3 class="text-lg font-semibold mb-4">Activités recommandées</h3>
+
+<div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+<div class="p-4 border-b">
+<h4 class="font-medium">Quiz: Génétique et hérédité</h4>
+</div>
+<div class="p-4">
+<p class="text-sm text-gray-600 mb-4">Testez vos connaissances sur les lois de Mendel et les mécanismes de l'hérédité.</p>
+<div class="flex items-center">
+<i class="fas fa-clock text-gray-400 mr-2"></i>
+<span class="text-sm">15 minutes</span>
+<span class="ml-auto px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded">+15 points</span>
+</div>
+<button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onclick="startQuiz()">
+Commencer
+</button>
+</div>
+</div>
+
+<div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+<div class="p-4 border-b">
+<h4 class="font-medium">Simulation 3D: Explorer une cellule</h4>
+</div>
+<div class="p-4">
+<p class="text-sm text-gray-600 mb-4">Voyage interactif dans une cellule en 3D pour découvrir ses organelles et fonctions.</p>
+<div class="flex items-center">
+<i class="fas fa-clock text-gray-400 mr-2"></i>
+<span class="text-sm">20 minutes</span>
+<span class="ml-auto px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded">+25 points</span>
+</div>
+<button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+Explorer
+</button>
+</div>
+</div>
+
+<div class="mt-6">
+<h3 class="text-lg font-semibold mb-4">Fiches de révision</h3>
+<ul class="bg-white rounded-lg shadow divide-y">
+<li class="p-4 hover:bg-gray-50 cursor-pointer">
+<div class="flex items-center">
+<i class="fas fa-file-alt text-blue-500 mr-3"></i>
+<span>Structure de l'ADN</span>
+<i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+</div>
+</li>
+<li class="p-4 hover:bg-gray-50 cursor-pointer">
+<div class="flex items-center">
+<i class="fas fa-file-alt text-blue-500 mr-3"></i>
+<span>Synthèse des protéines</span>
+<i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+</div>
+</li>
+<li class="p-4 hover:bg-gray-50 cursor-pointer">
+<div class="flex items-center">
+<i class="fas fa-file-alt text-blue-500 mr-3"></i>
+<span>Mutations génétiques</span>
+<i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="quiz-section" class="hidden mt-8 bg-white rounded-lg shadow-md p-6">
+<h3 class="text-lg font-semibold mb-4">Quiz: Génétique et hérédité</h3>
+
+<div class="quiz-question">
+<p class="mb-3 font-medium">Question 1: Qu'est-ce qu'un allèle?</p>
+<div class="space-y-2">
+<div class="flex items-center p-3 border rounded hover:bg-blue-50">
+<input type="radio" name="q1" id="q1a" class="mr-3">
+<label for="q1a">Une partie du chromosome</label>
+</div>
+<div class="flex items-center p-3 border rounded hover:bg-blue-50">
+<input type="radio" name="q1" id="q1b" class="mr-3">
+<label for="q1b">Une version d'un gène</label>
+</div>
+<div class="flex items-center p-3 border rounded hover:bg-blue-50">
+<input type="radio" name="q1" id="q1c" class="mr-3">
+<label for="q1c">Une protéine produite par un gène</label>
+</div>
+<div class="flex items-center p-3 border rounded hover:bg-blue-50">
+<input type="radio" name="q1" id="q1d" class="mr-3">
+<label for="q1d">Un brin d'ARN</label>
+</div>
+</div>
+</div>
+
+<div class="mt-6">
+<button class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
+Suivant
+</button>
+</div>
+</div>
+</section>
+
+<!-- Physics-Chemistry Section -->
+<section id="physique-chimie" class="screen fade-in">
+<button class="mb-4 flex items-center text-green-600" onclick="showScreen('dashboard')">
+<i class="fas fa-arrow-left mr-2"></i> Retour au tableau de bord
+</button>
+
+<h2 class="text-2xl font-bold mb-6 text-green-700">Physique-Chimie</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-white rounded-lg shadow-md p-6">
+<h3 class="text-lg font-semibold mb-4 flex items-center">
+<i class="fas fa-flask text-green-500 mr-2"></i>
+Laboratoire virtuel de chimie
+</h3>
+<p class="mb-4 text-gray-600">Réalisez des expériences chimiques virtuelles en toute sécurité. Mélangez des substances, observez des réactions, et apprenez les principes fondamentaux de la chimie.</p>
+<div class="bg-gray-100 rounded-lg p-4 mb-4">
+<div class="flex justify-between items-center mb-2">
+<span class="font-medium">Expérience récente:</span>
+<span class="text-sm text-gray-500">12/05/2024</span>
+</div>
+<p class="text-sm">Titrage acide-base avec indicateur coloré</p>
+</div>
+<button class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+Accéder au laboratoire
+</button>
+</div>
+
+<div class="bg-white rounded-lg shadow-md p-6">
+<h3 class="text-lg font-semibold mb-4 flex items-center">
+<i class="fas fa-bolt text-green-500 mr-2"></i>
+Simulateur de circuits électriques
+</h3>
+<p class="mb-4 text-gray-600">Construisez des circuits électriques virtuels. Ajoutez des composants, mesurez les valeurs, et visualisez le courant électrique en action.</p>
+<div class="bg-gray-100 rounded-lg p-4 mb-4">
+<div class="flex justify-between items-center mb-2">
+<span class="font-medium">Circuit récent:</span>
+<span class="text-sm text-gray-500">08/05/2024</span>
+</div>
+<p class="text-sm">Circuit parallèle avec résistances variables</p>
+</div>
+<button class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+Construire un circuit
+</button>
+</div>
+</div>
+
+<div class="mt-8">
+<h3 class="text-lg font-semibold mb-4">Modules de cours</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="h-32 bg-green-100 flex items-center justify-center">
+<i class="fas fa-atom text-green-500 text-4xl"></i>
+</div>
+<div class="p-4">
+<h4 class="font-medium mb-2">Structure atomique</h4>
+<div class="progress-bar">
+<div class="progress-bar-fill bg-green-500" style="width: 70%"></div>
+</div>
+<div class="text-sm mt-1 text-right">70%</div>
+<button class="mt-3 w-full bg-green-500 text-white px-4 py-1 rounded text-sm hover:bg-green-600">
+Continuer
+</button>
+</div>
+</div>
+
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="h-32 bg-green-100 flex items-center justify-center">
+<i class="fas fa-magnet text-green-500 text-4xl"></i>
+</div>
+<div class="p-4">
+<h4 class="font-medium mb-2">Électromagnétisme</h4>
+<div class="progress-bar">
+<div class="progress-bar-fill bg-green-500" style="width: 30%"></div>
+</div>
+<div class="text-sm mt-1 text-right">30%</div>
+<button class="mt-3 w-full bg-green-500 text-white px-4 py-1 rounded text-sm hover:bg-green-600">
+Continuer
+</button>
+</div>
+</div>
+
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="h-32 bg-green-100 flex items-center justify-center">
+<i class="fas fa-tint text-green-500 text-4xl"></i>
+</div>
+<div class="p-4">
+<h4 class="font-medium mb-2">Réactions chimiques</h4>
+<div class="progress-bar">
+<div class="progress-bar-fill bg-green-500" style="width: 15%"></div>
+</div>
+<div class="text-sm mt-1 text-right">15%</div>
+<button class="mt-3 w-full bg-green-500 text-white px-4 py-1 rounded text-sm hover:bg-green-600">
+Continuer
+</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="mt-8 bg-gray-50 p-6 rounded-lg">
+<h3 class="text-lg font-semibold mb-4">Recommandation IA</h3>
+<div class="bg-white p-4 rounded-lg border border-green-200">
+<div class="flex items-start">
+<div class="mr-3 mt-1">
+<i class="fas fa-lightbulb text-yellow-500 text-xl"></i>
+</div>
+<div>
+<p class="mb-3">Basé sur vos progrès, vous semblez avoir quelques difficultés avec les concepts d'électromagnétisme. Voici une approche plus visuelle qui pourrait vous aider :</p>
+<div class="bg-green-50 p-3 rounded mb-3">
+<h4 class="font-medium mb-1 text-green-700">Visualisation des champs magnétiques</h4>
+<p class="text-sm">Cette simulation interactive vous permet de voir les lignes de champ magnétique et comment elles interagissent avec différents objets.</p>
+</div>
+<p class="text-sm text-gray-600">Cette recommandation est basée sur votre style d'apprentissage visuel identifié par notre IA.</p>
+<button class="mt-3 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+Voir la simulation
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- English Section -->
+<section id="anglais" class="screen fade-in">
+<button class="mb-4 flex items-center text-yellow-600" onclick="showScreen('dashboard')">
+<i class="fas fa-arrow-left mr-2"></i> Retour au tableau de bord
+</button>
+
+<h2 class="text-2xl font-bold mb-6 text-yellow-700">English Learning</h2>
+
+<div class="bg-yellow-50 p-6 rounded-lg mb-8">
+<div class="flex">
+<div class="w-16 h-16 bg-yellow-200 rounded-full flex items-center justify-center mr-4">
+<i class="fas fa-comments text-yellow-600 text-2xl"></i>
+</div>
+<div>
+<h3 class="text-lg font-semibold mb-1">Conversation Practice</h3>
+<p class="mb-4 text-gray-600">Pratiquez votre anglais avec notre AI conversation partner. Choisissez un sujet et commencez à parler!</p>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="bg-white px-3 py-1 rounded-full border border-yellow-300 cursor-pointer hover:bg-yellow-100">Travel</span>
+<span class="bg-white px-3 py-1 rounded-full border border-yellow-300 cursor-pointer hover:bg-yellow-100">Food & Restaurants</span>
+<span class="bg-white px-3 py-1 rounded-full border border-yellow-300 cursor-pointer hover:bg-yellow-100">Business Meeting</span>
+<span class="bg-white px-3 py-1 rounded-full border border-yellow-300 cursor-pointer hover:bg-yellow-100">Shopping</span>
+<span class="bg-white px-3 py-1 rounded-full border border-yellow-300 cursor-pointer hover:bg-yellow-100">Movies & Entertainment</span>
+</div>
+<button class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600" onclick="showModal('conversation-modal')">
+Start Conversation
+</button>
+</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="p-4">
+<h3 class="font-medium mb-2">Vocabulary Builder</h3>
+<p class="text-sm text-gray-600 mb-4">Build your English vocabulary with interactive exercises and spaced repetition.</p>
+<div class="flex items-center mb-2">
+<div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-2">
+<i class="fas fa-book text-yellow-600"></i>
+</div>
+<span>450 words learned</span>
+</div>
+<div class="progress-bar">
+<div class="progress-bar-fill bg-yellow-500" style="width: 45%"></div>
+</div>
+<p class="text-right text-sm mt-1">Next review: 14 words</p>
+</div>
+<div class="bg-yellow-500 text-white p-3 text-center cursor-pointer hover:bg-yellow-600">
+Practice Now
+</div>
+</div>
+
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="p-4">
+<h3 class="font-medium mb-2">Grammar Workshop</h3>
+<p class="text-sm text-gray-600 mb-4">Master English grammar through interactive lessons and exercises.</p>
+<div class="flex items-center mb-2">
+<div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-2">
+<i class="fas fa-pencil-alt text-yellow-600"></i>
+</div>
+<span>7 units completed</span>
+</div>
+<div class="progress-bar">
+<div class="progress-bar-fill bg-yellow-500" style="width: 35%"></div>
+</div>
+<p class="text-right text-sm mt-1">Currently: Past Perfect</p>
+</div>
+<div class="bg-yellow-500 text-white p-3 text-center cursor-pointer hover:bg-yellow-600">
+Continue Learning
+</div>
+</div>
+
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="p-4">
+<h3 class="font-medium mb-2">Pronunciation Lab</h3>
+<p class="text-sm text-gray-600 mb-4">Improve your pronunciation with AI-powered speech analysis.</p>
+<div class="flex items-center mb-2">
+<div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-2">
+<i class="fas fa-microphone text-yellow-600"></i>
+</div>
+<span>12 sessions completed</span>
+</div>
+<div class="progress-bar">
+<div class="progress-bar-fill bg-yellow-500" style="width: 60%"></div>
+</div>
+<p class="text-right text-sm mt-1">Focus on: 'th' sound</p>
+</div>
+<div class="bg-yellow-500 text-white p-3 text-center cursor-pointer hover:bg-yellow-600">
+Start Session
+</div>
+</div>
+</div>
+
+<div class="mt-8">
+<h3 class="text-lg font-semibold mb-4">Cultural Immersion</h3>
+<p class="text-gray-600 mb-6">Discover English-speaking cultures through interactive scenarios and stories.</p>
+
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="grid grid-cols-1 md:grid-cols-2">
+<div class="p-6">
+<h4 class="font-medium mb-3">Virtual London Tour</h4>
+<p class="text-sm text-gray-600 mb-4">Explore the streets of London and interact with locals in this immersive experience.</p>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="bg-yellow-50 text-yellow-700 text-xs px-2 py-1 rounded">Cultural Learning</span>
+<span class="bg-yellow-50 text-yellow-700 text-xs px-2 py-1 rounded">Vocabulary</span>
+<span class="bg-yellow-50 text-yellow-700 text-xs px-2 py-1 rounded">Listening</span>
+</div>
+<button class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+Start Tour
+</button>
+</div>
+<div class="bg-yellow-100 flex items-center justify-center p-6">
+<div class="text-center">
+<i class="fas fa-landmark text-yellow-500 text-5xl mb-2"></i>
+<p class="text-yellow-800">Interactive Experience</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Philosophy Section -->
+<section id="philosophie" class="screen fade-in">
+<button class="mb-4 flex items-center text-purple-600" onclick="showScreen('dashboard')">
+<i class="fas fa-arrow-left mr-2"></i> Retour au tableau de bord
+</button>
+
+<h2 class="text-2xl font-bold mb-6 text-purple-700">Philosophie</h2>
+
+<div class="bg-purple-50 p-6 rounded-lg mb-8">
+<div class="flex flex-col md:flex-row">
+<div class="md:w-1/3 mb-4 md:mb-0">
+<div class="bg-white rounded-lg p-4 shadow-md">
+<h3 class="font-medium mb-2 text-purple-700">Dialogues philosophiques</h3>
+<p class="text-sm text-gray-600 mb-4">Engagez des conversations avec les plus grands philosophes de l'histoire, simulés par notre IA.</p>
+<div class="flex flex-wrap gap-2 mb-3">
+<span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">Socrate</span>
+<span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">Platon</span>
+<span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">Descartes</span>
+<span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">Kant</span>
+<span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">Nietzsche</span>
+</div>
+<button class="bg-purple-500 text-white px-4 py-2 rounded w-full hover:bg-purple-600" onclick="showModal('philosopher-modal')">
+Commencer un dialogue
+</button>
+</div>
+</div>
+<div class="md:w-2/3 md:ml-6">
+<h3 class="text-lg font-semibold mb-3">Exploration des grandes questions</h3>
+<p class="mb-4 text-gray-700">La philosophie nous invite à explorer les questions fondamentales de l'existence, de la connaissance, de l'éthique et bien plus encore.</p>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-white p-4 rounded-lg shadow-md">
+<h4 class="font-medium mb-2 flex items-center">
+<i class="fas fa-question-circle text-purple-500 mr-2"></i>
+Qu'est-ce que la vérité?
+</h4>
+<p class="text-sm text-gray-600">Explorez les différentes conceptions de la vérité à travers l'histoire de la philosophie.</p>
+<div class="mt-3 text-right">
+<a href="#" class="text-purple-600 hover:text-purple-800">Explorer &rarr;</a>
+</div>
+</div>
+<div class="bg-white p-4 rounded-lg shadow-md">
+<h4 class="font-medium mb-2 flex items-center">
+<i class="fas fa-balance-scale text-purple-500 mr-2"></i>
+Éthique et morale
+</h4>
+<p class="text-sm text-gray-600">Comment déterminer ce qui est bien ou mal? Découvrez les grandes théories éthiques.</p>
+<div class="mt-3 text-right">
+<a href="#" class="text-purple-600 hover:text-purple-800">Explorer &rarr;</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="mb-8">
+<h3 class="text-lg font-semibold mb-4">Dilemmes moraux interactifs</h3>
+<p class="text-gray-600 mb-6">Confrontez-vous à des situations éthiques complexes et explorez les différentes perspectives philosophiques.</p>
+
+<div class="bg-white rounded-lg shadow-md p-6">
+<h4 class="font-medium mb-4">Le dilemme du tramway</h4>
+<p class="mb-6">Un tramway hors de contrôle se dirige vers cinq personnes qui seront tuées s'il continue sa route. Vous pouvez actionner un levier qui détournera le tramway sur une autre voie où il ne tuera qu'une seule personne. Que faites-vous?</p>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+<button class="bg-purple-100 hover:bg-purple-200 p-4 rounded-lg text-left">
+<div class="font-medium mb-1">Je tire le levier</div>
+<p class="text-sm text-gray-600">Sauver cinq personnes au prix d'une vie</p>
+</button>
+<button class="bg-purple-100 hover:bg-purple-200 p-4 rounded-lg text-left">
+<div class="font-medium mb-1">Je ne fais rien</div>
+<p class="text-sm text-gray-600">Refuser d'intervenir directement dans la mort d'une personne</p>
+</button>
+</div>
+
+<p class="text-sm text-gray-500">Ce dilemme illustre la tension entre l'éthique utilitariste (maximiser le bien-être global) et l'éthique déontologique (respecter des principes moraux absolus).</p>
+</div>
+</div>
+
+<div class="mb-8">
+<h3 class="text-lg font-semibold mb-4">Fiches d'auteurs</h3>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="p-4">
+<h4 class="font-medium mb-2">Platon</h4>
+<p class="text-sm text-gray-600 mb-3">427 - 347 av. J.-C.</p>
+<div class="bg-purple-50 p-2 rounded mb-3">
+<p class="text-sm italic">"Nous pouvons facilement pardonner à un enfant qui a peur de l'obscurité; la vraie tragédie de la vie, c'est lorsque les hommes ont peur de la lumière."</p>
+</div>
+<div class="text-sm">
+<span class="font-medium">Œuvres principales:</span>
+<ul class="list-disc ml-5 mt-1 space-y-1">
+<li>La République</li>
+<li>Le Banquet</li>
+<li>Phédon</li>
+</ul>
+</div>
+</div>
+<div class="bg-purple-500 text-white p-2 text-center cursor-pointer hover:bg-purple-600">
+Voir la fiche complète
+</div>
+</div>
+
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="p-4">
+<h4 class="font-medium mb-2">René Descartes</h4>
+<p class="text-sm text-gray-600 mb-3">1596 - 1650</p>
+<div class="bg-purple-50 p-2 rounded mb-3">
+<p class="text-sm italic">"Je pense, donc je suis."</p>
+</div>
+<div class="text-sm">
+<span class="font-medium">Œuvres principales:</span>
+<ul class="list-disc ml-5 mt-1 space-y-1">
+<li>Discours de la méthode</li>
+<li>Méditations métaphysiques</li>
+<li>Les Principes de la philosophie</li>
+</ul>
+</div>
+</div>
+<div class="bg-purple-500 text-white p-2 text-center cursor-pointer hover:bg-purple-600">
+Voir la fiche complète
+</div>
+</div>
+
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div class="p-4">
+<h4 class="font-medium mb-2">Friedrich Nietzsche</h4>
+<p class="text-sm text-gray-600 mb-3">1844 - 1900</p>
+<div class="bg-purple-50 p-2 rounded mb-3">
+<p class="text-sm italic">"Celui qui lutte contre des monstres devrait prendre garde, dans le combat, à ne pas devenir monstre lui-même."</p>
+</div>
+<div class="text-sm">
+<span class="font-medium">Œuvres principales:</span>
+<ul class="list-disc ml-5 mt-1 space-y-1">
+<li>Ainsi parlait Zarathoustra</li>
+<li>Par-delà bien et mal</li>
+<li>Le Gai Savoir</li>
+</ul>
+</div>
+</div>
+<div class="bg-purple-500 text-white p-2 text-center cursor-pointer hover:bg-purple-600">
+Voir la fiche complète
+</div>
+</div>
+</div>
+</div>
+
+<div class="bg-white rounded-lg shadow-md p-6">
+<h3 class="text-lg font-semibold mb-4">Cartographie des concepts</h3>
+<p class="text-gray-600 mb-6">Visualisez les liens entre différents concepts philosophiques et créez votre propre carte de la pensée.</p>
+
+<div class="flex justify-center">
+<div class="text-center max-w-md">
+<div class="bg-purple-50 rounded-lg p-6">
+<i class="fas fa-project-diagram text-purple-600 text-4xl mb-4"></i>
+<h4 class="font-medium mb-2">Créer votre carte conceptuelle</h4>
+<p class="text-sm mb-4">Notre outil interactif vous permet de visualiser et connecter différentes idées philosophiques selon vos propres perceptions.</p>
+<button class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+Lancer l'outil
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-100 p-4 text-center text-gray-600 text-sm">
+<p>© 2025 EduSphère - Plateforme éducative interactive</p>
+<p class="mt-1">Un outil révolutionnaire pour l'apprentissage personnalisé</p>
+</footer>
+</div>
+
+<!-- Modals -->
+<div id="virtual-lab-modal" class="modal">
+<div class="modal-content max-w-4xl">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold">Laboratoire virtuel de génétique</h3>
+<button onclick="hideModals()" class="text-gray-500 hover:text-gray-700">
+<i class="fas fa-times text-xl"></i>
+</button>
+</div>
+
+<div class="bg-blue-50 p-4 rounded-lg mb-6">
+<div class="flex items-start">
+<div class="rounded-full bg-blue-500 w-10 h-10 flex items-center justify-center text-white mr-3">
+<i class="fas fa-flask"></i>
+</div>
+<div>
+<h4 class="font-medium mb-1">Expérience du jour: Extraction d'ADN</h4>
+<p class="text-sm">Dans cette simulation, vous allez extraire l'ADN d'un échantillon biologique en suivant un protocole précis.</p>
+</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2">
+<div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
+<div class="text-center">
+<i class="fas fa-dna text-blue-500 text-5xl mb-3"></i>
+<p>Simulation interactive</p>
+<button class="mt-3 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+Démarrer la simulation
+</button>
+</div>
+</div>
+</div>
+<div>
+<h4 class="font-medium mb-3">Matériel disponible:</h4>
+<ul class="bg-white rounded-lg shadow-sm">
+<li class="px-3 py-2 border-b flex items-center">
+<i class="fas fa-check-circle text-green-500 mr-2"></i>
+Tubes à essai
+</li>
+<li class="px-3 py-2 border-b flex items-center">
+<i class="fas fa-check-circle text-green-500 mr-2"></i>
+Solution saline
+</li>
+<li class="px-3 py-2 border-b flex items-center">
+<i class="fas fa-check-circle text-green-500 mr-2"></i>
+Détergent
+</li>
+<li class="px-3 py-2 border-b flex items-center">
+<i class="fas fa-check-circle text-green-500 mr-2"></i>
+Alcool froid
+</li>
+<li class="px-3 py-2 flex items-center">
+<i class="fas fa-check-circle text-green-500 mr-2"></i>
+Échantillon biologique
+</li>
+</ul>
+
+<h4 class="font-medium mt-4 mb-2">Notes personnelles:</h4>
+<textarea class="w-full border rounded p-2 text-sm" rows="3" placeholder="Prenez des notes pendant l'expérience..."></textarea>
+</div>
+</div>
+
+<div class="mt-6">
+<h4 class="font-medium mb-3">Protocole à suivre:</h4>
+<ol class="list-decimal ml-5 space-y-2">
+<li>Placez l'échantillon biologique dans un tube à essai.</li>
+<li>Ajoutez 10 ml de solution saline et mélangez doucement.</li>
+<li>Ajoutez 2 ml de détergent et mélangez lentement pour éviter la formation de mousse.</li>
+<li>Laissez reposer 5 minutes à température ambiante.</li>
+<li>Inclinez le tube et versez délicatement l'alcool froid le long de la paroi.</li>
+<li>Observez l'interface entre les deux phases pour voir l'ADN précipiter.</li>
+</ol>
+</div>
+
+<div class="mt-6 flex justify-between">
+<button class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
+Aide
+</button>
+<div>
+<button class="bg-gray-200 px-4 py-2 rounded mr-2 hover:bg-gray-300">
+Recommencer
+</button>
+<button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+Suivant
+</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="conversation-modal" class="modal">
+<div class="modal-content max-w-2xl">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold">English Conversation Practice</h3>
+<button onclick="hideModals()" class="text-gray-500 hover:text-gray-700">
+<i class="fas fa-times text-xl"></i>
+</button>
+</div>
+
+<div class="bg-yellow-50 p-4 rounded-lg mb-6">
+<div class="flex items-center">
+<div class="rounded-full bg-yellow-500 w-10 h-10 flex items-center justify-center text-white mr-3">
+<i class="fas fa-plane"></i>
+</div>
+<div>
+<h4 class="font-medium">Topic: Travel</h4>
+<p class="text-sm">Practice a conversation about travel plans and experiences.</p>
+</div>
+</div>
+</div>
+
+<div class="bg-white rounded-lg border p-4 mb-4 h-64 overflow-y-auto">
+<div class="flex mb-3">
+<div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-2">
+<i class="fas fa-user text-yellow-600"></i>
+</div>
+<div class="bg-gray-100 rounded-lg p-2 max-w-3/4">
+<p>Hello! How can I help you plan your travel?</p>
+</div>
+</div>
+
+<div class="flex justify-end mb-3">
+<div class="bg-yellow-100 rounded-lg p-2 max-w-3/4">
+<p>Hi! I'm planning a trip to London next month.</p>
+</div>
+<div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center ml-2 text-white">
+<i class="fas fa-user"></i>
+</div>
+</div>
+
+<div class="flex mb-3">
+<div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-2">
+<i class="fas fa-user text-yellow-600"></i>
+</div>
+<div class="bg-gray-100 rounded-lg p-2 max-w-3/4">
+<p>That sounds exciting! How long are you planning to stay in London?</p>
+</div>
+</div>
+</div>
+
+<div class="flex mb-4">
+<input type="text" class="flex-1 border rounded-l p-2" placeholder="Type your response...">
+<button class="bg-yellow-500 text-white px-4 rounded-r hover:bg-yellow-600">
+<i class="fas fa-paper-plane"></i>
+</button>
+</div>
+
+<div class="flex justify-between">
+<div>
+<button class="bg-gray-200 px-3 py-1 rounded text-sm hover:bg-gray-300 mr-2">
+<i class="fas fa-volume-up mr-1"></i> Listen
+</button>
+<button class="bg-gray-200 px-3 py-1 rounded text-sm hover:bg-gray-300">
+<i class="fas fa-microphone mr-1"></i> Speak
+</button>
+</div>
+<div>
+<button class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded text-sm hover:bg-yellow-200 mr-2">
+<i class="fas fa-lightbulb mr-1"></i> Hint
+</button>
+<button class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+Next
+</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="philosopher-modal" class="modal">
+<div class="modal-content max-w-2xl">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold">Dialogue avec Socrate</h3>
+<button onclick="hideModals()" class="text-gray-500 hover:text-gray-700">
+<i class="fas fa-times text-xl"></i>
+</button>
+</div>
+
+<div class="bg-purple-50 p-4 rounded-lg mb-6">
+<div class="flex items-start">
+<div class="rounded-full bg-purple-500 w-12 h-12 flex items-center justify-center text-white mr-3 mt-1">
+<i class="fas fa-user-tie"></i>
+</div>
+<div>
+<h4 class="font-medium">Socrate (470 - 399 av. J.-C.)</h4>
+<p class="text-sm mb-2">Philosophe grec considéré comme le père de la philosophie occidentale et connu pour sa méthode de questionnement.</p>
+<div class="text-sm italic">"Je ne sais qu'une chose, c'est que je ne sais rien."</div>
+</div>
+</div>
+</div>
+
+<div class="bg-white rounded-lg border p-4 mb-4 h-64 overflow-y-auto">
+<div class="flex mb-3">
+<div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-2">
+<i class="fas fa-user-tie text-purple-600"></i>
+</div>
+<div class="bg-gray-100 rounded-lg p-2 max-w-3/4">
+<p>Bonjour, jeune ami. Qu'est-ce qui t'amène à chercher la sagesse aujourd'hui?</p>
+</div>
+</div>
+
+<div class="flex justify-end mb-3">
+<div class="bg-purple-100 rounded-lg p-2 max-w-3/4">
+<p>Je voudrais comprendre ce qu'est la justice.</p>
+</div>
+<div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center ml-2 text-white">
+<i class="fas fa-user"></i>
+</div>
+</div>
+
+<div class="flex mb-3">
+<div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-2">
+<i class="fas fa-user-tie text-purple-600"></i>
+</div>
+<div class="bg-gray-100 rounded-lg p-2 max-w-3/4">
+<p>Une noble question! Mais avant de te répondre, permets-moi de te demander: qu'entends-tu par justice? Peux-tu m'en donner une définition?</p>
+</div>
+</div>
+</div>
+
+<div class="flex mb-4">
+<input type="text" class="flex-1 border rounded-l p-2" placeholder="Votre réponse...">
+<button class="bg-purple-500 text-white px-4 rounded-r hover:bg-purple-600">
+<i class="fas fa-paper-plane"></i>
+</button>
+</div>
+
+<div class="flex justify-between">
+<button class="bg-gray-200 px-3 py-1 rounded text-sm hover:bg-gray-300">
+<i class="fas fa-info-circle mr-1"></i> À propos de Socrate
+</button>
+<div>
+<button class="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm hover:bg-purple-200 mr-2">
+<i class="fas fa-book mr-1"></i> Concepts clés
+</button>
+<button class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+Terminer
+</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- JavaScript -->
+<script>
+// Global variables
+let currentScreen = 'dashboard';
+let points = 120;
+
+// Show a specific screen
+function showScreen(screenId) {
+// Hide all screens
+document.querySelectorAll('.screen').forEach(screen => {
+screen.classList.remove('active');
+});
+
+// Show the selected screen
+document.getElementById(screenId).classList.add('active');
+currentScreen = screenId;
+}
+
+// Show a modal
+function showModal(modalId) {
+document.getElementById(modalId).style.display = 'flex';
+}
+
+// Hide all modals
+function hideModals() {
+document.querySelectorAll('.modal').forEach(modal => {
+modal.style.display = 'none';
+});
+}
+
+// Start a quiz
+function startQuiz() {
+document.getElementById('quiz-section').classList.remove('hidden');
+// Scroll to quiz
+document.getElementById('quiz-section').scrollIntoView({
+behavior: 'smooth',
+block: 'start'
+});
+}
+
+// Award points to the user
+function awardPoints(amount) {
+points += amount;
+document.getElementById('points-counter').innerText = points;
+}
+
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', function() {
+// Close modals when clicking outside
+document.querySelectorAll('.modal').forEach(modal => {
+modal.addEventListener('click', function(event) {
+if (event.target === modal) {
+hideModals();
+}
+});
+});
+});
+
+// AI Assistant Simulation
+class AIAssistant {
+constructor() {
+this.learningData = {
+style: 'visual',
+strengths: ['anglais', 'svt'],
+weaknesses: ['physique-chimie'],
+interests: ['génétique', 'culture anglophone']
+};
+}
+
+// Generate personalized recommendations
+generateRecommendation() {
+// This would be more sophisticated in a real application
+if (this.learningData.weaknesses.includes('physique-chimie')) {
+return {
+subject: 'physique-chimie',
+activity: 'Simulation des champs magnétiques',
+reason: 'Aide visuelle pour comprendre l\'électromagnétisme'
+};
+}
+return null;
+}
+
+// Analyze quiz answers
+analyzePerformance(answers) {
+// Simplified analysis for demo purposes
+return {
+score: '80%',
+strengths: ['génétique mendélienne'],
+weaknesses: ['mutations génétiques'],
+nextSteps: ['Revoir le module sur l\'ADN et mutations']
+};
+}
+}
+
+// Initialize AI Assistant
+const aiAssistant = new AIAssistant();
+</script>
+</body>
+</html>
+
