@@ -2,6 +2,18 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [2.1.0] - 2026-11-22
+
+- Added CSS custom property completion in `var()`
+- Added go to definition for CSS custom properties
+- Added hover for CSS custom properties showing their resolved values
+- Fixed parser regex for selectors with combinators, attributes, escapes and non-ASCII names
+- Fixed selectors in comments and strings being suggested
+- Fixed go to definition matching ids and classes with the same name
+- Requires VS Code 1.103.0 or later
+- Switched build to Vite
+- Updated dependencies
+
 ## [2.0.14] - 2026-02-12
 
 - Update deps for a security vulnerability

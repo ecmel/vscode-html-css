@@ -2,15 +2,17 @@
 
 [![commit](https://github.com/ecmel/vscode-html-css/actions/workflows/commit.yml/badge.svg)](https://github.com/ecmel/vscode-html-css/actions/workflows/commit.yml)
 
-HTML `id` and `class` attribute completion for Visual Studio Code.
+HTML `id` and `class` attribute and CSS custom property completion for Visual Studio Code.
 
 ## Features
 
 - HTML `id` and `class` attribute completion
+- CSS custom property (variable) completion in `var()`
+- Shows custom property values on hover, resolving references to other custom properties
 - Supports completion from in file defined styles
 - Supports specifying remote and local style sheets
 - Supports any language for completion
-- Supports go to definition for selectors
+- Supports go to definition for selectors and custom properties
 - Validates class attributes on demand
 
 ## Supported Languages
@@ -91,6 +93,28 @@ or in case of Bootstrap CDN with additional plain `css`:
 
 All of Bootstrap's class selectors with additional user defined styles in the project will be available for completion in `html` files.
 
+### [Open Props](https://open-props.style/)
+
+Custom properties are completed inside `var()` in `style` attributes and `<style>` blocks, with their values shown as details:
+
+**`.vscode/settings.json`**
+
+```json
+{
+  "css.styleSheets": ["https://unpkg.com/open-props@1.7.4/open-props.min.css"]
+}
+```
+
+or from the `npm` module:
+
+```json
+{
+  "css.styleSheets": ["node_modules/open-props/open-props.min.css"]
+}
+```
+
+Custom properties defined in your own style sheets are completed as well. Hovering a custom property in `var()` shows its definitions and resolved value, so `var(--brand)` defined as `var(--indigo-7)` shows `#4263eb`.
+
 ### [Lit](https://lit.dev/)
 
 Enable `typescript` or `javascript` in global settings depending on your usage and restart VS Code:
@@ -149,7 +173,7 @@ With this setup, styles defined in e.g. `app.component.css` will be available in
 
 ## Go to Definition
 
-Go to definition for `id` and `class` selectors for local style sheets are supported. Selecting `Go to Definition` from context menu (`F12` or `⌘ click`) on a selector will open the local style sheet which the selector is defined.
+Go to definition for `id` and `class` selectors and custom properties in `var()` for local style sheets are supported. Selecting `Go to Definition` from context menu (`F12` or `⌘ click`) on a selector or custom property will open the local style sheet which it is defined.
 
 ## Commands
 

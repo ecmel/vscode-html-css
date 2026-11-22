@@ -7,6 +7,6 @@ out/**
 src/**
 test/**
 .gitignore
-tsconfig.json
-rollup.config.ts
+tsconfig*.json
+vite.config.mts
 *.zip

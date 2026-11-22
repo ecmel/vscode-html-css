@@ -9,6 +9,6 @@
     "strict": true,
     "noUnusedLocals": true
   },
-  "include": ["src", "test", "rollup.config.ts"],
+  "include": ["src", "test", "vite.config.mts"],
   "exclude": ["node_modules"]
 }

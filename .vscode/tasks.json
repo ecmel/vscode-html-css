@@ -3,39 +3,29 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "debug",
+      "script": "watch",
+      "isBackground": true,
       "problemMatcher": {
-        "owner": "typescript",
-        "source": "ts",
-        "applyTo": "closedDocuments",
-        "fileLocation": ["relative", "${cwd}"],
+        "owner": "vite",
         "pattern": {
-          "regexp": "^\\(!\\) Plugin typescript: @rollup\\/plugin-typescript TS(?<errorCode>\\d+): (?<message>.+)\\r?\\n(?<file>.*?):\\s*\\((?<line>\\d+):(?<column>\\d+)\\)$",
-          "file": 3,
-          "line": 4,
-          "column": 5,
-          "code": 1,
-          "message": 2
+          "regexp": "^(?:error during build:|✗ .*|\\s+.*is not exported.*)$",
+          "message": 0
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "^rollup v\\d+\\.\\d+\\.\\d+$"
-          },
-          "endsPattern": {
-            "regexp": "^\\[[:-\\s\\d]+\\] waiting for changes\\.\\.\\.$"
-          }
+          "beginsPattern": "build started\\.\\.\\.",
+          "endsPattern": "(built in \\d+ms\\.|error during build:)"
         }
       },
-      "isBackground": true,
       "presentation": {
-        "reveal": "always",
+        "reveal": "never",
         "group": "watchers"
       },
       "group": {
         "kind": "build",
         "isDefault": true
-      }
+      },
+      "label": "npm: watch"
     }
   ]
 }

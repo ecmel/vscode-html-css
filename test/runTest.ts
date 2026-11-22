@@ -10,5 +10,5 @@ const extensionDevelopmentPath = path.resolve(__dirname, "../../");
 const extensionTestsPath = path.resolve(__dirname, "./suite");
 
 runTests({ extensionDevelopmentPath, extensionTestsPath }).catch(() =>
-  process.exit(1)
+  process.exit(1),
 );

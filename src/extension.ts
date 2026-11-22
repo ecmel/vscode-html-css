@@ -24,7 +24,7 @@ const provider = new Provider();
 
 async function validate(
   document: TextDocument,
-  type: AutoValidation | undefined
+  type: AutoValidation | undefined,
 ) {
   if (enabledLanguages.includes(document.languageId)) {
     const validation = getAutoValidation(document);
@@ -38,8 +38,15 @@ async function validate(
 
 export function activate(context: ExtensionContext) {
   context.subscriptions.push(
-    languages.registerCompletionItemProvider(enabledLanguages, provider, " "),
+    languages.registerCompletionItemProvider(
+      enabledLanguages,
+      provider,
+      " ",
+      "(",
+      "-",
+    ),
     languages.registerDefinitionProvider(enabledLanguages, provider),
+    languages.registerHoverProvider(enabledLanguages, provider),
     workspace.onDidSaveTextDocument(async (document) => {
       invalidate(document.uri.toString());
       await validate(document, AutoValidation.SAVE);
@@ -62,14 +69,14 @@ export function activate(context: ExtensionContext) {
         if (editor) {
           await validate(editor.document, type);
         }
-      }
+      },
     ),
-    commands.registerCommand("vscode-html-css.clear", () => clear())
+    commands.registerCommand("vscode-html-css.clear", () => clear()),
   );
 
   return commands.executeCommand<void>(
     "vscode-html-css.validate",
-    AutoValidation.ALWAYS
+    AutoValidation.ALWAYS,
   );
 }
 

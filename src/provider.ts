@@ -14,8 +14,11 @@ import {
   DefinitionProvider,
   Diagnostic,
   DiagnosticSeverity,
+  Hover,
+  HoverProvider,
   Location,
   LocationLink,
+  MarkdownString,
   Position,
   ProviderResult,
   Range,
@@ -32,7 +35,38 @@ import { Style, StyleType, parse } from "./parser";
 const start = new Position(0, 0);
 const cache = new Map<string, Style[]>();
 
-export class Provider implements CompletionItemProvider, DefinitionProvider {
+// A var() reference, with an optional fallback that may hold one level of
+// parentheses, like `var(--a, var(--b))`.
+const reference =
+  /var\(\s*--([\w-]+)\s*(?:,\s*((?:[^()]|\([^()]*\))*?)\s*)?\)/g;
+
+// Replaces var() references with their values, following chains of custom
+// properties. References that cannot be resolved are kept as they are.
+function resolve(
+  value: string,
+  variables: Map<string, string>,
+  seen = new Set<string>(),
+): string {
+  return value.replace(
+    reference,
+    (match, name: string, fallback: string | undefined) => {
+      const found = variables.get(name);
+      if (seen.has(name)) {
+        return match;
+      }
+      if (found === undefined) {
+        return fallback === undefined
+          ? match
+          : resolve(fallback, variables, seen);
+      }
+      return resolve(found, variables, new Set(seen).add(name));
+    },
+  );
+}
+
+export class Provider
+  implements CompletionItemProvider, DefinitionProvider, HoverProvider
+{
   private get isRemote() {
     return /^https?:\/\//i;
   }
@@ -43,6 +77,21 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
 
   private get canComplete() {
     return /(id|class|className|[.#])\s*[=:]?\s*(["'])(?:.(?!\2))*$/is;
+  }
+
+  private get canCompleteVariable() {
+    return /\bvar\(\s*[\w-]*$/;
+  }
+
+  // What to complete or look up for the text before the cursor, if anything.
+  private getType(text: string) {
+    if (this.canCompleteVariable.test(text)) {
+      return StyleType.VARIABLE;
+    }
+    const match = this.canComplete.exec(text);
+    if (match) {
+      return match[1] === "id" ? StyleType.ID : StyleType.CLASS;
+    }
   }
 
   private async fetch(url: string) {
@@ -93,7 +142,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
         styles.set(glob, await this.getRemote(glob));
       } else if (folder) {
         const files = await workspace.findFiles(
-          this.getRelativePattern(folder, glob)
+          this.getRelativePattern(folder, glob),
         );
         for (const file of files) {
           styles.set(file.toString(), await this.getLocal(file));
@@ -110,12 +159,25 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
 
     for (const value of styles.values()) {
       for (const style of value) {
-        if (style.type === type) {
+        if (style.type !== type) {
+          continue;
+        }
+        if (type === StyleType.VARIABLE) {
+          // Keep the first definition, overrides like dark mode come later.
+          if (!map.has(style.selector)) {
+            const item = new CompletionItem(
+              StyleType.VARIABLE + style.selector,
+              CompletionItemKind.Variable,
+            );
+            item.detail = style.value;
+            map.set(style.selector, item);
+          }
+        } else {
           const item = new CompletionItem(
             style.selector,
-            style.type === StyleType.ID
+            type === StyleType.ID
               ? CompletionItemKind.Value
-              : CompletionItemKind.Enum
+              : CompletionItemKind.Enum,
           );
           map.set(style.selector, item);
         }
@@ -127,7 +189,7 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   private async getCompletionItems(
     document: TextDocument,
     position: Position,
-    type: StyleType
+    type: StyleType,
   ) {
     const range = document.getWordRangeAtPosition(position, this.wordRange);
     const map = await this.getCompletionMap(document, type);
@@ -144,42 +206,41 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
     document: TextDocument,
     position: Position,
     token: CancellationToken,
-    context: CompletionContext
+    context: CompletionContext,
   ): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
     const range = new Range(start, position);
-    const text = document.getText(range);
-    const match = this.canComplete.exec(text);
+    const type = this.getType(document.getText(range));
 
     return new Promise((resolve, reject) =>
-      match && !token.isCancellationRequested
-        ? resolve(
-            this.getCompletionItems(
-              document,
-              position,
-              match[1] === "id" ? StyleType.ID : StyleType.CLASS
-            )
-          )
-        : reject()
+      type && !token.isCancellationRequested
+        ? resolve(this.getCompletionItems(document, position, type))
+        : reject(),
     );
   }
 
-  private async getDefinitions(document: TextDocument, position: Position) {
+  private async getDefinitions(
+    document: TextDocument,
+    position: Position,
+    type: StyleType,
+  ) {
     const range = document.getWordRangeAtPosition(position, this.wordRange);
     const styles = await this.getStyles(document);
-    const selector = document.getText(range);
+    const word = document.getText(range);
+    const selector =
+      type === StyleType.VARIABLE ? word.replace(/^--/, "") : word;
     const locations: Location[] = [];
 
     for (const entry of styles) {
       if (!this.isRemote.test(entry[0])) {
         entry[1]
-          .filter((style) => style.selector === selector)
+          .filter((style) => style.type === type && style.selector === selector)
           .forEach((style) =>
             locations.push(
               new Location(
                 Uri.parse(entry[0]),
-                new Position(style.line, style.col)
-              )
-            )
+                new Position(style.line, style.col),
+              ),
+            ),
           );
       }
     }
@@ -189,17 +250,82 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
   provideDefinition(
     document: TextDocument,
     position: Position,
-    token: CancellationToken
+    token: CancellationToken,
   ): ProviderResult<Definition | LocationLink[]> {
     const range = new Range(start, position);
-    const text = document.getText(range);
-    const match = this.canComplete.exec(text);
+    const type = this.getType(document.getText(range));
 
     return new Promise((resolve, reject) =>
-      match && !token.isCancellationRequested
-        ? resolve(this.getDefinitions(document, position))
-        : reject()
+      type && !token.isCancellationRequested
+        ? resolve(this.getDefinitions(document, position, type))
+        : reject(),
     );
+  }
+
+  private async getHover(document: TextDocument, range: Range) {
+    const name = document.getText(range).replace(/^--/, "");
+    const styles = await this.getStyles(document);
+    const variables = new Map<string, string>();
+    const declarations = new Set<string>();
+    const sources = new Set<string>();
+
+    for (const [source, values] of styles) {
+      for (const style of values) {
+        if (style.type !== StyleType.VARIABLE) {
+          continue;
+        }
+        // Keep the first definition, as completion does.
+        if (!variables.has(style.selector)) {
+          // The parser always sets a value for custom properties.
+          variables.set(style.selector, style.value!);
+        }
+        if (style.selector === name) {
+          declarations.add(`--${name}: ${style.value};`);
+          sources.add(
+            this.isRemote.test(source)
+              ? source
+              : workspace.asRelativePath(Uri.parse(source)),
+          );
+        }
+      }
+    }
+
+    if (declarations.size === 0) {
+      return undefined;
+    }
+
+    const value = variables.get(name)!;
+    const resolved = resolve(value, variables);
+    const markdown = new MarkdownString();
+
+    markdown.appendCodeblock([...declarations].join("\n"), "css");
+    if (resolved !== value) {
+      // CSS values cannot contain backticks outside of strings, so this
+      // only guards against breaking out of the inline code span.
+      markdown.appendMarkdown(
+        `Resolves to \`${resolved.replace(/`/g, "")}\`\n\n`,
+      );
+    }
+    markdown.appendMarkdown("Defined in ");
+    markdown.appendText([...sources].join(", "));
+
+    return new Hover(markdown, range);
+  }
+
+  provideHover(
+    document: TextDocument,
+    position: Position,
+    token: CancellationToken,
+  ): ProviderResult<Hover> {
+    const range = document.getWordRangeAtPosition(position, this.wordRange);
+    if (!range || token.isCancellationRequested) {
+      return undefined;
+    }
+    const type = this.getType(document.getText(new Range(start, range.end)));
+    return type === StyleType.VARIABLE &&
+      document.getText(range).startsWith("--")
+      ? this.getHover(document, range)
+      : undefined;
   }
 
   async validate(document: TextDocument) {
@@ -227,8 +353,8 @@ export class Provider implements CompletionItemProvider, DefinitionProvider {
             new Diagnostic(
               new Range(start, end),
               `CSS selector '${value[1]}' not found.`,
-              DiagnosticSeverity.Warning
-            )
+              DiagnosticSeverity.Warning,
+            ),
           );
         }
       }
